@@ -1,19 +1,20 @@
 // ===== Interface: telas, personalização, HUD, overlays e controles =====
 const ASSETV='52'; // muda a cada versão: força o navegador a baixar as imagens de novo (evita cópia antiga quebrada no cache)
+try{localStorage.removeItem('67x_acc')}catch(e){} // descarta a sessão antiga; o progresso local continua salvo
 const I=(n,c='')=>`<svg class="i ${c}"><use href="#i-${n}"/></svg>`;
 let myLook=cleanLook(store.get('look',defaultLook(1)));
 const myNick=()=>safe($('nick').value||store.get('nick','')||pick(NICKS));
 let view='home',hudGun=-1;
-const SCREENS=['home','custom','loja','fundo','play','setup','online','lobby','arsenal','bye','result','conta'];
+const SCREENS=['home','custom','loja','fundo','play','setup','online','lobby','arsenal','bye','result'];
 // abas do menu (todas são "dentro" da tela inicial: a capivara desliza para o lado e o painel entra pela direita)
-const NAVV=['home','custom','loja','arsenal','fundo'],MENUV=['home','custom','loja','arsenal','fundo','setup','online','conta'];
+const NAVV=['home','custom','loja','arsenal','fundo'],MENUV=['home','custom','loja','arsenal','fundo','setup','online'];
 function go(v){const prev=view;view=v;if(prev==='loja'&&v!=='loja')clearTry();for(const s of SCREENS)$(s).classList.toggle('hidden',s!==v);
   const inGame=v==='game';$('hud').classList.toggle('hidden',!inGame);$('touch').classList.toggle('hidden',!inGame);document.body.classList.toggle('menu',!inGame);
   const inMenu=MENUV.includes(v);$('mnav').classList.toggle('hidden',!inMenu);$('mtop').classList.toggle('hidden',!inMenu);$('mnav').querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('on',b.dataset.nav===v));
   document.body.classList.toggle('mclear',inMenu);document.body.classList.toggle('mpanel',inMenu&&v!=='home');
   if(!inGame){$('death').classList.add('hidden');$('pause').classList.add('hidden');$('scoreOv').classList.add('hidden');$('perkOv').classList.add('hidden')}
   if(inMenu)renderTop();
-  if(v==='home')renderHome();if(v==='play')drawPlayArt();if(v==='custom')openCustom();if(v==='fundo')renderBgs();if(v==='loja')renderShop();if(v==='lobby'){lobbyKey='';renderLobby();lobbyAnim()}if(v==='setup'){renderSetup($('setupPanel'),true);setupSub()}if(v==='arsenal')renderArsenal();if(v==='conta'&&typeof accRender==='function')accRender();
+  if(v==='home')renderHome();if(v==='play')drawPlayArt();if(v==='custom')openCustom();if(v==='fundo')renderBgs();if(v==='loja')renderShop();if(v==='lobby'){lobbyKey='';renderLobby();lobbyAnim()}if(v==='setup'){renderSetup($('setupPanel'),true);setupSub()}if(v==='arsenal')renderArsenal();
   if(v==='online'){$('nick').value=store.get('nick','');enterOnline();if(OFFLINE)setTimeout(()=>setNet('O online está desligado por enquanto (modo local). Por enquanto, jogue contra os bots!','err'),60)}
   Sound.music(true,inGame?140:100)}
 function goHome(){leaveNet();players={};bullets=[];effects=[];started=false;over=false;paused=false;stopDemo();FX3D.clear();$('result').classList.add('hidden');go('home')}
@@ -40,7 +41,7 @@ let DAY=null,dayDirty=false;
 function daily(){if(!DAY||DAY.d!==dayKey()){DAY=store.get('daily',null);if(!DAY||DAY.d!==dayKey()){DAY={d:dayKey(),claimed:[],bonus:0};dayDirty=true}if(!DAY.claimed)DAY.claimed=[]}return DAY}
 setInterval(flushDay,4000);addEventListener('pagehide',flushDay);
 function flushDay(){if(dayDirty&&DAY){store.set('daily',DAY);dayDirty=false}}
-// soma um contador do dia (e o total da conta para kills/games/wins); "max" guarda o maior valor
+// soma um contador do dia (e o total local para kills/games/wins); "max" guarda o maior valor
 function bump(k,n=1,max){const d=daily();if(max)d[k]=Math.max(d[k]||0,n);else d[k]=(d[k]||0)+n;dayDirty=true;
   if(k==='kills'||k==='games'||k==='wins'){const st=store.get('stats',{kills:0,games:0,wins:0});st[k]=(st[k]||0)+n;store.set('stats',st)}
   checkChal()}
@@ -114,7 +115,7 @@ function rpNext(){const it=rpQ.shift();if(!it){rpOn=false;return}rpOn=true;const
   clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';setTimeout(rpNext,350)},3200)}
 function renderTop(){drawSpheres();const x=xpInfo(),tt=equip().title;
   $('homeNick').textContent=store.get('nick','')||'Capivara';$('avaLv').textContent=x.lv;$('xpFill').style.width=(x.cur/x.need*100)+'%';$('xpTxt').textContent=tt>=0?TITLES[tt]:`${x.cur} / ${x.need} XP`;
-  {const w=wallet(),el=$('totalGems');el.textContent=shortNum(w);el.parentNode.title=w.toLocaleString('pt-BR')+' laranjas'}$('totWins').textContent=trophies();if(typeof accTagUpd==='function')accTagUpd()}
+  {const w=wallet(),el=$('totalGems');el.textContent=shortNum(w);el.parentNode.title=w.toLocaleString('pt-BR')+' laranjas'}$('totWins').textContent=trophies()}
 function renderHome(){const x=xpInfo(),d=daily();
   const sl=Math.floor((x.lv-1)/3);$('seaLv').textContent=x.lv;$('seaName').textContent=SEASON[Math.min(SEASON.length-1,sl)];$('seaFill').style.width=(((x.lv-1)%3)+x.cur/x.need)/3*100+'%';
   const T3=todays();
