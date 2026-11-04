@@ -4,16 +4,16 @@ const I=(n,c='')=>`<svg class="i ${c}"><use href="#i-${n}"/></svg>`;
 let myLook=cleanLook(store.get('look',defaultLook(1)));
 const myNick=()=>safe($('nick').value||store.get('nick','')||pick(NICKS));
 let view='home',hudGun=-1;
-const SCREENS=['home','custom','loja','fundo','play','setup','online','lobby','arsenal','bye','result'];
+const SCREENS=['home','custom','loja','fundo','play','setup','online','lobby','arsenal','bye','result','conta'];
 // abas do menu (todas são "dentro" da tela inicial: a capivara desliza para o lado e o painel entra pela direita)
-const NAVV=['home','custom','loja','arsenal','fundo'],MENUV=['home','custom','loja','arsenal','fundo','setup','online'];
+const NAVV=['home','custom','loja','arsenal','fundo'],MENUV=['home','custom','loja','arsenal','fundo','setup','online','conta'];
 function go(v){const prev=view;view=v;if(prev==='loja'&&v!=='loja')clearTry();for(const s of SCREENS)$(s).classList.toggle('hidden',s!==v);
   const inGame=v==='game';$('hud').classList.toggle('hidden',!inGame);$('touch').classList.toggle('hidden',!inGame);document.body.classList.toggle('menu',!inGame);
   const inMenu=MENUV.includes(v);$('mnav').classList.toggle('hidden',!inMenu);$('mtop').classList.toggle('hidden',!inMenu);$('mnav').querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('on',b.dataset.nav===v));
   document.body.classList.toggle('mclear',inMenu);document.body.classList.toggle('mpanel',inMenu&&v!=='home');
   if(!inGame){$('death').classList.add('hidden');$('pause').classList.add('hidden');$('scoreOv').classList.add('hidden');$('perkOv').classList.add('hidden')}
   if(inMenu)renderTop();
-  if(v==='home')renderHome();if(v==='play')drawPlayArt();if(v==='custom')openCustom();if(v==='fundo')renderBgs();if(v==='loja')renderShop();if(v==='lobby'){lobbyKey='';renderLobby();lobbyAnim()}if(v==='setup'){renderSetup($('setupPanel'),true);setupSub()}if(v==='arsenal')renderArsenal();
+  if(v==='home')renderHome();if(v==='play')drawPlayArt();if(v==='custom')openCustom();if(v==='fundo')renderBgs();if(v==='loja')renderShop();if(v==='lobby'){lobbyKey='';renderLobby();lobbyAnim()}if(v==='setup'){renderSetup($('setupPanel'),true);setupSub()}if(v==='arsenal')renderArsenal();if(v==='conta'&&typeof accRender==='function')accRender();
   if(v==='online'){$('nick').value=store.get('nick','');enterOnline();if(OFFLINE)setTimeout(()=>setNet('O online está desligado por enquanto (modo local). Por enquanto, jogue contra os bots!','err'),60)}
   Sound.music(true,inGame?140:100)}
 function goHome(){leaveNet();players={};bullets=[];effects=[];started=false;over=false;paused=false;stopDemo();FX3D.clear();$('result').classList.add('hidden');go('home')}
@@ -114,7 +114,7 @@ function rpNext(){const it=rpQ.shift();if(!it){rpOn=false;return}rpOn=true;const
   clearTimeout(el._t);el._t=setTimeout(()=>{el.className='';setTimeout(rpNext,350)},3200)}
 function renderTop(){drawSpheres();const x=xpInfo(),tt=equip().title;
   $('homeNick').textContent=store.get('nick','')||'Capivara';$('avaLv').textContent=x.lv;$('xpFill').style.width=(x.cur/x.need*100)+'%';$('xpTxt').textContent=tt>=0?TITLES[tt]:`${x.cur} / ${x.need} XP`;
-  $('totalGems').textContent=wallet();$('totWins').textContent=trophies()}
+  {const w=wallet(),el=$('totalGems');el.textContent=shortNum(w);el.parentNode.title=w.toLocaleString('pt-BR')+' laranjas'}$('totWins').textContent=trophies();if(typeof accTagUpd==='function')accTagUpd()}
 function renderHome(){const x=xpInfo(),d=daily();
   const sl=Math.floor((x.lv-1)/3);$('seaLv').textContent=x.lv;$('seaName').textContent=SEASON[Math.min(SEASON.length-1,sl)];$('seaFill').style.width=(((x.lv-1)%3)+x.cur/x.need)/3*100+'%';
   const T3=todays();
@@ -224,6 +224,7 @@ function setFur(h){draftFur=h;myLook=cleanLook(Object.assign({},myLook,{body:h})
   $('furGrid').querySelectorAll('[data-fur]').forEach(b=>b.classList.toggle('on',b.dataset.fur===h));const fn=$('furName');if(fn)fn.textContent=furName(h)}
 
 // ---------- LOJA: compra com laranjas; o item vai para o Visual / Fundo e pode ser equipado na hora ----------
+const shortNum=n=>n>=1e6?(Math.floor(n/1e5)/10).toLocaleString('pt-BR')+' mi':n>=1e4?(Math.floor(n/100)/10).toLocaleString('pt-BR')+' mil':String(n); // 99.999.999 -> "99,9 mi" (cabe no topo)
 const wallet=()=>Math.max(0,store.get('totalGems',0)-store.get('spent',0)+store.get('bonusOr',0));
 const RAR={comum:['Comum','#9AA3B3'],raro:['Raro','#45D4FF'],epico:['Épico','#B777FF'],lend:['Lendário','#FFC531']};
 const SHOP=[['roupas','shirt','Roupas',[['Camiseta Listrada','#FF4F9A','comum',60],['Moletom de Capuz','#45D4FF','raro',150],['Jaqueta de Couro','#3A3048','epico',320],['Regata de Praia','#FFC531','comum',50],['Terno Chique','#2A2440','lend',600],['Macacão de Mecânico','#3D6BFF','raro',180]]],
@@ -517,7 +518,7 @@ $('statKills').onclick=$('statGems').onclick=()=>toggleScore(true);$('btnCloseSc
 // ---------- Resultado + votação ----------
 let myVote=null;
 function onMatchEnd(){$('death').classList.add('hidden');$('pause').classList.add('hidden');$('scoreOv').classList.add('hidden');for(const k of KEYLIST)keys[k]=false;pushInputs(true);myVote=null;
-  const list=rank(),me=players[self],place=list.findIndex(p=>p.id===self)+1;$('totalGems').textContent=wallet();
+  const list=rank(),me=players[self],place=list.findIndex(p=>p.id===self)+1;$('totalGems').textContent=shortNum(wallet());
   const tw=teamWinner();$('teamWin').classList.toggle('hidden',tw===-1);
   if(tw>=0){$('teamWin').innerHTML=`<b style="--c:${TEAM[tw].c}">TIME ${TEAM[tw].n.toUpperCase()} VENCEU!</b><span>${ms.teamScore[0]} × ${ms.teamScore[1]}</span>`}else if(tw===-2){$('teamWin').innerHTML=`<b style="--c:#FFC531">EMPATE!</b><span>${ms.teamScore[0]} × ${ms.teamScore[1]}</span>`}
   const won=tw>=0?(me&&me.team===tw):place===1;const trG=metaMatchEnd(me,place,won)||0;setTimeout(()=>{if(trG)toast(`+${trG} troféus`,'good')},900);$('resTitle').textContent=won?'VITÓRIA CAPIVARA!':'FIM DE PARTIDA';
@@ -599,7 +600,7 @@ let applyJoy=()=>{};
 document.addEventListener('pointerenter',e=>{if(e.target.classList&&e.target.classList.contains('btn')&&!isTouch)Sound.play('hover')},true);
 
 // ---------- Início ----------
-$('totalGems').textContent=wallet();$('nick').value=store.get('nick','');
+$('totalGems').textContent=shortNum(wallet());$('nick').value=store.get('nick','');
 applyJoy();drawSpheres();go('home');requestAnimationFrame(frame);
 document.fonts&&document.fonts.ready.then(()=>{drawSpheres();if(view==='play')drawPlayArt()});
 if(location.hash==='#debug')window.__67={get players(){return players},get self(){return self},get ms(){return ms},endMatch,cfg,MODES,

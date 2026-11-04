@@ -22,7 +22,8 @@ src/
     04_net.js          rede: servidor online (WebSocket) e modo direto P2P de reserva
     05_render.js       câmera, efeitos, partículas, previsão local e laço principal
     06_ui.js           menus, salas online, HUD, Arsenal, votação e controles
-    07_social.js       CapyAmigos: amigos por código, online/visto por último, mensagens
+    07_social.js       CapyAmigos: amigos por código, online/visto por último, mensagens (desligado: precisa do Cloudflare)
+    08_conta.js        contas (Supabase): cadastro, entrar e progresso salvo na nuvem
 server/
   worker.js            Worker: serve o jogo e a API /api/*
   room.js              Durable Object "Room": uma sala = uma partida rodando na nuvem
@@ -34,20 +35,36 @@ scripts/build.mjs      junta src/ em public/index.html e gera server/sim.gen.js
 versoes-antigas/       versões anteriores, só para consulta
 ```
 
-## Modo local (agora)
+## Online direto (P2P) — jogar com os amigos sem servidor
 
-- O jogo está DESCONECTADO da rede: `OFFLINE=true` em `src/js/04_net.js`. Nada de Cloudflare, salas online, P2P (PeerJS)
-  nem CapyAmigos; os botões de online mostram um aviso. A pasta `server/` e o `wrangler.jsonc` ficaram guardados para depois.
-- Three.js e as fontes vêm de `public/vendor/` (nada é baixado da internet).
-- Para jogar: `npm run dev` (gera o jogo e abre em http://localhost:8080) ou o Live Server em `public/index.html`.
-- Publicar no Cloudflare de novo no futuro: `npm run deploy:cloudflare` (depois de religar o OFFLINE e o PeerJS).
+- Quem toca em **JOGAR! → CRIAR SALA** vira o anfitrião: a partida roda no PC (ou celular) dele e os amigos se
+  conectam direto nele (WebRTC). Ele recebe um código de 6 letras; os amigos usam **ENTRAR COM CÓDIGO**.
+- Não depende do nosso servidor: o PeerJS (`public/vendor/peerjs.min.js`) usa o "apresentador" público gratuito
+  (0.peerjs.com) só para os aparelhos se acharem; depois a conversa é direta entre eles.
+- Funciona com o jogo aberto pelo Live Server, pelo `npm run dev` ou pelo site publicado (precisa de internet).
+- Se quiser um apresentador próprio (ex.: só na rede de casa): `npx peerjs --port 9000` e abra o jogo com
+  `?peerhost=IP-DO-PC:9000` em todos os aparelhos.
+- O servidor do Cloudflare (salas na nuvem, lista de salas e CapyAmigos) fica desligado: `CLOUD=false` em `src/js/04_net.js`.
+
+## Contas (Supabase)
+
+- Tela **MINHA CONTA** (toque no selo embaixo do seu nome, ou no botão de pessoas no celular em pé): criar conta
+  (email, nome de usuário, senha) ou entrar.
+- Projeto Supabase `cswuqdlxlguivvhzugyq`. Tabela `public.profiles`: `username`, `oranges` (laranjas) e `data`
+  (itens comprados, visual, olhos, fundo, troféus, estatísticas e desafios). Cada conta só lê e salva o próprio perfil (RLS).
+- É preciso criar uma conta ou entrar para jogar. Ao criar a conta, o progresso já salvo neste navegador vai junto.
+  Com conta, cada mudança é salva na nuvem ~4 s depois; em outro aparelho, é só entrar com o mesmo email.
+- `public.account_grants`: laranjas de presente e nome reservado por email (aplicado quando a conta é criada).
+  Só dá para mexer pelo painel do Supabase. Estrutura completa em `supabase/migrations/`.
+- Dar laranjas para alguém depois: no SQL Editor do Supabase,
+  `update profiles set oranges = 5000 where username = 'nome';` (o jogo pega o valor novo ao abrir).
 
 ## Comandos
 
 ```
 npm run build     gera public/index.html e server/sim.gen.js a partir de src/
-npm run dev       build + servidor local do Cloudflare (wrangler dev) com salas online
-npm run deploy    build + publica jogo e servidor no Cloudflare
+npm run dev                build + servidor local em http://localhost:8080
+npm run deploy:cloudflare  build + publica jogo e Worker no Cloudflare
 ```
 
 Edite sempre os arquivos em `src/` (e `server/`) e rode `npm run build`. Não edite `public/index.html` nem `server/sim.gen.js` direto: eles são sobrescritos a cada build.
@@ -59,7 +76,7 @@ Edite sempre os arquivos em `src/` (e `server/`) e rode `npm run build`. Não ed
 - Salas: públicas (aparecem na lista) ou privadas (só com o código), com ou sem senha. O dono configura modo,
   mapa e bots; se ele sair, outro jogador vira dono. Dá para entrar no meio da partida.
 - Se a conexão cair, o jogo tenta voltar sozinho por ~20 s sem perder a vaga.
-- No site publicado o jogo sempre usa o servidor. O modo direto P2P antigo só aparece quando o jogo é aberto como arquivo local.
+- Nesta versão, as partidas online usam P2P também no site publicado. As salas na nuvem e o CapyAmigos estão desligados.
 - Cota grátis do Cloudflare: 100 mil requisições e 13 mil GB-s de Durable Objects por dia. Uma sala usa ~1 req/s
   por jogador e fica "acordada" só enquanto tem gente — sobra bastante para jogar com os amigos.
 

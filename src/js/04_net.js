@@ -4,16 +4,16 @@ function send(c,d){try{if(c&&c.open)c.send(d)}catch(e){}}
 function sync(force){if(!host||solo)return;const t=time();if(!force&&t-netAt<66)return;netAt=t;const s=snapshot();for(const c of Object.values(clients))send(c,s)}
 function setNet(msg,kind=''){const el=$('netStatus');el.className='statusline '+kind;el.querySelector('.txt').textContent=msg}
 function hostRoom(){if(OFFLINE||typeof Peer==='undefined'){setNet('Não deu para carregar o módulo online. Verifique a internet.','err');return}
-  stopDemo();leaveNet();host=true;solo=false;room=roomId();setNet('Criando sala no servidor do caos…','busy');
-  peer=new Peer(PEER_PREFIX+room);
+  stopDemo();leaveNet();host=true;solo=false;room=roomId();setNet('Criando a sala no seu aparelho…','busy');
+  peer=new Peer(PEER_PREFIX+room,peerOpts());
   peer.on('open',()=>{self=peer.id;players={};players[self]=newPlayer(self,myNick(),myLook);started=false;over=false;setNet('Sala criada!','ok');go('lobby');renderLobby()});
   peer.on('connection',c=>{c.on('data',d=>hostMessage(c,d));c.on('close',()=>{delete clients[c.peer];delete votes[c.peer];if(players[c.peer]){toast(players[c.peer].name+' saiu da sala');dropFlag(players[c.peer],time());delete players[c.peer]}sync(true);renderLobby()});c.on('error',()=>{})});
   peer.on('error',e=>{setNet('Erro: '+(e.type||'desconhecido')+'. Tente de novo.','err');if(view==='lobby')toast('Conexão perdida','bad')})}
 function joinRoom(code){if(OFFLINE||typeof Peer==='undefined'){setNet('Não deu para carregar o módulo online. Verifique a internet.','err');return}
   code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length!==6){setNet('O código tem 6 letras ou números.','err');return}
   stopDemo();leaveNet();host=false;solo=false;room=code;setNet('Procurando a sala '+code+'…','busy');
-  peer=new Peer();
-  peer.on('open',pid=>{self=pid;conn=peer.connect(PEER_PREFIX+code,{reliable:true});const to=setTimeout(()=>{if(!conn||!conn.open){setNet('Sala não encontrada. Será que ela foi pegar um lanche?','err');leaveNet(true)}},9000);
+  peer=new Peer(peerOpts());
+  peer.on('open',pid=>{self=pid;conn=peer.connect(PEER_PREFIX+code,{reliable:true});const to=setTimeout(()=>{if(!conn||!conn.open){setNet('Sala não encontrada. Será que ela foi pegar um lanche?','err');leaveNet(true)}},16000);
     conn.on('open',()=>{clearTimeout(to);send(conn,{type:'join',name:myNick(),look:myLook})});
     conn.on('data',clientMessage);
     conn.on('close',()=>{if(conn){toast('O anfitrião fechou a sala','bad');leaveNet();goHome()}});conn.on('error',()=>setNet('A conexão falhou.','err'))});
@@ -51,10 +51,16 @@ function leaveNet(keepStatus){srvSession++;stopPing();srvOwner=null;srvInfo=null
 // só que a partida roda numa sala na nuvem. O P2P continua aqui como reserva.
 let netMode='p2p',srvOwner=null,srvInfo=null,wsTok='',rtt=0,pingTimer=null,srvUp=null,reconnectTry=0,srvSession=0;
 let srvCache={st:{},G:[],MD:[],CR:[],E:[]};
-// MODO LOCAL: o jogo está desconectado da rede (nada de Cloudflare, salas online, P2P nem CapyAmigos).
-// Para religar no futuro: OFFLINE=false e volte o script do PeerJS em scripts/build.mjs.
-const OFFLINE=true;
-const API_BASE=!OFFLINE&&/^https?:$/.test(location.protocol)?location.origin:'';
+// ONLINE DIRETO (P2P): quem cria a sala vira o anfitrião — a partida roda no PC/celular dele e os amigos se conectam
+// direto nele (WebRTC). Não depende do nosso servidor: o PeerJS só ajuda os dois aparelhos a se acharem no começo.
+// CLOUD=true religa o servidor do Cloudflare (salas na nuvem, lista de salas, CapyAmigos) quando ele voltar a ser publicado.
+const OFFLINE=false,CLOUD=false;
+const API_BASE=CLOUD&&/^https?:$/.test(location.protocol)?location.origin:'';
+// servidor de "apresentação" do PeerJS: o público (0.peerjs.com) ou um próprio (?peerhost=meu-ip:9000 — ver README)
+function peerOpts(){const q=new URLSearchParams(location.search).get('peerhost');const o={debug:0,config:{iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},
+  {urls:['turn:eu-0.turn.peerjs.com:3478','turn:us-0.turn.peerjs.com:3478'],username:'peerjs',credential:'peerjsp'}]}};
+  if(/[?&]ice=0/.test(location.search))o.config={iceServers:[]}; // só para testes na mesma máquina
+  if(q){const [h,p]=q.split(':');Object.assign(o,{host:h,port:+(p||9000),path:'/',secure:location.protocol==='https:'&&!/^(localhost|127\.|192\.168\.|10\.)/.test(h)})}return o}
 const SRV_STATIC=['name','look','bot','mods','perks','maxHp','offer','killer'];
 const srvMode=()=>netMode==='srv';
 const isOwner=()=>host||(srvMode()&&!!self&&srvOwner===self);
@@ -62,7 +68,7 @@ function ownerSend(d){if(srvMode()&&conn)send(conn,d)}
 async function api(path,opt){const r=await fetch(API_BASE+path,Object.assign({cache:'no-store'},opt||{}));if(!r.ok)throw new Error('http '+r.status);return r.json()}
 let srvCheckP=null;
 // No site publicado o jogo sempre usa o servidor; o P2P só existe quando o jogo é aberto como arquivo.
-const HOSTED=!OFFLINE&&!!API_BASE&&!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)||/[?&]srv=1/.test(location.search);
+const HOSTED=CLOUD&&!!API_BASE&&!/^(localhost|127\.|0\.0\.0\.0)/.test(location.hostname)||/[?&]srv=1/.test(location.search);
 function checkServer(){if(!API_BASE)return Promise.resolve(srvUp=false);if(srvCheckP)return srvCheckP;return srvCheckP=(async()=>{
   for(let i=0;i<3;i++){try{const d=await Promise.race([api('/api/health'),new Promise((_,j)=>setTimeout(()=>j(new Error('tempo')),6000))]);if(d&&d.ok){srvUp=true;break}}catch(e){}srvUp=false;if(i<2)await new Promise(r=>setTimeout(r,700))}
   srvCheckP=null;return srvUp})()}
