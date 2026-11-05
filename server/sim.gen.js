@@ -304,7 +304,7 @@ function fire(p,t){if(!p.alive||p.picking||t<p.stunUntil||t<p.frozenUntil)return
   if(g.mine){const mine=bullets.filter(b=>b.o===p.id&&GUNS[b.g].mine);if(mine.length>=3)bullets.splice(bullets.indexOf(mine[0]),1)}
   const n=g.n2+(g.mine||g.box||g.sticky||g.timestop||g.hole||g.tele?0:md.extra),spr=g.spr||(n>1?.18:0);
   for(let i=0;i<n;i++){const a=p.aim+(n>1&&!g.spr?(i-(n-1)/2)*.12:(Math.random()-.5)*spr),sp=g.sp*md.bspd*(g.fuse?rand(.9,1.05):1);
-    const b={id:gid++,o:p.id,g:g.id,x:p.x+Math.cos(a)*12,y:p.y+Math.sin(a)*12+2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:g.r,life:g.life*md.range/md.bspd,bn:(g.bounce||0)+md.bounce,age:0};if(md.aim&&!g.homing)b.hm=1.6;
+    const b={id:gid++,o:p.id,g:g.id,x:p.x+Math.cos(a)*12,y:p.y+Math.sin(a)*12+2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:g.r,life:g.life*md.range/md.bspd,bn:(g.bounce||0)+md.bounce,age:0};if(md.aim&&!g.homing)b.hm=1.6;if(md.aim)b.am=1;
     if(g.calc){b.six=p.calcFlip;p.calcFlip=!p.calcFlip}bullets.push(b)}
   if(g.recoil)push(p,p.aim+Math.PI,g.recoil)}
 
@@ -389,7 +389,12 @@ function hitPlayer(b,g,p,t){const a=Math.atan2(b.vy,b.vx),o=players[b.o];
   if(!b.tur)fx('hit',{x:b.x,y:b.y,w,c:g.col,s:dmg>=30?1:0},420);return true}
 function stepBullets(dt,t){const rects=blockRects();for(let i=bullets.length-1;i>=0;i--){const b=bullets[i],g=GUNS[b.g]||GUNS[0];if(b.frozen){b.frozen=0;continue}b.age+=dt;b.life-=dt;let dead=false;
   if(b.stick){const sp=players[b.stick];if(sp&&sp.alive){b.x=sp.x;b.y=sp.y-4}else b.stick=null}
-  const hm=g.homing||b.hm;if(hm&&b.age>.12&&!b.stick){const q=nearestEnemy(players[b.o]||{id:b.o,team:-1},b.x,b.y,560);if(q){const cur=Math.atan2(b.vy,b.vx),want=Math.atan2(q.y-b.y,q.x-b.x);let d=Math.atan2(Math.sin(want-cur),Math.cos(want-cur));const na=cur+clamp(d,-hm*dt,hm*dt),sp=Math.hypot(b.vx,b.vy);b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp}}
+  // teleguiados: sem Mira Assistida a curva é fraca e de perto, e o projétil explode logo se não achar ninguém;
+  // com Mira Assistida persegue de verdade, mas só por um tempo (e ainda explode ao bater em parede)
+  const hm0=g.homing||b.hm;if(hm0&&b.age>.12&&!b.stick){const full=!g.homing||b.am,hm=g.homing?(full?g.homing*1.15:g.homing*.38):hm0;
+    const q=nearestEnemy(players[b.o]||{id:b.o,team:-1},b.x,b.y,full?560:300);
+    if(q){b.lk=(b.lk||0)+dt;const cur=Math.atan2(b.vy,b.vx),want=Math.atan2(q.y-b.y,q.x-b.x);let d=Math.atan2(Math.sin(want-cur),Math.cos(want-cur));const na=cur+clamp(d,-hm*dt,hm*dt),sp=Math.hypot(b.vx,b.vy);b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp}else b.nl=(b.nl||0)+dt;
+    if(g.homing){if(full?(b.lk>2.2||b.age>3):(b.nl>.9||b.lk>1.2||b.age>1.6))b.life=Math.min(b.life,0)}}
   if(g.boomer&&b.age>g.life*.45){const o=players[b.o];if(o){const a=Math.atan2(o.y-b.y,o.x-b.x),sp=Math.hypot(b.vx,b.vy);b.vx=lerp(b.vx,Math.cos(a)*sp,.12);b.vy=lerp(b.vy,Math.sin(a)*sp,.12);if(dist(o.x,o.y,b.x,b.y)<22&&b.age>g.life*.55)dead=true}}
   if(g.portal&&!b.warped&&b.age>.16){const o=players[b.o],q=o&&nearestEnemy(o,b.x,b.y,900);if(q){const a=Math.atan2(q.y-o.y,q.x-o.x);fx('warp',{x:b.x,y:b.y},500);const [nx,ny]=nudgeFree(q.x+Math.cos(a)*85,q.y+Math.sin(a)*85);b.x=nx;b.y=ny;const sp=Math.hypot(b.vx,b.vy),a2=Math.atan2(q.y-ny,q.x-nx);b.vx=Math.cos(a2)*sp;b.vy=Math.sin(a2)*sp;b.warped=1;fx('warp',{x:b.x,y:b.y},500)}}
   if(g.fric&&!b.stick){const d=Math.exp(-g.fric*1.6*dt);b.vx*=d;b.vy*=d}

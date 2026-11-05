@@ -70,7 +70,7 @@ function seaRender(){const s=seaState(),f=seaInfo(s.xp);
   $('tsTop').innerHTML=`<div class="ts-hex"><small>NÍVEL</small><b>${f.lv}</b></div><div class="ts-info"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small>
       <div class="m-bar ts-bar"><i style="width:${f.max?100:f.cur/f.need*100}%"></i><span>${f.max?'Completa!':`${f.cur} / ${f.need} XP`}</span></div>
       <p>Termina em <b>${seaLeft()}</b> • ${f.lv}/30 prêmios desbloqueados</p></div>`;
-  $('tsHow').innerHTML=[['flag','Terminar partida','+40'],['crown','Vitória','+60'],['skull','Cada eliminação','+12'],['bolt','Double / Triple kill','+15 / +30'],['heart','Morrer pouco','até +40']].map(([ic,t,v])=>`<span>${I(ic)}${t}<b>${v}</b></span>`).join('');
+  $('tsHow').innerHTML=[['flag','Terminar partida','+25'],['crown','Vitória','+35'],['skull','Cada eliminação','+5 (até 15)'],['bolt','Double / Triple kill','+6 / +12'],['heart','Morrer pouco','até +20']].map(([ic,t,v])=>`<span>${I(ic)}${t}<b>${v}</b></span>`).join('');
   $('tsGrid').innerHTML=SEA_REW.map((rw,i)=>{const l=i+1,st=f.lv>=l?'got':l===f.lv+1?'next':'lock';
     return`<div class="ts-rw ${st}${SEA_BIG.includes(l)?' big':''}"><em>${l}</em><div class="ts-th">${rwThumb(rw)}</div><b>${escapeHtml(rwTitle(rw))}</b><span>${st==='got'?I('check')+'Desbloqueado':st==='next'?`Faltam ${f.need-f.cur} XP`:I('lock')+'Nível '+l}</span></div>`}).join('');
   const nx=$('tsGrid').querySelector('.next');if(nx)nx.scrollIntoView({block:'nearest'})}
@@ -79,12 +79,17 @@ function seaRender(){const s=seaState(),f=seaInfo(s.xp);
 const SM={d:0,t:0,m:0};function seaReset(){SM.d=SM.t=SM.m=0}
 function seaMulti(n){if(n===2)SM.d++;else if(n===3)SM.t++;else if(n>=4)SM.m++}
 function matchXP(me,place,won,n){const L=[],add=(t,v)=>{if(v>0)L.push([t,v])};if(!me)return L;
-  add('Partida finalizada',40);
-  if(won)add('Vitória!',60);else if(place===2)add('2º lugar',40);else if(place===3)add('3º lugar',30);else if(place<=Math.ceil(n/2))add('Metade de cima',15);
-  const k=me.kills||0,d=me.deaths||0;add(k+(k===1?' eliminação':' eliminações'),k*12);
-  if(d===0)add('Sem morrer nenhuma vez!',40);else if(d<=2)add('Morreu pouco',20);else if(d<=4)add('Sobreviveu bem',8);
-  add('Double kill'+(SM.d>1?' ×'+SM.d:''),SM.d*15);add('Triple kill'+(SM.t>1?' ×'+SM.t:''),SM.t*30);add('Multi kill'+(SM.m>1?' ×'+SM.m:''),SM.m*45);
-  if((me.best||0)>=3)add('Sequência de '+me.best,me.best*5);return L}
+  add('Partida finalizada',25);
+  if(won)add('Vitória!',35);else if(place===2)add('2º lugar',24);else if(place===3)add('3º lugar',16);else if(place<=Math.ceil(n/2))add('Metade de cima',8);
+  const k=me.kills||0,d=me.deaths||0;add(k+(k===1?' eliminação':' eliminações'),Math.min(k,15)*5);
+  if(d===0)add('Sem morrer nenhuma vez!',20);else if(d<=2)add('Morreu pouco',10);else if(d<=4)add('Sobreviveu bem',4);
+  add('Double kill'+(SM.d>1?' ×'+SM.d:''),Math.min(SM.d,4)*6);add('Triple kill'+(SM.t>1?' ×'+SM.t:''),Math.min(SM.t,3)*12);add('Multi kill'+(SM.m>1?' ×'+SM.m:''),Math.min(SM.m,2)*20);
+  if((me.best||0)>=3)add('Sequência de '+me.best,Math.min(me.best,10)*2);
+  // teto: uma partida rende no máximo 2 níveis da temporada (se passar, todas as linhas encolhem na mesma proporção)
+  const cap=seaCap(),tot=L.reduce((a,l)=>a+l[1],0);if(tot>cap){const vals=L.map(l=>Math.floor(l[1]*cap/tot));let left=cap-vals.reduce((a,v)=>a+v,0);for(let i=0;left>0;i=(i+1)%vals.length){vals[i]++;left--}L.forEach((l,i)=>l[1]=vals[i])}
+  return L.filter(l=>l[1]>0)}
+// XP que falta para subir exatamente 2 níveis a partir de agora (ou até o fim da temporada)
+function seaCap(){const x=seaState().xp,a=seaInfo(x);let need=a.need-a.cur;if(a.lv+1<30)need+=seaNeed(a.lv+2);return a.max?0:need}
 
 // ---------- fim de partida: suspense → pódio (top 3) → barra da temporada ----------
 let ES=null;
@@ -95,8 +100,8 @@ function endSeq(o){const el=$('endSeq');if(!el)return;ES=Object.assign({phase:0,
 function esSuspense(){const o=ES,st=$('esStage');const tw=o.tw;const win=tw>=0?'TIME '+TEAM[tw].n.toUpperCase():tw===-2?'EMPATE!':(o.list[0]?o.list[0].name:'???');
   st.innerHTML=`<div class="es-sus"><div class="es-spot"></div><div class="es-title">FIM DE PARTIDA!</div><div class="es-q">E o grande vencedor é…</div>
     <div class="es-roll"><b id="esRoll">???</b></div><div class="es-drum"><i></i><i></i><i></i></div><button class="es-tap" id="esTap">TOQUE PARA REVELAR</button></div>`;
-  const names=o.list.map(p=>p.name);let i=0,delay=60,done=false;const roll=()=>{if(done)return;$('esRoll').textContent=names[i++%names.length]||'???';Sound.play('tick');delay*=1.09;if(delay<380)ES.rt=setTimeout(roll,delay);else reveal()};
-  const reveal=()=>{if(done)return;done=true;clearTimeout(ES.rt);const r=$('esRoll');r.textContent=win;r.parentNode.classList.add('win');$('esTap').classList.add('gone');
+  const names=o.list.map(p=>p.name);let i=0,delay=60,done=false;const roll=()=>{if(done||!$('esRoll'))return;$('esRoll').textContent=names[i++%names.length]||'???';Sound.play('tick');delay*=1.09;if(delay<380)ES.rt=setTimeout(roll,delay);else reveal()};
+  const reveal=()=>{if(done||!$('esRoll'))return;done=true;clearTimeout(ES.rt);const r=$('esRoll');r.textContent=win;r.parentNode.classList.add('win');$('esTap').classList.add('gone');
     st.querySelector('.es-sus').classList.add('revealed');Sound.play('win');celebrate(o.won?180:90);ES.tm=setTimeout(esPodium,1700)};
   roll();$('esTap').onclick=reveal;st.querySelector('.es-sus').onclick=e=>{if(e.target.id!=='esTap')reveal()}}
 function esPodium(){const o=ES,st=$('esStage'),top=o.list.slice(0,3),me=o.me;
@@ -109,18 +114,18 @@ function esPodium(){const o=ES,st=$('esStage'),top=o.list.slice(0,3),me=o.me;
 function esSeason(){const o=ES,st=$('esStage'),r=o.res,s=seaState();
   st.innerHTML=`<div class="es-sea"><div class="es-seahead"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small><div class="es-lvrow"><div class="ts-hex"><small>NÍVEL</small><b id="esLv">${r.from.lv}</b></div>
       <div class="es-barw"><div class="m-bar es-bar"><i id="esFill"></i><span id="esXp"></span></div><div class="es-gain">+<b id="esGain">0</b> XP</div></div></div></div>
-    <ul class="es-lines" id="esLines"></ul><div class="es-unlock hidden" id="esUnlock"></div>
+    <div class="es-mid" id="esMid"><ul class="es-lines" id="esLines"></ul><div class="es-unlock hidden" id="esUnlock"></div></div>
     <div class="es-btns">${solo?`<button class="m-btn2" id="esMenu">${I('home')}MENU</button><button class="m-play sm" id="esAgain"><b>JOGAR DE NOVO</b></button>`:`<button class="m-play sm" id="esCont"><b>CONTINUAR</b></button>`}</div></div>`;
   const fill=$('esFill'),xpT=$('esXp'),lvT=$('esLv');let shown=r.xp0,lv=r.from.lv;const draw=()=>{const f=seaInfo(shown);fill.style.width=(f.max?100:f.cur/f.need*100)+'%';xpT.textContent=f.max?'Temporada completa!':`${f.cur} / ${f.need} XP`;
     if(f.lv!==lv){lv=f.lv;lvT.textContent=lv;lvT.parentNode.classList.remove('pop');void lvT.offsetWidth;lvT.parentNode.classList.add('pop');const up=r.ups.find(u=>u.lv===lv);if(up)esUnlock(up)}};draw();
   // cada motivo aparece em sequência e a barra corre junto
-  let li=0,gain=0;const next=()=>{if(ES!==o||li>=o.lines.length)return;const [t,v]=o.lines[li++],ul=$('esLines');if(!ul)return;ul.insertAdjacentHTML('beforeend',`<li><span>${escapeHtml(t)}</span><b>+${v}</b></li>`);Sound.play('gem',li);
-    const from=shown,to=shown+v,t0=performance.now();const run=()=>{if(ES!==o||!$('esFill'))return;const k=Math.min(1,(performance.now()-t0)/520);shown=Math.round(from+(to-from)*k);$('esGain').textContent=gain+Math.round(v*k);draw();if(k<1)requestAnimationFrame(run);else{gain+=v;ES.tm=setTimeout(next,260)}};run()};
+  let li=0,gain=0;const next=()=>{if(ES!==o||li>=o.lines.length)return;const [t,v]=o.lines[li++],ul=$('esLines');if(!ul)return;ul.insertAdjacentHTML('beforeend',`<li><span>${escapeHtml(t)}</span><b>+${v}</b></li>`);const mid=$('esMid');if(mid)mid.scrollTop=mid.scrollHeight;Sound.play('gem',li);
+    const from=shown,to=shown+v,t0=performance.now();const run=()=>{if(ES!==o||!$('esFill'))return;const k=Math.min(1,(performance.now()-t0)/520);shown=Math.round(from+(to-from)*k);const eg=$('esGain');if(eg)eg.textContent=gain+Math.round(v*k);draw();if(k<1)requestAnimationFrame(run);else{gain+=v;ES.tm=setTimeout(next,260)}};run()};
   ES.tm=setTimeout(next,500);
   if(solo){$('esMenu').onclick=()=>{esClose();Sound.play('click');goHome()};$('esAgain').onclick=()=>{esClose();if(QUICK){goHome();setTimeout(quickPlay,60)}else{goHome();setTimeout(playNow,60)}}}
   else $('esCont').onclick=()=>{Sound.play('click');esClose()}}
 function esUnlock(up){const el=$('esUnlock');if(!el)return;el.classList.remove('hidden');Sound.play('level');celebrate(60);
-  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`)}
+  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`);const mid=$('esMid');if(mid)setTimeout(()=>{mid.scrollTop=mid.scrollHeight},30)}
 function esClose(){clearTimeout(ES&&ES.tm);clearTimeout(ES&&ES.rt);$('endSeq').classList.add('hidden');document.body.classList.remove('endseq');ES=null}
 
 $('seaCard').onclick=()=>{Sound.play('click');go('temporada')};

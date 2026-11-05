@@ -1313,7 +1313,13 @@ body.g3menu.menu #game{visibility:hidden}
 .m-accmsg{font:700 13px var(--font-ui);padding:9px 12px;border-radius:10px;background:#170A38b0;border:1.5px solid #ffffff1c}
 .m-accmsg.bad{border-color:#FF5F6F;color:#FFD0D5}.m-accmsg.ok{border-color:#6CF06A;color:#D8FFD4}
 .m-accmain{width:100%;height:56px}
-.m-acclink{background:none;border:0;color:#FFC531;font:800 13px var(--font-ui);text-decoration:underline;cursor:pointer;align-self:flex-start;padding:2px}
+.m-acclink{background:none;border:0;color:#FFC531;font:800 13px var(--font-ui);text-decoration:underline;cursor:pointer;padding:2px;display:inline-flex;align-items:center;gap:4px}.m-acclink .i{width:14px;height:14px}
+.m-keeprow .m-acclink{margin-left:auto}.m-keeprow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:-2px 0 2px}
+.m-keep{display:inline-flex!important;flex-direction:row!important;align-items:center;gap:8px;font:800 13px var(--font-ui)!important;letter-spacing:0!important;color:#fff;cursor:pointer;user-select:none}
+.m-keep input{position:absolute;opacity:0;width:0;height:0}.m-keep i{width:22px;height:22px;border-radius:7px;border:2.5px solid #ffffff66;background:#170A38;display:grid;place-items:center;transition:.15s}
+.m-keep input:checked+i{background:#6CF06A;border-color:#1F6B2A}.m-keep input:checked+i::after{content:'';width:6px;height:11px;border:solid #12401A;border-width:0 3px 3px 0;transform:translateY(-1px) rotate(45deg)}
+.m-keep input:focus-visible+i{outline:2px solid #FFC531;outline-offset:2px}
+.m-accrec h4{display:flex;align-items:center;gap:8px;margin:0 0 4px;font:400 22px var(--font-display);color:#fff}.m-accrec h4 .i{width:20px;height:20px;color:#FFC531}
 .m-accnote{font:700 12px var(--font-ui);opacity:.75;line-height:1.35}
 .m-accprof{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:#170A38b0;border:2px solid #ffffff1c}
 .m-accprof canvas{width:70px;height:70px;border-radius:12px;background:radial-gradient(circle at 50% 40%,#7A4CD0,#3A1C80);flex:none}
@@ -1437,21 +1443,21 @@ body.mport .ts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .es-you span{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;background:#170A38d0;border:2px solid #ffffff22;font:700 13px var(--font-ui)}
 .es-you b{font:400 18px var(--font-display);color:#FFC531}.es-you .i{width:16px;height:16px;color:#FF8FC8}
 .es-btn{min-width:220px}
-.es-sea{max-width:560px;padding:18px;border-radius:22px;background:linear-gradient(#3A1C80f2,#24104Ff2);border:3px solid #ffffff2a;box-shadow:0 10px 0 #0C0522}
+.es-sea{max-width:560px;height:min(560px,calc(100dvh - 32px - var(--sat) - var(--sab)));justify-content:flex-start;padding:18px;border-radius:22px;background:linear-gradient(#3A1C80f2,#24104Ff2);border:3px solid #ffffff2a;box-shadow:0 10px 0 #0C0522}
 .es-seahead{width:100%}.es-seahead>small{display:block;text-align:center;font:800 12px var(--font-ui);letter-spacing:1.5px;color:#FFD0EC;margin-bottom:10px}
 .es-lvrow{display:flex;align-items:center;gap:14px}.es-barw{flex:1;min-width:0}
 .es-bar{height:30px}.es-bar i{transition:none}.es-bar span{position:relative;z-index:1;display:block;text-align:center;font:400 15px/26px var(--font-display);-webkit-text-stroke:3px var(--mdark);paint-order:stroke fill}
 .es-gain{margin-top:6px;text-align:right;font:400 18px var(--font-display);color:#6CF06A}
-.es-lines{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow:auto}
+.es-mid{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:12px;padding-right:2px}.es-lines{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:6px}.es-seahead,.es-unlock,.es-btns{flex-shrink:0}.es-sea{overflow:hidden}
 .es-lines li{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:10px;background:#170A38b0;border:1.5px solid #ffffff18;font:700 14px var(--font-ui);animation:esLine .35s cubic-bezier(.3,1.5,.5,1) both}
 .es-lines li b{font:400 18px var(--font-display);color:#FFC531}@keyframes esLine{from{transform:translateX(-30px);opacity:0}}
-.es-unlock{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;width:100%}
+.es-unlock{display:flex;flex-wrap:nowrap;justify-content:center;gap:10px;width:100%;overflow-x:auto}.es-unlock .es-uc{flex:0 0 auto;padding:8px 12px;gap:4px}.es-unlock .ts-th{width:52px;height:52px}
 .es-uc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 16px;border-radius:16px;background:linear-gradient(#FFE15A,#F2B21C);border:3px solid var(--mdark);color:var(--mdark);box-shadow:0 5px 0 var(--mdark);animation:esWin .7s cubic-bezier(.3,1.8,.5,1)}
 .es-uc small{font:800 11px var(--font-ui);letter-spacing:1px}.es-uc b{font:400 18px var(--font-display)}
 .es-btns{display:flex;gap:10px;width:100%;justify-content:center}.es-btns>*{flex:1;max-width:260px}
 .es-btns .m-btn2{height:64px}
 body.endseq #hud,body.endseq #touch{display:none!important}
-@media (max-height:520px){.es-slot canvas{width:min(100px,20vw)}.es-slot.s1 canvas{width:min(120px,24vw)}.s1 .es-blk{height:70px}.s2 .es-blk{height:54px}.s3 .es-blk{height:44px}.es-lines{max-height:24vh}.es-sea{padding:12px;gap:8px}}
+@media (max-height:520px){.es-slot canvas{width:min(100px,20vw)}.es-slot.s1 canvas{width:min(120px,24vw)}.s1 .es-blk{height:70px}.s2 .es-blk{height:54px}.s3 .es-blk{height:44px}.es-sea{padding:10px 12px;gap:8px}.es-unlock .ts-th{width:36px;height:36px}.es-btns .m-btn2{height:50px}.es-btns .m-play.sm{height:50px}.es-seahead>small{margin-bottom:4px}.es-bar{height:24px}.es-bar span{line-height:20px}.es-lines li{padding:5px 10px}}
 .es-btns .m-play.sm b{font-size:24px;white-space:nowrap}
 /* celular em pé: cartão da temporada logo abaixo dos desafios */
 body.mport #home .m-bl{display:flex;top:calc(186px + var(--sat));bottom:auto;transform:scale(var(--ms));transform-origin:top left}
@@ -4311,7 +4317,7 @@ function fire(p,t){if(!p.alive||p.picking||t<p.stunUntil||t<p.frozenUntil)return
   if(g.mine){const mine=bullets.filter(b=>b.o===p.id&&GUNS[b.g].mine);if(mine.length>=3)bullets.splice(bullets.indexOf(mine[0]),1)}
   const n=g.n2+(g.mine||g.box||g.sticky||g.timestop||g.hole||g.tele?0:md.extra),spr=g.spr||(n>1?.18:0);
   for(let i=0;i<n;i++){const a=p.aim+(n>1&&!g.spr?(i-(n-1)/2)*.12:(Math.random()-.5)*spr),sp=g.sp*md.bspd*(g.fuse?rand(.9,1.05):1);
-    const b={id:gid++,o:p.id,g:g.id,x:p.x+Math.cos(a)*12,y:p.y+Math.sin(a)*12+2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:g.r,life:g.life*md.range/md.bspd,bn:(g.bounce||0)+md.bounce,age:0};if(md.aim&&!g.homing)b.hm=1.6;
+    const b={id:gid++,o:p.id,g:g.id,x:p.x+Math.cos(a)*12,y:p.y+Math.sin(a)*12+2,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:g.r,life:g.life*md.range/md.bspd,bn:(g.bounce||0)+md.bounce,age:0};if(md.aim&&!g.homing)b.hm=1.6;if(md.aim)b.am=1;
     if(g.calc){b.six=p.calcFlip;p.calcFlip=!p.calcFlip}bullets.push(b)}
   if(g.recoil)push(p,p.aim+Math.PI,g.recoil)}
 
@@ -4396,7 +4402,12 @@ function hitPlayer(b,g,p,t){const a=Math.atan2(b.vy,b.vx),o=players[b.o];
   if(!b.tur)fx('hit',{x:b.x,y:b.y,w,c:g.col,s:dmg>=30?1:0},420);return true}
 function stepBullets(dt,t){const rects=blockRects();for(let i=bullets.length-1;i>=0;i--){const b=bullets[i],g=GUNS[b.g]||GUNS[0];if(b.frozen){b.frozen=0;continue}b.age+=dt;b.life-=dt;let dead=false;
   if(b.stick){const sp=players[b.stick];if(sp&&sp.alive){b.x=sp.x;b.y=sp.y-4}else b.stick=null}
-  const hm=g.homing||b.hm;if(hm&&b.age>.12&&!b.stick){const q=nearestEnemy(players[b.o]||{id:b.o,team:-1},b.x,b.y,560);if(q){const cur=Math.atan2(b.vy,b.vx),want=Math.atan2(q.y-b.y,q.x-b.x);let d=Math.atan2(Math.sin(want-cur),Math.cos(want-cur));const na=cur+clamp(d,-hm*dt,hm*dt),sp=Math.hypot(b.vx,b.vy);b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp}}
+  // teleguiados: sem Mira Assistida a curva é fraca e de perto, e o projétil explode logo se não achar ninguém;
+  // com Mira Assistida persegue de verdade, mas só por um tempo (e ainda explode ao bater em parede)
+  const hm0=g.homing||b.hm;if(hm0&&b.age>.12&&!b.stick){const full=!g.homing||b.am,hm=g.homing?(full?g.homing*1.15:g.homing*.38):hm0;
+    const q=nearestEnemy(players[b.o]||{id:b.o,team:-1},b.x,b.y,full?560:300);
+    if(q){b.lk=(b.lk||0)+dt;const cur=Math.atan2(b.vy,b.vx),want=Math.atan2(q.y-b.y,q.x-b.x);let d=Math.atan2(Math.sin(want-cur),Math.cos(want-cur));const na=cur+clamp(d,-hm*dt,hm*dt),sp=Math.hypot(b.vx,b.vy);b.vx=Math.cos(na)*sp;b.vy=Math.sin(na)*sp}else b.nl=(b.nl||0)+dt;
+    if(g.homing){if(full?(b.lk>2.2||b.age>3):(b.nl>.9||b.lk>1.2||b.age>1.6))b.life=Math.min(b.life,0)}}
   if(g.boomer&&b.age>g.life*.45){const o=players[b.o];if(o){const a=Math.atan2(o.y-b.y,o.x-b.x),sp=Math.hypot(b.vx,b.vy);b.vx=lerp(b.vx,Math.cos(a)*sp,.12);b.vy=lerp(b.vy,Math.sin(a)*sp,.12);if(dist(o.x,o.y,b.x,b.y)<22&&b.age>g.life*.55)dead=true}}
   if(g.portal&&!b.warped&&b.age>.16){const o=players[b.o],q=o&&nearestEnemy(o,b.x,b.y,900);if(q){const a=Math.atan2(q.y-o.y,q.x-o.x);fx('warp',{x:b.x,y:b.y},500);const [nx,ny]=nudgeFree(q.x+Math.cos(a)*85,q.y+Math.sin(a)*85);b.x=nx;b.y=ny;const sp=Math.hypot(b.vx,b.vy),a2=Math.atan2(q.y-ny,q.x-nx);b.vx=Math.cos(a2)*sp;b.vy=Math.sin(a2)*sp;b.warped=1;fx('warp',{x:b.x,y:b.y},500)}}
   if(g.fric&&!b.stick){const d=Math.exp(-g.fric*1.6*dt);b.vx*=d;b.vy*=d}
@@ -5666,7 +5677,8 @@ socInit();
 // e ao entrar em outro aparelho o progresso vem junto. Na primeira vez, o progresso que já estava no navegador vai para a conta.
 const SB_URL='https://cswuqdlxlguivvhzugyq.supabase.co',SB_KEY='sb_publishable_RVa9J--f2jg_XqPhVU5_sQ_Xs1a_hV3';
 const SYNC_KEYS=['nick','look','owned','equip','eyes','menubg','trophies','bonusXp','stats','daily','totalGems','spent','bonusOr','season'];
-const ACC={ses:store.get('acc',null),prof:null,tab:'novo',msg:null,busy:false,dirty:false,saveT:0,lastSave:0,syncErr:false,pending:null};
+const SKEY='67x_acc_s',sesTab=()=>{try{return JSON.parse(sessionStorage.getItem(SKEY)||'null')}catch(e){return null}};
+const ACC={keep:store.get('accKeep',true)!==false,ses:store.get('acc',null)||sesTab(),prof:null,tab:'novo',msg:null,busy:false,dirty:false,saveT:0,lastSave:0,syncErr:false,pending:null};
 const rawSet=store.set.bind(store);
 store.set=(k,v)=>{rawSet(k,v);if(ACC.prof&&SYNC_KEYS.includes(k))accDirty()};
 
@@ -5675,8 +5687,10 @@ async function sb(path,o={}){const h={apikey:SB_KEY,'Content-Type':'application/
   const r=await fetch(SB_URL+path,{method:o.method||'GET',headers:h,body:o.body?JSON.stringify(o.body):undefined,keepalive:!!o.keepalive});
   let j=null;try{j=await r.json()}catch(e){}
   if(!r.ok){const e=new Error((j&&(j.msg||j.error_description||j.message||j.error))||('http '+r.status));e.status=r.status;e.code=j&&(j.error_code||j.code);throw e}return j}
-function saveSes(d){if(!d||!d.access_token){ACC.ses=null;rawSet('acc',null);return}
-  ACC.ses={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:d.expires_at||Math.floor(Date.now()/1000)+(d.expires_in||3600),uid:(d.user&&d.user.id)||ACC.ses&&ACC.ses.uid,email:(d.user&&d.user.email)||ACC.ses&&ACC.ses.email};rawSet('acc',ACC.ses)}
+function saveSes(d){if(!d||!d.access_token){ACC.ses=null;rawSet('acc',null);try{sessionStorage.removeItem(SKEY)}catch(e){}return}
+  ACC.ses={access_token:d.access_token,refresh_token:d.refresh_token,expires_at:d.expires_at||Math.floor(Date.now()/1000)+(d.expires_in||3600),uid:(d.user&&d.user.id)||ACC.ses&&ACC.ses.uid,email:(d.user&&d.user.email)||ACC.ses&&ACC.ses.email};storeSes()}
+// "Manter conectado": guarda o login no aparelho; desmarcado, vale só enquanto esta aba estiver aberta
+function storeSes(){if(ACC.keep){rawSet('acc',ACC.ses);try{sessionStorage.removeItem(SKEY)}catch(e){}}else{rawSet('acc',null);try{sessionStorage.setItem(SKEY,JSON.stringify(ACC.ses))}catch(e){}}}
 async function fresh(){if(!ACC.ses)return false;if(ACC.ses.expires_at-60>Date.now()/1000)return true;
   try{saveSes(await sb('/auth/v1/token?grant_type=refresh_token',{method:'POST',auth:false,body:{refresh_token:ACC.ses.refresh_token}}));return true}
   catch(e){if(e.status===400||e.status===401){saveSes(null);ACC.prof=null;accTagUpd();ACC.tab='entrar';ACC.msg=['Sua sessão expirou. Entre de novo.','bad'];gateShow()}return false}}
@@ -5728,7 +5742,7 @@ async function accLogout(){if(ACC.dirty)await accPush();try{await sb('/auth/v1/l
 // voltou do link de confirmação do email (#access_token=...): entra direto
 (function(){const h=location.hash;if(!/access_token=/.test(h))return;const q=new URLSearchParams(h.slice(1));
   saveSes({access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:+q.get('expires_in')||3600});
-  try{const pl=JSON.parse(atob(q.get('access_token').split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));ACC.ses.uid=pl.sub;ACC.ses.email=pl.email;rawSet('acc',ACC.ses)}catch(e){}
+  try{const pl=JSON.parse(atob(q.get('access_token').split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));ACC.ses.uid=pl.sub;ACC.ses.email=pl.email;storeSes()}catch(e){}
   history.replaceState(null,'',location.pathname+location.search);if(q.get('type')==='recovery')ACC.recovery=true;else ACC.welcome=true})();
 
 // ---------- tela ----------
@@ -5761,6 +5775,14 @@ function accRender(){const el=ACC.ses?$('accBody'):$('gateBody');if(!el)return;
   if(ACC.pending){el.innerHTML=`<div class="m-accmsg ok"><b>Quase lá!</b> Enviamos um link para <b>${esc(ACC.pending)}</b>. Abra seu email, toque no link para confirmar e você entra automaticamente.</div>
       <p class="m-accnote">Não chegou? Olhe a caixa de spam. Já confirmou em outro aparelho? Entre aqui com email e senha.</p><button class="m-play sm m-accmain" id="accGoLogin"><b>JÁ CONFIRMEI — ENTRAR</b></button>`;
     $('accGoLogin').onclick=()=>{ACC.tab='entrar';ACC.pending=null;accRender()};return}
+  if(ACC.tab==='recuperar'){el.innerHTML=`<div class="m-accrec"><h4>${I('lock')}Esqueci minha senha</h4><p class="m-accnote">Escreva o email da sua conta. Vamos mandar um link para você criar uma senha nova.</p>
+      ${ACC.msg?`<div class="m-accmsg ${ACC.msg[1]}">${esc(ACC.msg[0])}</div>`:''}
+      <form class="m-accform" id="recForm"><label>EMAIL<input class="field" type="email" id="recEmail" autocomplete="email" required value="${esc(ACC.recEm||'')}"></label>
+      <button class="m-play sm m-accmain" type="submit" id="recGo"><b>ENVIAR LINK</b></button><button class="m-acclink" type="button" id="recBack">${I('back')}Voltar para o login</button></form></div>`;
+    $('recBack').onclick=()=>{ACC.tab='entrar';ACC.msg=null;Sound.play('click');accRender()};
+    $('recForm').onsubmit=async ev=>{ev.preventDefault();if(ACC.busy)return;const em=$('recEmail').value.trim();ACC.recEm=em;ACC.busy=true;const b=$('recGo');b.disabled=true;b.querySelector('b').textContent='ENVIANDO…';
+      try{await sb('/auth/v1/recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',auth:false,body:{email:em}});ACC.msg=['Pronto! Se existir uma conta com esse email, o link chega em instantes. Olhe também o spam.','ok'];Sound.play('yes')}catch(e){ACC.msg=[accErr(e),'bad'];Sound.play('no')}
+      ACC.busy=false;accRender()};return}
   const novo=ACC.tab==='novo';
   el.innerHTML=`<div class="m-acctabs"><button class="m-tab${novo?' on':''}" data-at="novo">${I('plus')}<span>Criar conta</span></button><button class="m-tab${novo?'':' on'}" data-at="entrar">${I('arrow')}<span>Entrar</span></button></div>
     ${ACC.msg?`<div class="m-accmsg ${ACC.msg[1]}">${esc(ACC.msg[0])}</div>`:''}
@@ -5769,8 +5791,8 @@ function accRender(){const el=ACC.ses?$('accBody'):$('gateBody');if(!el)return;
       ${novo?`<label>NOME DE USUÁRIO<input class="field" id="accUser" maxlength="16" autocomplete="username" required><span class="hint" id="accUserHint">3 a 16 letras, números ou _</span></label>`:''}
       <label>SENHA<input class="field" type="password" id="accPass" autocomplete="${novo?'new-password':'current-password'}" required></label>
       ${novo?`<label>CONFIRMAR SENHA<input class="field" type="password" id="accPass2" autocomplete="new-password" required></label>`:''}
+      <div class="m-keeprow"><label class="m-keep"><input type="checkbox" id="accKeep"${ACC.keep?' checked':''}><i></i>Manter conectado</label>${novo?'':`<button class="m-acclink" type="button" id="accForgot">Esqueci minha senha</button>`}</div>
       <button class="m-play sm m-accmain" type="submit" id="accGo"><b>${novo?'CRIAR CONTA':'ENTRAR'}</b></button>
-      ${novo?'':`<button class="m-acclink" type="button" id="accForgot">Esqueci minha senha</button>`}
     </form>
     <p class="m-accnote">${novo?'Com uma conta, suas laranjas, skins, itens, visual e troféus ficam salvos e você joga em qualquer aparelho. O que você já tem neste navegador vai junto para a conta.':'Entre com o email e a senha da sua conta para trazer seu progresso para este aparelho.'}</p>`;
   el.querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{ACC.tab=b.dataset.at;ACC.msg=null;Sound.play('click');accRender()});
@@ -5779,8 +5801,8 @@ function accRender(){const el=ACC.ses?$('accBody'):$('gateBody');if(!el)return;
       if(!/^[A-Za-z0-9_]{3,16}$/.test(v)){hint.className='hint'+(v?' bad':'');hint.textContent=v?'Use 3 a 16 letras, números ou _ (sem espaço).':'3 a 16 letras, números ou _';return}
       hint.className='hint';hint.textContent='Verificando…';t=setTimeout(async()=>{try{const ok=await sb('/rest/v1/rpc/username_available',{method:'POST',auth:false,body:{u:v,mail:$('accEmail').value.trim()||null}});
         if(u.value.trim()!==v)return;hint.className='hint '+(ok?'ok':'bad');hint.textContent=ok?'✓ Nome livre!':'Esse nome já é de outra capivara.'}catch(e){hint.className='hint';hint.textContent=''}},450)}}
-  else $('accForgot').onclick=async()=>{const em=$('accEmail').value.trim();if(!em){ACC.msg=['Escreva seu email acima e toque de novo em "Esqueci minha senha".','bad'];accRender();return}
-    try{await sb('/auth/v1/recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',auth:false,body:{email:em}});ACC.msg=['Se existir uma conta com esse email, enviamos um link para criar uma senha nova.','ok']}catch(e){ACC.msg=[accErr(e),'bad']}accRender()};
+  else $('accForgot').onclick=()=>{ACC.recEm=$('accEmail').value.trim();ACC.tab='recuperar';ACC.msg=null;Sound.play('click');accRender()};
+  $('accKeep').onchange=e=>{ACC.keep=e.target.checked;rawSet('accKeep',ACC.keep);Sound.play('click')};
   form.onsubmit=async ev=>{ev.preventDefault();if(ACC.busy)return;const em=$('accEmail').value.trim(),pw=$('accPass').value;
     if(novo){const us=$('accUser').value.trim();
       if(!/^[A-Za-z0-9_]{3,16}$/.test(us)){ACC.msg=['Nome de usuário: 3 a 16 letras, números ou _ (sem espaço).','bad'];return accRenderKeep(em,us)}
@@ -5882,7 +5904,7 @@ function seaRender(){const s=seaState(),f=seaInfo(s.xp);
   $('tsTop').innerHTML=`<div class="ts-hex"><small>NÍVEL</small><b>${f.lv}</b></div><div class="ts-info"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small>
       <div class="m-bar ts-bar"><i style="width:${f.max?100:f.cur/f.need*100}%"></i><span>${f.max?'Completa!':`${f.cur} / ${f.need} XP`}</span></div>
       <p>Termina em <b>${seaLeft()}</b> • ${f.lv}/30 prêmios desbloqueados</p></div>`;
-  $('tsHow').innerHTML=[['flag','Terminar partida','+40'],['crown','Vitória','+60'],['skull','Cada eliminação','+12'],['bolt','Double / Triple kill','+15 / +30'],['heart','Morrer pouco','até +40']].map(([ic,t,v])=>`<span>${I(ic)}${t}<b>${v}</b></span>`).join('');
+  $('tsHow').innerHTML=[['flag','Terminar partida','+25'],['crown','Vitória','+35'],['skull','Cada eliminação','+5 (até 15)'],['bolt','Double / Triple kill','+6 / +12'],['heart','Morrer pouco','até +20']].map(([ic,t,v])=>`<span>${I(ic)}${t}<b>${v}</b></span>`).join('');
   $('tsGrid').innerHTML=SEA_REW.map((rw,i)=>{const l=i+1,st=f.lv>=l?'got':l===f.lv+1?'next':'lock';
     return`<div class="ts-rw ${st}${SEA_BIG.includes(l)?' big':''}"><em>${l}</em><div class="ts-th">${rwThumb(rw)}</div><b>${escapeHtml(rwTitle(rw))}</b><span>${st==='got'?I('check')+'Desbloqueado':st==='next'?`Faltam ${f.need-f.cur} XP`:I('lock')+'Nível '+l}</span></div>`}).join('');
   const nx=$('tsGrid').querySelector('.next');if(nx)nx.scrollIntoView({block:'nearest'})}
@@ -5891,12 +5913,17 @@ function seaRender(){const s=seaState(),f=seaInfo(s.xp);
 const SM={d:0,t:0,m:0};function seaReset(){SM.d=SM.t=SM.m=0}
 function seaMulti(n){if(n===2)SM.d++;else if(n===3)SM.t++;else if(n>=4)SM.m++}
 function matchXP(me,place,won,n){const L=[],add=(t,v)=>{if(v>0)L.push([t,v])};if(!me)return L;
-  add('Partida finalizada',40);
-  if(won)add('Vitória!',60);else if(place===2)add('2º lugar',40);else if(place===3)add('3º lugar',30);else if(place<=Math.ceil(n/2))add('Metade de cima',15);
-  const k=me.kills||0,d=me.deaths||0;add(k+(k===1?' eliminação':' eliminações'),k*12);
-  if(d===0)add('Sem morrer nenhuma vez!',40);else if(d<=2)add('Morreu pouco',20);else if(d<=4)add('Sobreviveu bem',8);
-  add('Double kill'+(SM.d>1?' ×'+SM.d:''),SM.d*15);add('Triple kill'+(SM.t>1?' ×'+SM.t:''),SM.t*30);add('Multi kill'+(SM.m>1?' ×'+SM.m:''),SM.m*45);
-  if((me.best||0)>=3)add('Sequência de '+me.best,me.best*5);return L}
+  add('Partida finalizada',25);
+  if(won)add('Vitória!',35);else if(place===2)add('2º lugar',24);else if(place===3)add('3º lugar',16);else if(place<=Math.ceil(n/2))add('Metade de cima',8);
+  const k=me.kills||0,d=me.deaths||0;add(k+(k===1?' eliminação':' eliminações'),Math.min(k,15)*5);
+  if(d===0)add('Sem morrer nenhuma vez!',20);else if(d<=2)add('Morreu pouco',10);else if(d<=4)add('Sobreviveu bem',4);
+  add('Double kill'+(SM.d>1?' ×'+SM.d:''),Math.min(SM.d,4)*6);add('Triple kill'+(SM.t>1?' ×'+SM.t:''),Math.min(SM.t,3)*12);add('Multi kill'+(SM.m>1?' ×'+SM.m:''),Math.min(SM.m,2)*20);
+  if((me.best||0)>=3)add('Sequência de '+me.best,Math.min(me.best,10)*2);
+  // teto: uma partida rende no máximo 2 níveis da temporada (se passar, todas as linhas encolhem na mesma proporção)
+  const cap=seaCap(),tot=L.reduce((a,l)=>a+l[1],0);if(tot>cap){const vals=L.map(l=>Math.floor(l[1]*cap/tot));let left=cap-vals.reduce((a,v)=>a+v,0);for(let i=0;left>0;i=(i+1)%vals.length){vals[i]++;left--}L.forEach((l,i)=>l[1]=vals[i])}
+  return L.filter(l=>l[1]>0)}
+// XP que falta para subir exatamente 2 níveis a partir de agora (ou até o fim da temporada)
+function seaCap(){const x=seaState().xp,a=seaInfo(x);let need=a.need-a.cur;if(a.lv+1<30)need+=seaNeed(a.lv+2);return a.max?0:need}
 
 // ---------- fim de partida: suspense → pódio (top 3) → barra da temporada ----------
 let ES=null;
@@ -5907,8 +5934,8 @@ function endSeq(o){const el=$('endSeq');if(!el)return;ES=Object.assign({phase:0,
 function esSuspense(){const o=ES,st=$('esStage');const tw=o.tw;const win=tw>=0?'TIME '+TEAM[tw].n.toUpperCase():tw===-2?'EMPATE!':(o.list[0]?o.list[0].name:'???');
   st.innerHTML=`<div class="es-sus"><div class="es-spot"></div><div class="es-title">FIM DE PARTIDA!</div><div class="es-q">E o grande vencedor é…</div>
     <div class="es-roll"><b id="esRoll">???</b></div><div class="es-drum"><i></i><i></i><i></i></div><button class="es-tap" id="esTap">TOQUE PARA REVELAR</button></div>`;
-  const names=o.list.map(p=>p.name);let i=0,delay=60,done=false;const roll=()=>{if(done)return;$('esRoll').textContent=names[i++%names.length]||'???';Sound.play('tick');delay*=1.09;if(delay<380)ES.rt=setTimeout(roll,delay);else reveal()};
-  const reveal=()=>{if(done)return;done=true;clearTimeout(ES.rt);const r=$('esRoll');r.textContent=win;r.parentNode.classList.add('win');$('esTap').classList.add('gone');
+  const names=o.list.map(p=>p.name);let i=0,delay=60,done=false;const roll=()=>{if(done||!$('esRoll'))return;$('esRoll').textContent=names[i++%names.length]||'???';Sound.play('tick');delay*=1.09;if(delay<380)ES.rt=setTimeout(roll,delay);else reveal()};
+  const reveal=()=>{if(done||!$('esRoll'))return;done=true;clearTimeout(ES.rt);const r=$('esRoll');r.textContent=win;r.parentNode.classList.add('win');$('esTap').classList.add('gone');
     st.querySelector('.es-sus').classList.add('revealed');Sound.play('win');celebrate(o.won?180:90);ES.tm=setTimeout(esPodium,1700)};
   roll();$('esTap').onclick=reveal;st.querySelector('.es-sus').onclick=e=>{if(e.target.id!=='esTap')reveal()}}
 function esPodium(){const o=ES,st=$('esStage'),top=o.list.slice(0,3),me=o.me;
@@ -5921,18 +5948,18 @@ function esPodium(){const o=ES,st=$('esStage'),top=o.list.slice(0,3),me=o.me;
 function esSeason(){const o=ES,st=$('esStage'),r=o.res,s=seaState();
   st.innerHTML=`<div class="es-sea"><div class="es-seahead"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small><div class="es-lvrow"><div class="ts-hex"><small>NÍVEL</small><b id="esLv">${r.from.lv}</b></div>
       <div class="es-barw"><div class="m-bar es-bar"><i id="esFill"></i><span id="esXp"></span></div><div class="es-gain">+<b id="esGain">0</b> XP</div></div></div></div>
-    <ul class="es-lines" id="esLines"></ul><div class="es-unlock hidden" id="esUnlock"></div>
+    <div class="es-mid" id="esMid"><ul class="es-lines" id="esLines"></ul><div class="es-unlock hidden" id="esUnlock"></div></div>
     <div class="es-btns">${solo?`<button class="m-btn2" id="esMenu">${I('home')}MENU</button><button class="m-play sm" id="esAgain"><b>JOGAR DE NOVO</b></button>`:`<button class="m-play sm" id="esCont"><b>CONTINUAR</b></button>`}</div></div>`;
   const fill=$('esFill'),xpT=$('esXp'),lvT=$('esLv');let shown=r.xp0,lv=r.from.lv;const draw=()=>{const f=seaInfo(shown);fill.style.width=(f.max?100:f.cur/f.need*100)+'%';xpT.textContent=f.max?'Temporada completa!':`${f.cur} / ${f.need} XP`;
     if(f.lv!==lv){lv=f.lv;lvT.textContent=lv;lvT.parentNode.classList.remove('pop');void lvT.offsetWidth;lvT.parentNode.classList.add('pop');const up=r.ups.find(u=>u.lv===lv);if(up)esUnlock(up)}};draw();
   // cada motivo aparece em sequência e a barra corre junto
-  let li=0,gain=0;const next=()=>{if(ES!==o||li>=o.lines.length)return;const [t,v]=o.lines[li++],ul=$('esLines');if(!ul)return;ul.insertAdjacentHTML('beforeend',`<li><span>${escapeHtml(t)}</span><b>+${v}</b></li>`);Sound.play('gem',li);
-    const from=shown,to=shown+v,t0=performance.now();const run=()=>{if(ES!==o||!$('esFill'))return;const k=Math.min(1,(performance.now()-t0)/520);shown=Math.round(from+(to-from)*k);$('esGain').textContent=gain+Math.round(v*k);draw();if(k<1)requestAnimationFrame(run);else{gain+=v;ES.tm=setTimeout(next,260)}};run()};
+  let li=0,gain=0;const next=()=>{if(ES!==o||li>=o.lines.length)return;const [t,v]=o.lines[li++],ul=$('esLines');if(!ul)return;ul.insertAdjacentHTML('beforeend',`<li><span>${escapeHtml(t)}</span><b>+${v}</b></li>`);const mid=$('esMid');if(mid)mid.scrollTop=mid.scrollHeight;Sound.play('gem',li);
+    const from=shown,to=shown+v,t0=performance.now();const run=()=>{if(ES!==o||!$('esFill'))return;const k=Math.min(1,(performance.now()-t0)/520);shown=Math.round(from+(to-from)*k);const eg=$('esGain');if(eg)eg.textContent=gain+Math.round(v*k);draw();if(k<1)requestAnimationFrame(run);else{gain+=v;ES.tm=setTimeout(next,260)}};run()};
   ES.tm=setTimeout(next,500);
   if(solo){$('esMenu').onclick=()=>{esClose();Sound.play('click');goHome()};$('esAgain').onclick=()=>{esClose();if(QUICK){goHome();setTimeout(quickPlay,60)}else{goHome();setTimeout(playNow,60)}}}
   else $('esCont').onclick=()=>{Sound.play('click');esClose()}}
 function esUnlock(up){const el=$('esUnlock');if(!el)return;el.classList.remove('hidden');Sound.play('level');celebrate(60);
-  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`)}
+  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`);const mid=$('esMid');if(mid)setTimeout(()=>{mid.scrollTop=mid.scrollHeight},30)}
 function esClose(){clearTimeout(ES&&ES.tm);clearTimeout(ES&&ES.rt);$('endSeq').classList.add('hidden');document.body.classList.remove('endseq');ES=null}
 
 $('seaCard').onclick=()=>{Sound.play('click');go('temporada')};
