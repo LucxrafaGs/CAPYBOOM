@@ -1871,7 +1871,9 @@ const Sound=(()=>{
     const p=next.play();if(p&&p.catch)p.catch(()=>{curKind=''});fade(next,Math.min(1,tvol()),900)}
   function music(on,bpm){wantMusic=on;wantKind=bpm&&bpm>120?'battle':'menu';if(!on){if(cur)fade(cur,0,400,()=>cur&&cur.pause());curKind='';return}startTrack(wantKind)}
   let wantKind='menu';
-  document.addEventListener('visibilitychange',()=>{if(!cur)return;if(document.hidden)cur.pause();else if(wantMusic){const p=cur.play();if(p&&p.catch)p.catch(()=>{})}});
+  // aba escondida / janela minimizada: música pausa e o motor de áudio dorme (não gasta processador em segundo plano)
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){try{if(ac&&ac.state==='running')ac.suspend()}catch(e){}if(cur)cur.pause();return}
+    try{if(ac&&ac.state==='suspended')ac.resume()}catch(e){}if(cur&&wantMusic){const p=cur.play();if(p&&p.catch)p.catch(()=>{})}});
   let unlocked=false,silentEl=null;
   function unlock(){init();if(!ac)return;try{if(ac.state!=='running')ac.resume()}catch(e){}
     if(!unlocked){unlocked=true;try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(e){}
@@ -4395,10 +4397,25 @@ function predictSelf(p){const t=time(),ht=hostNow(),dt=pred.on?clamp((t-pred.lt)
   p.rx=pred.x;p.ry=pred.y;return true}
 
 // ---------- Laço ----------
+// Segundo plano (trocou de aba / minimizou): o navegador para de chamar o desenho. Então:
+//  - contra bots: a partida PAUSA sozinha (e o relógio da partida não corre enquanto você está fora);
+//  - online, se você é o anfitrião: a partida continua para os amigos num relógio leve à parte (só a simulação, sem desenhar nada);
+//  - nada de "recuperar o atraso" ao voltar: o jogo retoma do ponto em que estava, sem engasgar.
+let bgWk=null,bgWkUrl='',bgLast=0;
+function bgTick(){if(!document.hidden||!host||!started||solo||demo)return;const t=time(),dt=Math.min(.1,(t-(bgLast||t))/1000);bgLast=t;if(dt>0){step(dt,t);sync()}}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){for(const k of KEYLIST)keys[k]=false;
+    if(started&&solo&&!over&&view==='game'&&$('pause').classList.contains('hidden'))openPause();
+    if(host&&started&&!solo&&!bgWk){try{bgLast=time();bgWkUrl=URL.createObjectURL(new Blob(['setInterval(()=>postMessage(0),33)'],{type:'text/javascript'}));bgWk=new Worker(bgWkUrl);bgWk.onmessage=bgTick}catch(e){bgWk=null;if(bgWkUrl)URL.revokeObjectURL(bgWkUrl);bgWkUrl=''}}
+    return}
+  if(bgWk){bgWk.terminate();bgWk=null}if(bgWkUrl){URL.revokeObjectURL(bgWkUrl);bgWkUrl=''}
+  lastFrame=0;resize()});
 let lastFrame=0,hudAt=0,mmAt=0,slowT=0,wasMenuBg=null,menuClr=false;
 function frame(t){requestAnimationFrame(frame);
+  if(document.hidden)return;
   const mb=menuBg();if(mb!==wasMenuBg){wasMenuBg=mb;resize()}
-  const minDt=1000/(mb&&!Map3D.menuOk?Math.min(30,S.fps):mb?S.fps:Math.min(S.fps,Map3D.fpsCap))-1.5;if(t-lastFrame<minDt)return;let dt=Math.min(.05,(t-lastFrame)/1000);
+  const blurCap=document.hasFocus()?999:30; // janela visível mas em outro app: 30 fps bastam e deixam o computador livre
+  const minDt=1000/Math.min(blurCap,mb&&!Map3D.menuOk?Math.min(30,S.fps):mb?S.fps:Math.min(S.fps,Map3D.fpsCap))-1.5;if(t-lastFrame<minDt)return;let dt=Math.min(.05,(t-lastFrame)/1000);
   if(S.dynres&&!isTouch&&!mb&&view==='game'&&dt>.026){slowT+=dt;if(slowT>2&&resScale>.55){resScale*=.85;resize();slowT=0}}else slowT=Math.max(0,slowT-dt*.5);
   lastFrame=t;
   const active=demo||started;if(active)menuClr=false;
@@ -4968,10 +4985,11 @@ function flyGem(x,y){if(document.querySelectorAll('.flyer').length>6)return;cons
   requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.left=(r.left+r.width*clamp((players[self]?.energy||0)/67,.05,.95))+'px';d.style.top=(r.top+r.height/2-9)+'px';d.style.transform='scale(.6) rotate(180deg)'}));setTimeout(()=>{d.remove();const b=$('bar67');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')},560)}
 
 // ---------- Pause / placar ----------
-function openPause(){showCursor();if(view!=='game'||over)return;$('pause').classList.remove('hidden');if(solo)paused=true;$('pauseNote').textContent=solo?'Os bots estão congelados esperando você.':'A partida continua sem você!'+(srvMode()&&rtt?` (ping ${Math.round(rtt)} ms)`:'');
+let pauseAt=0;
+function openPause(){showCursor();if(view!=='game'||over)return;$('pause').classList.remove('hidden');if(solo){if(!paused)pauseAt=time();paused=true}$('pauseNote').textContent=solo?'Os bots estão congelados esperando você.':'A partida continua sem você!'+(srvMode()&&rtt?` (ping ${Math.round(rtt)} ms)`:'');
   $('btnRestart').classList.toggle('hidden',!solo);$('pauseTip').textContent='Dica: '+pick(['o dash atravessa a confusão: use para fugir de granadas.','kits médicos recuperam metade da vida.','caixas com "?" trocam sua arma atual.','aperte Q (ou o botão de troca) para alternar entre as duas armas.','a Pausa Dramática congela até os tiros dentro dela.','paredes da Pá de Pedreiro bloqueiam tiros por 16 segundos.']);
   for(const k of KEYLIST)keys[k]=false;pushInputs(true);Sound.play('click')}
-function closePause(){$('pause').classList.add('hidden');paused=false;lastFrame=performance.now();Sound.play('click')}
+function closePause(){$('pause').classList.add('hidden');if(solo&&paused&&pauseAt&&started&&!over)matchEnd+=time()-pauseAt; /* contra bots, o tempo pausado não conta */pauseAt=0;paused=false;lastFrame=performance.now();Sound.play('click')}
 $('btnPause').onclick=openPause;$('btnResume').onclick=closePause;$('btnPauseSettings').onclick=openSettings;
 $('btnRestart').onclick=()=>{closePause();startBots()};
 $('btnQuitMatch').onclick=async()=>{if(await confirmBox('Sair da partida?',solo?'Seu progresso nesta partida será perdido.':host?'Você é o anfitrião: a partida acaba para todos.':isOwner()?'A partida continua: outro jogador vira o dono da sala.':'Você vai sair da sala.','SAIR','FICAR'))goHome()};
@@ -5267,6 +5285,7 @@ function accErr(e){const m=String(e&&e.message||e).toLowerCase(),c=e&&e.code||''
   if(c==='weak_password'||m.includes('password should'))return'Senha fraca: use pelo menos 6 caracteres.';
   if(c==='over_email_send_rate_limit'||m.includes('rate limit'))return'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.';
   if(m.includes('invalid')&&m.includes('email'))return'Esse email não parece válido.';
+  if(m.includes('sending confirmation')||m.includes('sending')&&m.includes('email'))return'Não conseguimos enviar o email de confirmação agora. Tente de novo daqui a pouco.';
   if(m.includes('failed to fetch')||m.includes('network'))return'Sem conexão com o servidor de contas. Verifique a internet.';
   return'Não deu certo: '+(e&&e.message||e)}
 

@@ -58,6 +58,9 @@ versoes-antigas/       versões anteriores, só para consulta
   Só dá para mexer pelo painel do Supabase. Estrutura completa em `supabase/migrations/`.
 - Dar laranjas para alguém depois: no SQL Editor do Supabase,
   `update profiles set oranges = 5000 where username = 'nome';` (o jogo pega o valor novo ao abrir).
+- O modelo visual do email de confirmação está em `supabase/templates/confirmar_email.html`. Para ativá-lo, cole o HTML
+  em **Supabase → Authentication → Emails → Templates → Confirm signup**. As imagens e a rota `/api/email/fundo.jpg`
+  são publicadas no Cloudflare pelo deploy do jogo; o template do Supabase exige publicação separada no painel.
 
 ## Comandos
 

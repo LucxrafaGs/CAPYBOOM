@@ -26,6 +26,7 @@ function accErr(e){const m=String(e&&e.message||e).toLowerCase(),c=e&&e.code||''
   if(c==='weak_password'||m.includes('password should'))return'Senha fraca: use pelo menos 6 caracteres.';
   if(c==='over_email_send_rate_limit'||m.includes('rate limit'))return'Muitas tentativas seguidas. Espere alguns minutos e tente de novo.';
   if(m.includes('invalid')&&m.includes('email'))return'Esse email não parece válido.';
+  if(m.includes('sending confirmation')||m.includes('sending')&&m.includes('email'))return'Não conseguimos enviar o email de confirmação agora. Tente de novo daqui a pouco.';
   if(m.includes('failed to fetch')||m.includes('network'))return'Sem conexão com o servidor de contas. Verifique a internet.';
   return'Não deu certo: '+(e&&e.message||e)}
 

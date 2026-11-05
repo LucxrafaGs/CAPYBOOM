@@ -503,10 +503,11 @@ function flyGem(x,y){if(document.querySelectorAll('.flyer').length>6)return;cons
   requestAnimationFrame(()=>requestAnimationFrame(()=>{d.style.left=(r.left+r.width*clamp((players[self]?.energy||0)/67,.05,.95))+'px';d.style.top=(r.top+r.height/2-9)+'px';d.style.transform='scale(.6) rotate(180deg)'}));setTimeout(()=>{d.remove();const b=$('bar67');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop')},560)}
 
 // ---------- Pause / placar ----------
-function openPause(){showCursor();if(view!=='game'||over)return;$('pause').classList.remove('hidden');if(solo)paused=true;$('pauseNote').textContent=solo?'Os bots estão congelados esperando você.':'A partida continua sem você!'+(srvMode()&&rtt?` (ping ${Math.round(rtt)} ms)`:'');
+let pauseAt=0;
+function openPause(){showCursor();if(view!=='game'||over)return;$('pause').classList.remove('hidden');if(solo){if(!paused)pauseAt=time();paused=true}$('pauseNote').textContent=solo?'Os bots estão congelados esperando você.':'A partida continua sem você!'+(srvMode()&&rtt?` (ping ${Math.round(rtt)} ms)`:'');
   $('btnRestart').classList.toggle('hidden',!solo);$('pauseTip').textContent='Dica: '+pick(['o dash atravessa a confusão: use para fugir de granadas.','kits médicos recuperam metade da vida.','caixas com "?" trocam sua arma atual.','aperte Q (ou o botão de troca) para alternar entre as duas armas.','a Pausa Dramática congela até os tiros dentro dela.','paredes da Pá de Pedreiro bloqueiam tiros por 16 segundos.']);
   for(const k of KEYLIST)keys[k]=false;pushInputs(true);Sound.play('click')}
-function closePause(){$('pause').classList.add('hidden');paused=false;lastFrame=performance.now();Sound.play('click')}
+function closePause(){$('pause').classList.add('hidden');if(solo&&paused&&pauseAt&&started&&!over)matchEnd+=time()-pauseAt; /* contra bots, o tempo pausado não conta */pauseAt=0;paused=false;lastFrame=performance.now();Sound.play('click')}
 $('btnPause').onclick=openPause;$('btnResume').onclick=closePause;$('btnPauseSettings').onclick=openSettings;
 $('btnRestart').onclick=()=>{closePause();startBots()};
 $('btnQuitMatch').onclick=async()=>{if(await confirmBox('Sair da partida?',solo?'Seu progresso nesta partida será perdido.':host?'Você é o anfitrião: a partida acaba para todos.':isOwner()?'A partida continua: outro jogador vira o dono da sala.':'Você vai sair da sala.','SAIR','FICAR'))goHome()};

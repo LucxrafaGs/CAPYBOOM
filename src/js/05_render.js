@@ -175,10 +175,25 @@ function predictSelf(p){const t=time(),ht=hostNow(),dt=pred.on?clamp((t-pred.lt)
   p.rx=pred.x;p.ry=pred.y;return true}
 
 // ---------- Laço ----------
+// Segundo plano (trocou de aba / minimizou): o navegador para de chamar o desenho. Então:
+//  - contra bots: a partida PAUSA sozinha (e o relógio da partida não corre enquanto você está fora);
+//  - online, se você é o anfitrião: a partida continua para os amigos num relógio leve à parte (só a simulação, sem desenhar nada);
+//  - nada de "recuperar o atraso" ao voltar: o jogo retoma do ponto em que estava, sem engasgar.
+let bgWk=null,bgWkUrl='',bgLast=0;
+function bgTick(){if(!document.hidden||!host||!started||solo||demo)return;const t=time(),dt=Math.min(.1,(t-(bgLast||t))/1000);bgLast=t;if(dt>0){step(dt,t);sync()}}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){for(const k of KEYLIST)keys[k]=false;
+    if(started&&solo&&!over&&view==='game'&&$('pause').classList.contains('hidden'))openPause();
+    if(host&&started&&!solo&&!bgWk){try{bgLast=time();bgWkUrl=URL.createObjectURL(new Blob(['setInterval(()=>postMessage(0),33)'],{type:'text/javascript'}));bgWk=new Worker(bgWkUrl);bgWk.onmessage=bgTick}catch(e){bgWk=null;if(bgWkUrl)URL.revokeObjectURL(bgWkUrl);bgWkUrl=''}}
+    return}
+  if(bgWk){bgWk.terminate();bgWk=null}if(bgWkUrl){URL.revokeObjectURL(bgWkUrl);bgWkUrl=''}
+  lastFrame=0;resize()});
 let lastFrame=0,hudAt=0,mmAt=0,slowT=0,wasMenuBg=null,menuClr=false;
 function frame(t){requestAnimationFrame(frame);
+  if(document.hidden)return;
   const mb=menuBg();if(mb!==wasMenuBg){wasMenuBg=mb;resize()}
-  const minDt=1000/(mb&&!Map3D.menuOk?Math.min(30,S.fps):mb?S.fps:Math.min(S.fps,Map3D.fpsCap))-1.5;if(t-lastFrame<minDt)return;let dt=Math.min(.05,(t-lastFrame)/1000);
+  const blurCap=document.hasFocus()?999:30; // janela visível mas em outro app: 30 fps bastam e deixam o computador livre
+  const minDt=1000/Math.min(blurCap,mb&&!Map3D.menuOk?Math.min(30,S.fps):mb?S.fps:Math.min(S.fps,Map3D.fpsCap))-1.5;if(t-lastFrame<minDt)return;let dt=Math.min(.05,(t-lastFrame)/1000);
   if(S.dynres&&!isTouch&&!mb&&view==='game'&&dt>.026){slowT+=dt;if(slowT>2&&resScale>.55){resScale*=.85;resize();slowT=0}}else slowT=Math.max(0,slowT-dt*.5);
   lastFrame=t;
   const active=demo||started;if(active)menuClr=false;

@@ -6,6 +6,7 @@
 //   GET  /api/rooms/CODE/ws   -> WebSocket da sala (Durable Object "Room")
 //   POST /api/social/register -> cria conta de CapyAmigos (código de amigo)
 //   GET  /api/social/ws       -> WebSocket de amigos/mensagens (Durable Object "Social")
+//   GET  /api/email/fundo.jpg -> um dos 3 quadros de capivara, sorteado a cada pedido (imagem do email de boas-vindas)
 export {Room} from './room.js';
 export {Lobby} from './lobby.js';
 export {Social} from './social.js';
@@ -18,6 +19,9 @@ export default{
   async fetch(req,env){
     const url=new URL(req.url),path=url.pathname;
     if(!path.startsWith('/api/'))return env.ASSETS.fetch(req);
+    // email de boas-vindas: sorteia um quadro a cada pedido; não recebe tokens de confirmação na URL
+    if(path==='/api/email/fundo.jpg'){const n=1+Math.floor(Math.random()*3);const r=await env.ASSETS.fetch(new Request(new URL('/email/fundo'+n+'.jpg',url)));
+      return new Response(r.body,{status:r.status,headers:{'content-type':'image/jpeg','cache-control':'no-store, max-age=0'}})}
     try{
       if(path==='/api/health')return json({ok:true,v:1});
       if(path==='/api/rooms'&&req.method==='GET')return json({rooms:await lobby(env).list()});

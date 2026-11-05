@@ -79,7 +79,9 @@ const Sound=(()=>{
     const p=next.play();if(p&&p.catch)p.catch(()=>{curKind=''});fade(next,Math.min(1,tvol()),900)}
   function music(on,bpm){wantMusic=on;wantKind=bpm&&bpm>120?'battle':'menu';if(!on){if(cur)fade(cur,0,400,()=>cur&&cur.pause());curKind='';return}startTrack(wantKind)}
   let wantKind='menu';
-  document.addEventListener('visibilitychange',()=>{if(!cur)return;if(document.hidden)cur.pause();else if(wantMusic){const p=cur.play();if(p&&p.catch)p.catch(()=>{})}});
+  // aba escondida / janela minimizada: música pausa e o motor de áudio dorme (não gasta processador em segundo plano)
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){try{if(ac&&ac.state==='running')ac.suspend()}catch(e){}if(cur)cur.pause();return}
+    try{if(ac&&ac.state==='suspended')ac.resume()}catch(e){}if(cur&&wantMusic){const p=cur.play();if(p&&p.catch)p.catch(()=>{})}});
   let unlocked=false,silentEl=null;
   function unlock(){init();if(!ac)return;try{if(ac.state!=='running')ac.resume()}catch(e){}
     if(!unlocked){unlocked=true;try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(e){}

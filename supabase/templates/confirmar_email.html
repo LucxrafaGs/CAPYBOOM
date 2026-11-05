@@ -1,0 +1,56 @@
+<!-- CapiBoom — email "Confirm signup" do Supabase (Authentication → Emails → Templates → Confirm signup)
+     Assunto sugerido: Bem-vindo ao CapiBoom! Confirme seu email
+     As imagens vêm do site publicado (public/email/). O quadro do topo é sorteado entre 3 no endpoint /api/email/fundo.jpg. -->
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="supported-color-schemes" content="dark">
+<title>Bem-vindo ao CapiBoom</title>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+</head>
+<body style="margin:0;padding:0;background:#1B0D4A;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">Falta só um toque para sua capivara entrar na arena!</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1B0D4A;">
+<tr><td align="center" style="padding:28px 12px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;">
+    <!-- logo -->
+    <tr><td align="center" style="padding:0 0 18px;">
+      <img src="https://67-the-chaos-arena.lucasrafael.workers.dev/email/logo.png" width="300" alt="CapiBoom" style="display:block;width:300px;max-width:80%;height:auto;border:0;">
+    </td></tr>
+    <!-- card -->
+    <tr><td style="background:#3A1C80;border:3px solid #5A34B0;border-radius:22px;overflow:hidden;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <!-- quadro sorteado -->
+        <tr><td style="padding:0;">
+          <img src="https://67-the-chaos-arena.lucasrafael.workers.dev/api/email/fundo.jpg" width="560" alt="Quadro de capivaras do CapiBoom" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:19px 19px 0 0;">
+        </td></tr>
+        <!-- "Bem-vindo ao CapiBoom!" na fonte do jogo (imagem, porque email não carrega fonte) + nome do jogador -->
+        <tr><td align="center" style="padding:28px 24px 0;">
+          <img src="https://67-the-chaos-arena.lucasrafael.workers.dev/email/bemvindo.png" width="420" alt="Bem-vindo ao CapiBoom!" style="display:block;width:420px;max-width:100%;height:auto;border:0;">
+        </td></tr>
+        {{ if .Data.username }}<tr><td align="center" style="padding:6px 24px 0;font-family:'Lilita One','Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif;font-size:34px;line-height:1.1;font-weight:normal;letter-spacing:.5px;color:#FFC531;text-shadow:0 3px 0 #2A1366;">{{ .Data.username }}</td></tr>{{ end }}
+        <!-- botão igual ao JOGAR! do jogo -->
+        <tr><td align="center" style="padding:24px 24px 6px;">
+          <a href="{{ .ConfirmationURL }}" target="_blank" style="display:inline-block;text-decoration:none;border:0;">
+            <img src="https://67-the-chaos-arena.lucasrafael.workers.dev/email/botao.png" width="392" alt="CONFIRMAR! — toque para ativar sua conta" style="display:block;width:392px;max-width:100%;height:auto;border:0;color:#FFC531;font:bold 22px Arial,sans-serif;">
+          </a>
+        </td></tr>
+        <tr><td align="center" style="padding:14px 30px 28px;font-family:'Trebuchet MS',Verdana,Arial,sans-serif;font-size:12px;line-height:1.5;color:#B9A8E8;">
+          O botão não abriu? Copie e cole este link no navegador:<br>
+          <a href="{{ .ConfirmationURL }}" style="color:#FFC531;word-break:break-all;">{{ .ConfirmationURL }}</a>
+        </td></tr>
+      </table>
+    </td></tr>
+    <!-- rodapé -->
+    <tr><td align="center" style="padding:18px 20px 0;font-family:'Trebuchet MS',Verdana,Arial,sans-serif;font-size:12px;line-height:1.5;color:#8C7BC4;">
+      Você recebeu este email porque alguém criou uma conta no CapiBoom com este endereço.<br>Se não foi você, é só ignorar — nada acontece sem a confirmação.<br><br>
+      CapiBoom · Entre Mundos Studio
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>
