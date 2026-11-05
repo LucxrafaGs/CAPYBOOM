@@ -699,7 +699,12 @@ function sharedCapyMats(){if(capyM)return capyM;if(!OU.uRes.value)OU.uRes.value=
   const outNeon=new T.MeshBasicMaterial({color:'#45F0FF',side:T.BackSide});outNeon.onBeforeCompile=out.onBeforeCompile;outNeon.customProgramCacheKey=()=>'capyOutline';
   const cv=document.createElement('canvas');cv.width=cv.height=64;const g=cv.getContext('2d'),gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(0,0,0,.55)');gr.addColorStop(.6,'rgba(0,0,0,.28)');gr.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);
   const bt=new T.CanvasTexture(cv);
-  capyM={out,outNeon,shine:new T.MeshBasicMaterial({color:'#FFFFFF'}),lid:patch(new T.MeshStandardMaterial({color:'#A86B40',roughness:.85,emissive:new T.Color('#3A2010')}),{key:'lid'}),
+  // contorno do Marombeiro: o corpo é inflado no shader (músculos), então o contorno infla junto
+  const musOB=s=>{out.onBeforeCompile(s);s.vertexShader=s.vertexShader.replace('attribute vec3 outN;','attribute vec3 outN;\n'+MUSC_GLSL).replace('#include <begin_vertex>','#include <begin_vertex>\ntransformed+=normalize(outN)*musc(position);')};
+  const outMus=new T.MeshBasicMaterial({color:'#2A1A12',side:T.BackSide});outMus.onBeforeCompile=musOB;outMus.customProgramCacheKey=()=>'capyOutlineMus';
+  const outMusN=new T.MeshBasicMaterial({color:'#45F0FF',side:T.BackSide});outMusN.onBeforeCompile=musOB;outMusN.customProgramCacheKey=()=>'capyOutlineMus';
+  Skins3D.init(T,{patch,OU});
+  capyM={out,outNeon,outMus,outMusN,shine:new T.MeshBasicMaterial({color:'#FFFFFF'}),lid:patch(new T.MeshStandardMaterial({color:'#A86B40',roughness:.85,emissive:new T.Color('#3A2010')}),{key:'lid'}),
     blush:new T.MeshBasicMaterial({color:'#FF7FA0',transparent:true,opacity:.6,depthWrite:false}),blob:new T.MeshBasicMaterial({map:bt,transparent:true,depthWrite:false}),dashR:new T.MeshBasicMaterial({color:'#FFC531',depthWrite:false,transparent:true}),
     target:new T.MeshBasicMaterial({color:'#E8443A'}),targetW:new T.MeshBasicMaterial({color:'#FFF4E0'})};return capyM}
 const xray=c=>xrayC[c]||(xrayC[c]=new T.MeshBasicMaterial({color:c,transparent:true,opacity:.6,depthFunc:T.GreaterDepth,depthWrite:false}));
@@ -730,16 +735,16 @@ const EYE_FS=`
  float hs=(uE2.z>2.5&&uE2.z<3.5)?1.45:1.;float hr=max(ir,.5);
  float h1=length(q-vec2(-.3,.34)*hr)/(hr*.25*hs),h2=length(q-vec2(.28,-.3)*hr)/(hr*.12*hs);
  e=mix(e,vec3(1.),max(1.-smoothstep(.75,1.,h1),(1.-smoothstep(.7,1.,h2))*.9)*(1.-uE2.w));
- vec3 lc=uFlat*uFur*(1.12+.25*y);
+ vec3 lc=mix(uFlat*uFur*(1.12+.25*y),uLidC*(1.+.15*y),uLidOn);
  vec3 c=mix(lc,e,inside);
  float edge=min(abs(y-yU),abs(y-yL));
  float ln=(1.-smoothstep(.03,.075,edge))*step(yL-.08,y)*step(y,yU+.08);
  float rim=1.-smoothstep(.36,.5,p.z);
  c=mix(c,vec3(.09,.05,.04),max(ln,rim*inside));
- diffuseColor.rgb=c;}`;
+ diffuseColor.rgb=mix(c,vec3(dot(c,vec3(.3,.59,.11))),uGray);}`;
 function eyeMat(fur){const m=new T.MeshBasicMaterial({color:'#FFFFFF'});if(!FLATC){const fa=(CapyRig.extras&&CapyRig.extras.furAvg)||'#c3835c';FLATC={value:new T.Color(fa)}}
-  m.userData.eu={uFur:fur,uFlat:FLATC,uIrisC:{value:new T.Color('#6B3A1E')},uE1:{value:new T.Vector4(1,0,0,0)},uE2:{value:new T.Vector4(.6,.55,0,0)},uGaze:{value:new T.Vector2()},uAsp:{value:ER_ASP}};
-  return patch(m,{key:'eye',uni:mm=>mm.userData.eu,vd:'varying vec3 vEP;\n',v:'vEP=position;',fd:'uniform vec3 uFur,uFlat,uIrisC;uniform vec4 uE1,uE2;uniform vec2 uGaze;uniform float uAsp;varying vec3 vEP;',
+  m.userData.eu={uFur:fur,uFlat:FLATC,uIrisC:{value:new T.Color('#6B3A1E')},uE1:{value:new T.Vector4(1,0,0,0)},uE2:{value:new T.Vector4(.6,.55,0,0)},uGaze:{value:new T.Vector2()},uAsp:{value:ER_ASP},uLidC:{value:new T.Color('#D6262E')},uLidOn:{value:0},uGray:{value:0}};
+  return patch(m,{key:'eye',uni:mm=>mm.userData.eu,vd:'varying vec3 vEP;\n',v:'vEP=position;',fd:'uniform vec3 uFur,uFlat,uIrisC,uLidC;uniform vec4 uE1,uE2;uniform vec2 uGaze;uniform float uAsp,uLidOn,uGray;varying vec3 vEP;',
     fr:[['#include <color_fragment>','#include <color_fragment>\n'+EYE_FS]]})}
 const ER_ASP=.05/.041;
 function browMat(fur){const m=new T.MeshBasicMaterial({color:'#FFFFFF'});m.userData.bu={uFur:fur,uFlat:FLATC};
@@ -753,9 +758,99 @@ const eyeKey=e=>(e.t|0)+'.'+e.b+'.'+e.c;
 function capyBodyMat(a,hex){const m=new T.MeshStandardMaterial({map:CapyRig.map,normalMap:CapyRig.nrm,normalScale:new T.Vector2(.8,.8),roughness:.78,metalness:0,emissiveMap:CapyRig.map,emissive:new T.Color(.5,.5,.5)});
   m.userData.fur={value:furVec(hex||capyFurHex(a.look,a.bot))};
   if(!FLATC){const fa=(CapyRig.extras&&CapyRig.extras.furAvg)||'#c3835c';FLATC={value:new T.Color(fa)}}
-  m.userData.sty={uPat:{value:0},uPatC:{value:new T.Color('#2A1A12')},uOut:{value:0},uOutC:{value:new T.Color('#FF4F9A')}};
-  return patch(m,{key:'capy',uni:mm=>Object.assign({uFur:mm.userData.fur,uFlat:FLATC},mm.userData.sty),vd:'attribute float aFlat;varying float vFlat;varying vec3 vOP;\n',v:'vFlat=aFlat;vOP=position;',
-    fd:'uniform vec3 uFur;uniform vec3 uFlat;varying float vFlat;varying vec3 vOP;uniform float uPat,uOut;uniform vec3 uPatC,uOutC;\n'+CAPY_STYLE+'\nvec3 furC(vec3 t){return capyStyle(mix(t,uFlat,clamp(vFlat,0.,1.))*(1.-.68*clamp(vFlat-1.,0.,1.))*uFur);}',fr:[FURF,FURE]})}
+  m.userData.sty={uPat:{value:0},uPatC:{value:new T.Color('#2A1A12')},uOut:{value:0},uOutC:{value:new T.Color('#FF4F9A')},uSk:{value:0}};
+  return patch(m,{key:'capy',uni:mm=>Object.assign({uFur:mm.userData.fur,uFlat:FLATC},mm.userData.sty),vd:'attribute float aFlat;attribute vec3 outN;uniform float uSk;varying float vFlat;varying vec3 vOP;\n'+MUSC_GLSL,v:'vFlat=aFlat;vOP=position;'+MUSC_V,
+    fd:'uniform vec3 uFur;uniform vec3 uFlat;varying float vFlat;varying vec3 vOP;uniform float uPat,uOut,uSk;uniform vec3 uPatC,uOutC;\nvec3 skinPaint(vec3 c,float lum);\n'+CAPY_STYLE+SKIN_FS+'\nvec3 furC(vec3 t){return capyStyle(mix(t,uFlat,clamp(vFlat,0.,1.))*(1.-.68*clamp(vFlat-1.,0.,1.))*uFur);}',f:NOIR_F,fr:[FURF,FURE]})}
+// skins: músculos do Marombeiro (o corpo infla nesses pontos e a luz acompanha) — mesma função no corpo e no contorno
+const MUSC_GLSL=`float gsM(vec3 p,vec3 c,vec3 r){vec3 d=(p-c)/r;return exp(-dot(d,d));}
+float musc(vec3 p){vec3 q=vec3(abs(p.x),p.y,p.z);float d=0.;
+ d+=.04*gsM(q,vec3(.105,.43,.2),vec3(.088,.062,.075));
+ d+=.042*gsM(q,vec3(.27,.475,.03),vec3(.07,.07,.085));
+ d+=.032*gsM(q,vec3(.15,.505,-.07),vec3(.085,.05,.085));
+ d+=.03*gsM(q,vec3(.3,.405,.075),vec3(.045,.06,.05));
+ d+=.022*gsM(q,vec3(.305,.275,.085),vec3(.04,.05,.045));
+ d+=.028*gsM(q,vec3(.18,.37,-.17),vec3(.085,.1,.065));
+ d+=.014*gsM(q,vec3(.045,.355,.24),vec3(.03,.019,.06));d+=.014*gsM(q,vec3(.045,.307,.245),vec3(.03,.019,.06));d+=.013*gsM(q,vec3(.045,.259,.245),vec3(.03,.019,.06));
+ d+=.02*gsM(q,vec3(.1,.12,.1),vec3(.05,.05,.065));
+ return d;}
+`;
+const MUSC_V=`if(uSk>1.5&&uSk<2.5){vec3 n0=normalize(outN);float m0=musc(position);transformed+=n0*m0;
+  vec3 gr=vec3(musc(position+vec3(.004,0,0))-m0,musc(position+vec3(0,.004,0))-m0,musc(position+vec3(0,0,.004))-m0)/.004;gr-=n0*dot(gr,n0);
+  #ifndef FLAT_SHADED
+  vNormal=normalize(vNormal-normalMatrix*gr*.85);
+  #endif
+}`;
+// skins: pintura do corpo (roupas, uniforme, máscara, macacão de dino) — pela posição no modelo, acompanha a animação
+const SKIN_FS=`
+vec3 sR(float r,float g,float b){return pow(vec3(r,g,b),vec3(2.2));}
+float bx(vec2 q,vec2 c,vec2 h){vec2 d=abs(q-c)-h;return max(d.x,d.y);}
+vec3 skinPaint(vec3 c,float lum){vec3 p=vOP;float ax=abs(p.x);float fl=max(dot(uFlat*uFur,vec3(.3,.59,.11)),.02);float sh=clamp(lum/fl,.6,1.35);
+ float arm=smoothstep(.2,.24,ax)*step(.15,p.y)*(1.-step(.53,p.y));
+ float head=step(.515,p.y)*(1.-arm);
+ float front=smoothstep(.04,.1,p.z);
+ float hand=arm*(1.-smoothstep(.255,.275,p.y));
+ float tor=step(.19,p.y)*(1.-step(.515,p.y))*(1.-arm);
+ vec3 o=c;float m=0.;
+ if(uSk<1.5){
+   vec3 shirt=sR(.89,.81,.63),vest=sR(.47,.47,.28),pants=sR(.79,.71,.52),boot=sR(.36,.23,.14),belt=sR(.42,.26,.14),strap=sR(.5,.33,.18);
+   if(arm>.5&&p.y>.375){o=shirt;m=1.;if(p.y<.4)o*=.84;}
+   if(tor>.5){m=1.;o=shirt;
+     float open=front*(1.-smoothstep(.05,.058,ax));
+     if(open<.5){o=vest;
+       for(int i=0;i<2;i++){vec2 pc=i==0?vec2(.13,.425):vec2(.14,.29);vec2 hs=i==0?vec2(.06,.043):vec2(.068,.052);float d=bx(vec2(ax,p.y),pc,hs);
+         if(d<0.&&p.z>.08){o=vest*.84;if(p.y>pc.y+hs.y-.02)o=vest*.68;if(ax<pc.x+.006&&ax>pc.x-.006&&abs(p.y-(pc.y+hs.y-.022))<.007)o=sR(.6,.58,.5);}
+         if(abs(d)<.0035&&p.z>.08)o=vest*1.35;}
+       if(ax<.068&&front>.5&&step(.5,fract(p.y*90.))>.5)o=sR(.62,.62,.6);
+       if(p.z<-.05&&abs(p.y-.3)<.004)o=vest*.75;
+     } else {float by=fract((p.y-.235)/.07);if(ax<.012&&abs(by-.5)<.17)o=sR(.97,.93,.82);}
+     float sx=abs(ax-.172);if(sx<.022&&p.y>.29&&p.z>-.05){o=strap;if(sx>.016)o=strap*.72;if(abs(p.y-.43)<.014&&p.z>0.)o=sR(.58,.58,.55);}
+   }
+   if(p.y<.218&&p.y>.186&&arm<.5){o=belt;m=1.;if(abs(p.y-.202)>.012)o=belt*.78;}
+   if(p.y<=.186&&arm<.5){o=pants;m=1.;if(p.y<.085)o*=.86;if(ax<.006&&p.z>0.&&p.y>.12)o*=.8;if(abs(ax-.2)<.004&&p.y>.1)o*=.82;}
+   if(p.y<.072&&arm<.5){o=boot;m=1.;if(p.y<.016)o=sR(.17,.11,.07);if(p.y>.06)o*=.8;
+     float lx=abs(ax-.099);if(p.z>.07&&p.y>.022&&p.y<.06&&lx<.016&&abs(fract(p.y*55.)-.5)<.14)o=sR(.86,.78,.6);}
+ }
+ else if(uSk<2.5){
+   float g=0.;
+   if(front>.5&&ax<.105&&p.y>.225&&p.y<.392){g=max(g,1.-smoothstep(.0,.007,ax));for(int i=0;i<3;i++){float y=.381-float(i)*.048;g=max(g,(1.-smoothstep(.0,.006,abs(p.y-y)))*.75);}}
+   if(front>.5&&ax<.2&&tor>.5){float y=.392+ax*.3-ax*ax*1.7;g=max(g,(1.-smoothstep(.0,.009,abs(p.y-y)))*(1.-smoothstep(.15,.2,ax)));}
+   c*=1.-g*.42;
+   vec3 sh2=sR(.73,.64,.48),belt=sR(.45,.29,.16);float rag=.078+.014*vn(vec3(p.x*70.,0.,p.z*70.));
+   if(p.y<.2&&p.y>rag&&arm<.5){m=1.;o=sh2*(.93+.14*vn(p*130.));if(p.y<rag+.012)o*=.8;if(ax<.006&&p.z>0.)o*=.84;if(bx(vec2(ax,p.y),vec2(.205,.145),vec2(.03,.035))<0.&&abs(p.z)<.1)o*=.86;}
+   if(p.y<.218&&p.y>=.188&&arm<.5){m=1.;o=belt;if(abs(p.y-.203)>.011)o=belt*.78;}
+ }
+ else if(uSk<3.5){
+   vec3 blue=sR(.17,.23,.62),gold=sR(.94,.72,.24),red=sR(.85,.14,.17),brown=sR(.44,.26,.15);
+   if(head<.5){m=1.;o=blue*(.95+.05*sin(p.x*520.)*sin(p.y*520.));
+     if(tor>.5&&ax>.14&&abs(p.z+.01)<.008)o=gold;
+     if(front>.5&&tor>.5){float vx=.205-(.5-p.y)*.6;if(abs(ax-vx)<.0075&&p.y>.24)o=gold;}
+     if(p.y>.488&&p.y<.512&&arm<.5)o=gold;
+     if(arm<.5&&p.y<.185&&p.y>.1&&abs(p.z)<.008&&ax>.06)o=gold;
+     if(p.z>.14&&tor>.5){vec2 q=vec2(ax,p.y-.392);float wid=sqrt(.082*.082*clamp((q.y+.08)/.1,0.,1.));
+       float insd=step(q.y,.062)*step(-.08,q.y)*step(q.x,wid);
+       if(insd>.5){o=red;if(q.y>.05||q.x>wid-.012||q.y<-.068)o=gold;
+         vec2 qq=vec2(p.x,q.y);float paw=step(length((qq-vec2(0.,-.016))/vec2(.03,.024)),1.);
+         paw=max(paw,step(length(vec2(ax-.032,q.y-.02)/vec2(.012,.015)),1.));paw=max(paw,step(length(vec2(ax-.011,q.y-.036)/vec2(.0115,.014)),1.));
+         if(paw>.5)o=gold;}
+       float u=q.x-.092;if(u>0.&&u<.085){float yy=q.y-.016+u*.3+step(.038,u)*.024;if(abs(yy)<.011*(1.-u/.09)+.003)o=gold;}}
+     if(p.y<.226&&p.y>.184&&arm<.5){o=brown;if(abs(p.y-.205)>.016)o=gold;}
+     if(hand>.5)o=brown;else if(arm>.5&&p.y<.292)o=gold;
+     if(arm<.5&&p.y<.105)o=brown;else if(arm<.5&&p.y<.122)o=gold;
+   }
+   if(head>.5&&p.z>.1){float x=p.x;float yt=.848-.75*x*x,yb=.73+.5*x*x;if(ax<.215&&p.y<yt&&p.y>yb){o=red;m=1.;if(p.y>yt-.009||p.y<yb+.009)o=gold;}}
+ }
+ else if(uSk>4.5){
+   vec3 gr=sR(.31,.55,.23),cr=sR(.93,.8,.55);
+   float face=head*step(.0,p.z)*step(length(vec2(p.x/.22,(p.y-.705)/.185)),1.);
+   if(face<.5){m=1.;o=gr*(.9+.2*vn(p*40.));o*=1.-.22*smoothstep(.6,.68,vn(p*13.));o*=.92+.1*smoothstep(.3,.7,vn(p*110.));
+     float by=(p.y-.29)/.23;float bw=.165*sqrt(max(0.,1.-by*by));if(head<.5&&arm<.5&&p.z>.05&&ax<bw&&p.y>.08){o=cr*(.93+.1*vn(p*60.));if(fract((p.y-.075)/.06)<.13)o=cr*.78;}}
+ }
+ return mix(c,o*sh,m);}
+`;
+// skin Cinema Mudo: preto e branco de filme antigo (granulado, tremulação e riscos)
+const NOIR_F=`if(uSk>3.5&&uSk<4.5){float l=dot(gl_FragColor.rgb,vec3(.3,.59,.11));l=clamp((l-.5)*1.18+.52,0.,1.);
+  vec2 fc=floor(gl_FragCoord.xy*.6);float fr=floor(uTime*16.);float gn=fract(sin(dot(fc+fr*7.31,vec2(12.9898,78.233)))*43758.5453);l+=(gn-.5)*.12;
+  l*=.92+.08*fract(sin(fr*91.7)*4375.85);float sx=fract(sin(fr*3.1)*91.3);if(abs(gl_FragCoord.x*.004-sx*4.)<.002)l*=.6;gl_FragColor.rgb=vec3(l);}`;
 // pelagens (padrões no pelo) e roupas pintadas no corpo — tudo no shader, pela posição no modelo (acompanha a animação)
 const CAPY_STYLE=`
 float h3(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
@@ -781,6 +876,7 @@ vec3 capyStyle(vec3 c){vec3 p=vOP;float lum=dot(c,vec3(.3,.59,.11));
     else if(uOut<5.5){m=max(torso,arm*smoothstep(.24,.28,p.y));float v=(1.-smoothstep(.0,.01,ax-(.6-p.y)*.35))*step(.05,p.z)*step(.38,p.y);oc=mix(oc,vec3(.97),v);oc=mix(oc,vec3(.8,.1,.15),(1.-smoothstep(.008,.014,ax))*step(.05,p.z)*step(.38,p.y)*step(p.y,.58));} // terno
     else{m=smoothstep(.1,.13,p.y)*(1.-smoothstep(.5,.53,p.y))*(1.-arm);float strap=(1.-smoothstep(.02,.03,abs(ax-.1)))*step(.5,p.y)*(1.-smoothstep(.6,.62,p.y));m=max(m,strap);} // macacão
     c=mix(c,oc*(.75+lum*.55),m);}
+  if(uSk>.5)c=skinPaint(c,lum);
   return c;}`;
 let FLATC=null,depthOnly=null;
 function newActor(a){const m=sharedCapyMats(),body=capyBodyMat(a);
@@ -796,7 +892,7 @@ function newActor(a){const m=sharedCapyMats(),body=capyBodyMat(a);
     for(const [mm,z] of [[r1,.272],[r2,.27],[r3,.274]]){mm.position.set(0,-.07,z);mm.rotation.x=-.12;ch.add(mm)}}
   A.gun=null;A.gunId=-2;
   actG.add(A.g);return A}
-function dropActor(id){const A=actors.get(id);if(!A)return;actG.remove(A.g);if(A.gun)actG.remove(A.gun);actG.remove(A.rings.g);A.rings.ring.material.dispose();A.rings.dash.material.dispose();if(A.mat)A.mat.dispose();if(A.E3){A.E3.mat.dispose();A.E3.list[0].brow.material.dispose()}actors.delete(id)}
+function dropActor(id){const A=actors.get(id);if(!A)return;Skins3D.set(A,0);actG.remove(A.g);if(A.gun)actG.remove(A.gun);actG.remove(A.rings.g);A.rings.ring.material.dispose();A.rings.dash.material.dispose();if(A.mat)A.mat.dispose();if(A.E3){A.E3.mat.dispose();A.E3.list[0].brow.material.dispose()}actors.delete(id)}
 // arma = modelo 3D low poly (03_guns3d.js) preso na mão direita, apontando para a mira
 function setGun(A,gi){if(A.gun){actG.remove(A.gun);A.gun=null}A.gunId=gi;if(gi==null||gi<0)return;const g=Guns3D.instance(gi);if(!g)return;
   g.matrixAutoUpdate=false;g.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.castShadow=!isTouch&&!o.material.userData.nocast&&!!(cur&&cur.q.sh)}});actG.add(g);A.gun=g}
@@ -944,11 +1040,11 @@ let pwI=0,pwJ=0;
 function prewarm(ms,geoOnly){if(st!=='ready'||!R||lost||compiling)return true;const t0=performance.now();
   while(performance.now()-t0<ms){if(pwI<GUNS.length){Guns3D.build(pwI++);continue}if(geoOnly)return true;if(pwJ<GUNS.length){gunIconBig(pwJ++);continue}return true}return false}
 // visual equipado (só para a SUA capivara): pelagem, roupa e efeito
-let STY={pat:0,patC:'#2A1A12',out:0,outC:'#FF4F9A',fx:''};
-function setStyle(o){STY=Object.assign({pat:0,patC:'#2A1A12',out:0,outC:'#FF4F9A',fx:''},o||{})}
+let STY={pat:0,patC:'#2A1A12',out:0,outC:'#FF4F9A',fx:'',sk:0};
+function setStyle(o){STY=Object.assign({pat:0,patC:'#2A1A12',out:0,outC:'#FF4F9A',fx:'',sk:0},o||{})}
 function applySty(A,on,so){const u=A.mat&&A.mat.userData.sty;if(!u)return;const s=on?(so||STY):null;u.uPat.value=s?s.pat:0;u.uPatC.value.set(s?s.patC:'#2A1A12');u.uOut.value=s?s.out:0;u.uOutC.value.set(s?s.outC:'#FF4F9A');
-  const m=sharedCapyMats(),ol=on&&(so||STY).fx==='neon'?m.outNeon:m.out;if(A.outline&&A.outline.material!==ol){A.outline.material=ol;if(A.hat[1])A.hat[1].material=ol}}
-const styKey=(o=STY)=>o.pat+'|'+o.out+'|'+o.outC+'|'+o.fx+'|'+eyeKey(o.eye||EYE)+(o.ex||'');
+  Skins3D.set(A,s?s.sk|0:0);const m=sharedCapyMats(),ne=on&&(so||STY).fx==='neon',ol=A.skId===2?(ne?m.outMusN:m.outMus):ne?m.outNeon:m.out;if(A.outline&&A.outline.material!==ol){A.outline.material=ol;if(A.hat[1])A.hat[1].material=ol}}
+const styKey=(o=STY)=>o.pat+'|'+o.out+'|'+o.outC+'|'+o.fx+'|'+(o.sk|0)+'|'+eyeKey(o.eye||EYE)+(o.ex||'');
 function menuSpin(dx){if(MN)MN.spin+=dx*.012}
 function menuPoke(){if(MN&&MN.A)CapyRig.poke(MN.A)}
 // retrato 3D da capivara (cabeça ou corpo todo), guardado por cor e tamanho — usado no HUD, nos menus e no pódio

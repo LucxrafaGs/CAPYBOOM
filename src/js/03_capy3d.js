@@ -49,7 +49,7 @@ function make(mats,scale){const d=data,g=new T.Group(),bs=d.bones.map(b=>{const 
     const ck=new T.Mesh(new T.CircleGeometry(.03,12),mats.blush);ck.position.set(s*.135,.125,.175);ck.rotation.set(-.1,s*.7,0);head.add(ck)}}
   // olhos 3D (modelo de chapéu): por cima dos olhinhos fechados pintados na textura. Abrem, piscam, mudam de expressão e podem ser personalizados.
   let E3=null;if(d.extras.eyes===false&&B.head&&mats.eye)E3=makeEyes(B.head,mats.eye,mats.brow);
-  return{sc:scale,g,inner,B,skel,body,outline,xray,hat,setHat(on){for(const m of hat)m.visible=!!on},eyes,lids,E3,ev:[],st:{ph:0,mv:0,dash:0,yaw:0,look:0,lookT:0,lookAt:0,tilt:0,gag:0,gagK:'',gagT:1.5+Math.random()*2.5,blink:3,bl:0,rec:0,hurt:0,lx:null,ly:null,idle:0,spd:0,lean:0,lastS:0,hatLag:0,hatV:0,wasDash:0,air:0}}}
+  return{sc:scale,g,inner,B,skel,body,outline,xray,hat,setHat(on){this.hatWant=!!on;for(const m of hat)m.visible=!!on&&!this.noHat},eyes,lids,E3,ev:[],st:{ph:0,mv:0,dash:0,yaw:0,look:0,lookT:0,lookAt:0,tilt:0,gag:0,gagK:'',gagT:1.5+Math.random()*2.5,blink:3,bl:0,rec:0,hurt:0,lx:null,ly:null,idle:0,spd:0,lean:0,lastS:0,hatLag:0,hatV:0,wasDash:0,air:0}}}
 
 // ---------- Olhos 3D ----------
 // cada olho = meia-esfera achatada encaixada na cabeça; o shader (03_map3d.js, eyeMat) desenha esclera, íris, pupila, brilhos, pálpebras e contorno.
@@ -75,7 +75,7 @@ function makeEyes(head,mat,bmat){const up=new T.Vector3(0,1,0),fw=new T.Vector3(
     head.add(g);out.push({g,eye,brow})}
   return{list:out,mat,cfg:null,ex:EXPR.normal.slice(),exK:'',exT:0,blink:2,bl:0,gx:0,gy:0,gT:0,gtx:0,gty:0,fireT:9}}
 // personalização: {t: tipo, b: sobrancelha, c: cor da íris}
-function setEyes(A,cfg){const E=A.E3;if(!E)return;cfg=cfg||{};const k=(cfg.t|0)+'|'+(cfg.b==null?1:cfg.b)+'|'+(cfg.c||'#6B3A1E');if(E.key===k)return;E.key=k;E.cfg=cfg;
+function setEyes(A,cfg){const E=A.E3;if(!E)return;E.raw=cfg;cfg=A.skinEye?Object.assign({},cfg||{},A.skinEye):cfg||{};const k=(cfg.t|0)+'|'+(cfg.b==null?1:cfg.b)+'|'+(cfg.c||'#6B3A1E');if(E.key===k)return;E.key=k;E.cfg=cfg;
   const ty=EYET[cfg.t|0]||EYET[0],u=E.mat.userData.eu,bi=cfg.b==null?1:cfg.b;u.uE2.value.set(ty[1],ty[2],cfg.t|0,0);u.uIrisC.value.set(cfg.c||'#6B3A1E');
   for(const o of E.list){o.eye.scale.set(ER[0]*ty[0],ER[1]*ty[0],ER[2]*ty[0]);const gg=browGeos()[bi];o.brow.visible=!!gg;if(gg)o.brow.geometry=gg;o.brow.userData.base=bi===4?-.4:0;o.brow.userData.lift=ER[1]*ty[0]*1.45}}
 function expr(A,k,dur){const E=A.E3;if(!E||!EXPR[k])return;E.exK=k;E.exT=dur||1.4}
@@ -114,6 +114,7 @@ function animate(A,s){const S=A.st,B=A.B,dt=Math.min(s.dt,.05),t=s.t;
   // vira para onde está mirando (rápido, com um pouquinho de atraso fofo)
   const want=Math.atan2(Math.cos(s.aim),Math.sin(s.aim));S.yaw=dampA(S.yaw,want,Math.min(1,dt*(fz?16:0)));A.g.rotation.y=S.yaw;
   eyesTick(A,s,dt,t);
+  if(A.skId)Skins3D.tick(A,s,dt,t,S);
   if(!fz)return;
   const mv=S.mv,ds=S.dash,id=1-mv;
   // passada: cada passo é um pulinho (o corpo sobe entre os passos e amassa quando o pé bate no chão)

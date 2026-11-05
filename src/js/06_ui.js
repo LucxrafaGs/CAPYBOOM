@@ -166,10 +166,10 @@ function allFurs(){const L=FURS.map(([h,n])=>({h,n,id:null}));SHOP.find(s=>s[0]=
 const furName=h=>(allFurs().find(f=>f.h.toLowerCase()===String(h).toLowerCase())||{n:'Personalizada'}).n;
 // itens equipados (pelagem, roupa, efeito e título) — só a SUA capivara usa
 const FXK=['neon','rainbow','hearts','aura','sparks','bubbles'];
-function equip(){return Object.assign({pat:-1,out:-1,fx:-1,title:-1},store.get('equip',{}))}
+function equip(){return Object.assign({pat:-1,out:-1,fx:-1,title:-1,skin:-1},store.get('equip',{}))}
 function setEquip(k,v){const e=equip();e[k]=v;store.set('equip',e);applyEquip();Map3D.menuPoke()}
-function styOf(e){const R=SHOP.find(s=>s[0]==='roupas')[3];return{pat:e.pat>=0?e.pat+1:0,out:e.out>=0?e.out+1:0,outC:e.out>=0?R[e.out][1]:'#FF4F9A',fx:e.fx>=0?FXK[e.fx]:''}}
-function applyEquip(){Map3D.setStyle(styOf(Object.assign({},equip(),view==='loja'?PV.sty:{})));Map3D.setEyes(eyesCfg());drawSpheres()}
+function styOf(e){const R=SHOP.find(s=>s[0]==='roupas')[3];return{pat:e.pat>=0?e.pat+1:0,out:e.out>=0?e.out+1:0,outC:e.out>=0?R[e.out][1]:'#FF4F9A',fx:e.fx>=0?FXK[e.fx]:'',sk:e.skin>=0?e.skin+1:0}}
+function applyEquip(){Map3D.setStyle(styOf(Object.assign({},equip(),view==='loja'?PV.sty:{})));Map3D.setEyes(eyesCfg());drawSpheres();if(players[self]&&!solo&&(host||conn))cosSend()}
 // olhos (vestiário): tipo, sobrancelha e cor — grátis, só a sua capivara usa
 const EYE_T=['Redondo','Grandão','Sonolento','Brilhante','Pontinho','Gatinho'],EYE_B=['Nenhuma','Fina','Grossa','Arqueada','Brava'],
   EYE_CN=['Castanho','Preto','Azul','Verde','Mel','Violeta','Rosa','Vermelho','Dourado','Ciano','Cinza','Laranja'],
@@ -177,7 +177,7 @@ const EYE_T=['Redondo','Grandão','Sonolento','Brilhante','Pontinho','Gatinho'],
 const eyesCfg=()=>Object.assign({t:0,b:1,c:'#6B3A1E'},store.get('eyes',{}));
 function setEyeCfg(k,v){const e=eyesCfg();e[k]=v;store.set('eyes',e);applyEquip();Map3D.menuExpr(k==='c'?'surpreso':'feliz');Sound.play('pop')}
 // abas do Visual
-const VTABS=[['cor','palette','Cor'],['olhos','eye','Olhos'],['cabeca','hat','Cabeça'],['roupa','shirt','Roupas'],['pelo','sparkle','Pelagens'],['fx','bolt','Efeitos'],['titulo','crown','Títulos']];
+const VTABS=[['cor','palette','Cor'],['skin','crown','Skins'],['olhos','eye','Olhos'],['cabeca','hat','Cabeça'],['roupa','shirt','Roupas'],['pelo','sparkle','Pelagens'],['fx','bolt','Efeitos'],['titulo','crown','Títulos']];
 let vtab='cor';
 const HEADS=[['none','Nada'],['palha','Chapéu de palha']];
 function openCustom(){draftFur=myLook.body;renderVis()}
@@ -207,8 +207,8 @@ function renderVis(){$('visTabs').innerHTML=VTABS.map(([k,ic,n])=>`<button class
   else if(vtab==='cabeca'){const cur=myLook.hat==='none'?'none':'palha';sub.innerHTML=`<b>${cur==='none'?'Nada':'Chapéu de palha'}</b> — chapéus, cabelos e óculos.`;
     g.innerHTML=HEADS.map(([k,n])=>`<button class="m-fur${k===cur?' on':''}" data-head="${k}"><canvas width="112" height="112"></canvas><b>${n}</b></button>`).join('')+['Boné','Óculos escuros','Topete','Coroa'].map(n=>lockTile(n,'EM BREVE')).join('');
     g.querySelectorAll('[data-head]').forEach(b=>{drawPortrait(b.querySelector('canvas'),{body:myLook.body},{bg:false,hat:b.dataset.head!=='none',styObj:styOf(equip())});b.onclick=()=>setHead(b.dataset.head)})}
-  else if(vtab==='roupa'||vtab==='pelo'||vtab==='fx'){const cat=vtab==='roupa'?'roupas':vtab==='pelo'?'pelos':'estilos',key=vtab==='roupa'?'out':vtab==='pelo'?'pat':'fx',items=SHOP.find(s=>s[0]===cat)[3],cur=e[key];
-    sub.innerHTML=`<b>${cur>=0?escapeHtml(items[cur][0]):'Nada'}</b> — ${vtab==='roupa'?'roupas pintadas no corpo':vtab==='pelo'?'padrões no pelo':'efeitos que acompanham sua capivara'}. Compre na Loja ou ganhe nos Desafios.`;
+  else if(vtab==='roupa'||vtab==='pelo'||vtab==='fx'||vtab==='skin'){const cat={roupa:'roupas',pelo:'pelos',fx:'estilos',skin:'skins'}[vtab],key={roupa:'out',pelo:'pat',fx:'fx',skin:'skin'}[vtab],items=SHOP.find(s=>s[0]===cat)[3],cur=e[key];
+    sub.innerHTML=`<b>${cur>=0?escapeHtml(items[cur][0]):'Nada'}</b> — ${vtab==='roupa'?'roupas pintadas no corpo':vtab==='pelo'?'padrões no pelo':vtab==='skin'?'personagens completos em 3D (vencem roupas e pelagens)':'efeitos que acompanham sua capivara'}. ${vtab==='skin'?'Compre na Loja.':'Compre na Loja ou ganhe nos Desafios.'}`;
     g.innerHTML=`<button class="m-fur${cur<0?' on':''}" data-eq="-1"><canvas width="112" height="112"></canvas><b>Nada</b></button>`+items.map(([n,v],i)=>has(cat+':'+i)?
       `<button class="m-fur${cur===i?' on':''}" data-eq="${i}">${vtab==='fx'?`<span class="m-fxpv" style="background:${v}"></span>`:'<canvas width="112" height="112"></canvas>'}<b>${escapeHtml(n)}</b></button>`:lockTile(n,'LOJA',`data-lock="${cat}:${i}"`)).join('');
     g.querySelectorAll('[data-eq]').forEach(b=>{const i=+b.dataset.eq,cv=b.querySelector('canvas');if(cv){const tmp=Object.assign({},e,{[key]:i});tileCv(cv,myLook.body,styOf(vtab==='fx'?Object.assign(tmp,{fx:-1}):tmp))}b.onclick=()=>{setEquip(key,i);Sound.play('pop');renderVis()}})}
@@ -226,7 +226,8 @@ function setFur(h){draftFur=h;myLook=cleanLook(Object.assign({},myLook,{body:h})
 const shortNum=n=>n>=1e6?(Math.floor(n/1e5)/10).toLocaleString('pt-BR')+' mi':n>=1e4?(Math.floor(n/100)/10).toLocaleString('pt-BR')+' mil':String(n); // 99.999.999 -> "99,9 mi" (cabe no topo)
 const wallet=()=>Math.max(0,store.get('totalGems',0)-store.get('spent',0)+store.get('bonusOr',0));
 const RAR={comum:['Comum','#9AA3B3'],raro:['Raro','#45D4FF'],epico:['Épico','#B777FF'],lend:['Lendário','#FFC531']};
-const SHOP=[['roupas','shirt','Roupas',[['Camiseta Listrada','#FF4F9A','comum',60],['Moletom de Capuz','#45D4FF','raro',150],['Jaqueta de Couro','#3A3048','epico',320],['Regata de Praia','#FFC531','comum',50],['Terno Chique','#2A2440','lend',600],['Macacão de Mecânico','#3D6BFF','raro',180]]],
+const SHOP=[['skins','crown','Skins',[['Explorador','#D9C69A','epico',900],['Marombeiro','#C98B4E','lend',1500],['Super-Capi','#D6262E','lend',1800],['Cinema Mudo','#8A8F9A','raro',600],['Dino','#4E8B3B','lend',1600]]],
+  ['roupas','shirt','Roupas',[['Camiseta Listrada','#FF4F9A','comum',60],['Moletom de Capuz','#45D4FF','raro',150],['Jaqueta de Couro','#3A3048','epico',320],['Regata de Praia','#FFC531','comum',50],['Terno Chique','#2A2440','lend',600],['Macacão de Mecânico','#3D6BFF','raro',180]]],
   ['fundos','image','Fundos e temas',[['Praia ao Pôr do Sol','linear-gradient(#FF9A5A,#FF5F8F 55%,#3A1C80)','raro',200],['Floresta Encantada','linear-gradient(#1F5E3A,#3DBE6C 60%,#C9F0A0)','raro',200],['Cidade Neon','linear-gradient(#0B0730,#4A1A8A 50%,#FF4FB0)','epico',350],['Aurora Boreal','linear-gradient(#0A1A3A,#2FA88A 45%,#B777FF)','lend',700],['Doce Chiclete','linear-gradient(#FFD1E8,#FF8FC8)','comum',90],['Deserto','linear-gradient(#FFE0A0,#E8A050 60%,#8A4A20)','comum',90]]],
   ['quadros','image','Quadros',[['A Última Ceia das Capivaras','ceia','lend',800],['O Repouso de Capybarus','deusa','epico',450],['O Vaso Grego das Capivaras','vaso','epico',450],['Capivaras em Festa','pop','raro',300],
     ['Capivárias Operárias','operarios','epico',500],['O Lamento das Capivaras','lamento','raro',350],['Capivara no Sertão','sertao','raro',300]]],
@@ -244,17 +245,17 @@ function tabArrows(id){const el=$(id);if(!el||el._upd)return;const w=document.cr
   addEventListener('pointerup',()=>{dn=null;w.classList.remove('drag')});
   el.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false}},true);
   el.addEventListener('wheel',e=>{if(Math.abs(e.deltaY)>Math.abs(e.deltaX)&&el.scrollWidth>el.clientWidth){el.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false})}
-let shopTab='roupas';
+let shopTab='skins';
 // experimentar: tocar no card aplica o item na sua capivara / no fundo só para ver; comprar é só no botão do preço
 function tryItem(id){const [k,i]=id.split(':'),n=+i,on=PV.ids.includes(id);PV.ids=PV.ids.filter(x=>x.split(':')[0]!==k);
-  const key={roupas:'out',pelos:'pat',estilos:'fx'}[k];
+  const key={roupas:'out',pelos:'pat',estilos:'fx',skins:'skin'}[k];
   if(key){if(on)delete PV.sty[key];else PV.sty[key]=n;Map3D.setStyle(styOf(Object.assign({},equip(),PV.sty)))}
   else if(k==='cores')PV.fur=on?null:SHOP.find(c=>c[0]==='cores')[3][n][1];
   else{PV.bg=on?null:k==='fundos'?'shop_f'+n:SHOP.find(c=>c[0]==='quadros')[3][n][1];applyMenuBg()}
   if(!on){PV.ids.push(id);Map3D.menuExpr(pick(['feliz','surpreso']))}Sound.play(on?'click':'pop');renderShop()}
 function clearTry(){if(!PV.ids.length)return;PV={sty:{},fur:null,bg:null,ids:[]};Map3D.setStyle(styOf(equip()));applyMenuBg()}
-const isEq=id=>{const [k,i]=id.split(':'),e=equip(),n=+i;return k==='roupas'?e.out===n:k==='pelos'?e.pat===n:k==='estilos'?e.fx===n:k==='cores'?myLook.body.toLowerCase()===SHOP.find(s=>s[0]==='cores')[3][n][1].toLowerCase():k==='fundos'?curBg==='shop_f'+n:k==='quadros'?curBg===SHOP.find(s=>s[0]==='quadros')[3][n][1]:false};
-function equipItem(id){const [k,i]=id.split(':'),n=+i;if(k==='roupas')setEquip('out',n);else if(k==='pelos')setEquip('pat',n);else if(k==='estilos')setEquip('fx',n);
+const isEq=id=>{const [k,i]=id.split(':'),e=equip(),n=+i;return k==='skins'?e.skin===n:k==='roupas'?e.out===n:k==='pelos'?e.pat===n:k==='estilos'?e.fx===n:k==='cores'?myLook.body.toLowerCase()===SHOP.find(s=>s[0]==='cores')[3][n][1].toLowerCase():k==='fundos'?curBg==='shop_f'+n:k==='quadros'?curBg===SHOP.find(s=>s[0]==='quadros')[3][n][1]:false};
+function equipItem(id){const [k,i]=id.split(':'),n=+i;if(k==='skins')setEquip('skin',n);else if(k==='roupas')setEquip('out',n);else if(k==='pelos')setEquip('pat',n);else if(k==='estilos')setEquip('fx',n);
   else if(k==='cores')setFur(SHOP.find(s=>s[0]==='cores')[3][n][1]);else if(k==='fundos'||k==='quadros'){curBg=k==='fundos'?'shop_f'+n:SHOP.find(s=>s[0]==='quadros')[3][n][1];store.set('menubg',curBg);applyMenuBg()}Sound.play('pop')}
 function renderShop(){$('shopBal').textContent=wallet();
   $('shopTabs').innerHTML=SHOP.map(([k,ic,n])=>`<button class="m-tab${k===shopTab?' on':''}" data-st="${k}">${I(ic)}<span>${n}</span></button>`).join('');
@@ -262,7 +263,7 @@ function renderShop(){$('shopBal').textContent=wallet();
   tabArrows('shopTabs');$('shopTabs')._upd();
   const cat=SHOP.find(c=>c[0]===shopTab),bal=wallet();
   $('shopGrid').innerHTML=cat[3].map(([n,v,r,price],i)=>{const id=shopTab+':'+i,own=has(id),[rn,rc]=RAR[r],eqd=own&&isEq(id);
-    const pv=(shopTab==='roupas'||shopTab==='pelos'||shopTab==='cores')?`<span class="m-spv" style="background:radial-gradient(circle at 50% 40%,#5A34B0,#24104F)"><canvas width="112" height="112" data-pv="${id}"></canvas></span>`
+    const pv=(shopTab==='skins'||shopTab==='roupas'||shopTab==='pelos'||shopTab==='cores')?`<span class="m-spv" style="background:radial-gradient(circle at 50% 40%,#5A34B0,#24104F)"><canvas width="112" height="112" data-pv="${id}"></canvas></span>`
       :shopTab==='estilos'?`<span class="m-spv" style="background:radial-gradient(circle at 50% 40%,#3A1C80,#170A38)"><i class="m-sglow" style="background:${v}"></i></span>`
       :shopTab==='quadros'?`<span class="m-spv m-art" style="background-image:url(loading/${v}_p.jpg?v=${ASSETV})"></span>`
       :`<span class="m-spv" style="background:radial-gradient(ellipse at 50% 60%,${SHOPWATERS[i][0]},${SHOPWATERS[i][1]} 70%,${SHOPWATERS[i][3]})"><i class="m-wv"></i></span>`;
@@ -270,11 +271,11 @@ function renderShop(){$('shopBal').textContent=wallet();
   const e=equip();
   $('shopGrid').querySelectorAll('canvas[data-pv]').forEach(cv=>{const [k,i]=cv.dataset.pv.split(':'),n=+i;
     if(k==='cores')drawPortrait(cv,{body:cat[3][n][1],hat:myLook.hat},{bg:false,styObj:styOf(e)});
-    else drawPortrait(cv,{body:myLook.body,hat:myLook.hat},{bg:false,full:k==='roupas',styObj:styOf(Object.assign({},e,k==='roupas'?{out:n}:{pat:n}))})});
+    else drawPortrait(cv,{body:myLook.body,hat:myLook.hat},{bg:false,full:k==='roupas'||k==='skins',styObj:styOf(Object.assign({},e,k==='roupas'?{out:n}:k==='skins'?{skin:n}:{pat:n}))})});
   $('shopGrid').querySelectorAll('[data-try]').forEach(c=>c.onclick=()=>tryItem(c.dataset.try));
   $('shopGrid').querySelectorAll('[data-buy]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();buy(b.dataset.buy,+b.dataset.price)});
   $('shopGrid').querySelectorAll('[data-eq]').forEach(b=>b.onclick=ev=>{ev.stopPropagation();untry(b.dataset.eq);equipItem(b.dataset.eq);renderShop()})}
-function untry(id){const k=id.split(':')[0];if(!PV.ids.some(x=>x.split(':')[0]===k))return;PV.ids=PV.ids.filter(x=>x.split(':')[0]!==k);const key={roupas:'out',pelos:'pat',estilos:'fx'}[k];if(key)delete PV.sty[key];else if(k==='cores')PV.fur=null;else PV.bg=null}
+function untry(id){const k=id.split(':')[0];if(!PV.ids.some(x=>x.split(':')[0]===k))return;PV.ids=PV.ids.filter(x=>x.split(':')[0]!==k);const key={roupas:'out',pelos:'pat',estilos:'fx',skins:'skin'}[k];if(key)delete PV.sty[key];else if(k==='cores')PV.fur=null;else PV.bg=null}
 async function buy(id,price){if(wallet()<price){Sound.play('no');toast(`Faltam ${price-wallet()} laranjas. Jogue partidas e complete desafios para juntar mais!`,'bad');return}
   if(!await confirmBox('Comprar item?',`${itemName(id)} — ${price} laranjas.`,'COMPRAR','CANCELAR'))return;
   store.set('spent',store.get('spent',0)+price);give(id);untry(id);Sound.play('level');celebrate(30);equipItem(id);toast('Comprado e equipado! Troque quando quiser no Visual'+(id.startsWith('fundos')||id.startsWith('quadros')?' / Fundo':'')+'.','good');renderShop();renderTop()}
@@ -423,7 +424,11 @@ function renderLobby(force){if(view!=='lobby')return;const lk=JSON.stringify([ro
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const ghostBots=[];
 function lobbyAnim(){if(view!=='lobby')return;requestAnimationFrame(lobbyAnim);const t=time(),list=Object.values(players).filter(p=>!p.bot);document.querySelectorAll('#roster .slot canvas').forEach((cv,i)=>{const c=cv.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,cv.width,cv.height);const p=list[i];
-  c.translate(100,170);c.scale(3.1,3.1);if(p)drawChar(c,p.look,{face:i%2?-1:1,t:t+i*333,noGun:true,shout:Math.sin(t/700+i)>.85});else if(i<list.length+cfg.bots){c.globalAlpha=.7;if(!ghostBots[i])ghostBots[i]=randomLook();drawChar(c,ghostBots[i],{face:i%2?-1:1,t:t+i*333,noGun:true,bot:true})}
+  // capivara 3D de cada um (com skin/roupa/olhos que vêm pelo canal 'cos'); respira e dá pulinhos de vez em quando
+  const bot=!p&&i<list.length+cfg.bots,im=(p||bot)?Map3D.capyIcon(bot?'#E2C48C':p.look.body,200,230,'full',bot||p.look.hat!=='none',bot?false:p.id===self?true:(COS[p.id]||false)):null;
+  if(im){const ph=t/1000*2.4+i*.9,hop=Math.max(0,Math.sin(t/1000*1.3+i*1.7))**12,br=Math.sin(ph)*.018;c.globalAlpha=bot?.62:1;
+    c.save();c.translate(100,226-hop*22);c.scale(1+br-hop*.04,1-br+hop*.06);c.drawImage(im,-100,-226,200,230);c.restore();c.globalAlpha=1;return}
+  c.translate(100,170);c.scale(3.1,3.1);if(p)drawChar(c,p.look,{face:i%2?-1:1,t:t+i*333,noGun:true,shout:Math.sin(t/700+i)>.85});else if(bot){c.globalAlpha=.7;if(!ghostBots[i])ghostBots[i]=randomLook();drawChar(c,ghostBots[i],{face:i%2?-1:1,t:t+i*333,noGun:true,bot:true})}
   else{c.globalAlpha=.5;c.setLineDash([3,3]);c.strokeStyle='#fff';c.lineWidth=1.2;capyPath(c);c.stroke()}LW=2.2})}
 $('btnCopy').onclick=()=>{const done=()=>{toast('Copiado! Manda pros amigos.','good');Sound.play('yes');celebrate(25)};try{navigator.clipboard.writeText(room).then(done,()=>toast('Código: '+room))}catch(e){toast('Código: '+room)}};
 $('btnStart').onclick=()=>{if(host){Sound.play('boing');startMatch()}else if(isOwner()){Sound.play('boing');ownerSend({type:'start'})}};

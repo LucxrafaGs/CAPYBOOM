@@ -18,7 +18,7 @@ function botProfile(i){const R=mulberry(9173+i*7919),pk=a=>a[Math.floor(R()*a.le
   const furs=[...FURS.map(f=>f[0]),...RFURS.map(f=>f[0]),...SHOP.find(s=>s[0]==='cores')[3].map(c=>c[1])];
   const L=defaultLook(Math.floor(R()*PRESETS.length));L.body=pk(furs);L.hat=R()<.62?'cartola':'none';
   const roupas=SHOP.find(s=>s[0]==='roupas')[3],pat=R()<.45?0:1+Math.floor(R()*6),out=R()<.35?0:1+Math.floor(R()*6);
-  return{name:BOT_NICKS[i%BOT_NICKS.length],look:cleanLook(L),sty:{pat,patC:'#2A1A12',out,outC:out?roupas[out-1][1]:'#FF4F9A',fx:R()<.08?'neon':''},eye:{t:Math.floor(R()*6),b:Math.floor(R()*5),c:pk(Map3D.EYECOLS)}}}
+  return{name:BOT_NICKS[i%BOT_NICKS.length],look:cleanLook(L),sty:{pat,patC:'#2A1A12',out,outC:out?roupas[out-1][1]:'#FF4F9A',fx:R()<.08?'neon':'',sk:R()<.2?1+Math.floor(R()*5):0},eye:{t:Math.floor(R()*6),b:Math.floor(R()*5),c:pk(Map3D.EYECOLS)}}}
 function disguiseBots(){const pool=[...Array(BOT_NICKS.length).keys()].sort(()=>Math.random()-.5);let j=0;
   for(const p of Object.values(players))if(p.bot){const pr=botProfile(pool[j++]);p.name=pr.name;p.look=pr.look;p.sty=pr.sty;p.eye=pr.eye;p.fake=1}}
 

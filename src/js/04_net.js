@@ -1,13 +1,21 @@
 // ---------- Rede (PeerJS, anfitrião autoritativo) ----------
 let netAt=0;
+// visual 3D de cada jogador (skin, roupa, pelagem, efeito e olhos): fica fora da simulação, viaja num canal próprio ('cos')
+let COS={};
+function myCos(){const s=styOf(equip());return{sk:s.sk,pat:s.pat,out:s.out,outC:s.outC,fx:s.fx,eye:eyesCfg()}}
+function cleanCos(c){if(!c||typeof c!=='object')return null;const n=(v,a,b)=>Math.max(a,Math.min(b,v|0)),hx=v=>/^#[0-9a-f]{6}$/i.test(v);
+  return{sk:n(c.sk,0,5),pat:n(c.pat,0,6),patC:'#2A1A12',out:n(c.out,0,6),outC:hx(c.outC)?c.outC:'#FF4F9A',fx:['neon','rainbow','hearts','aura','sparks','bubbles'].includes(c.fx)?c.fx:'',
+    eye:c.eye&&typeof c.eye==='object'?{t:n(c.eye.t,0,5),b:n(c.eye.b,0,4),c:hx(c.eye.c)?c.eye.c:'#6B3A1E'}:null}}
+function cosBroadcast(){if(!host||solo)return;COS[self]=cleanCos(myCos());const m={type:'cos',m:COS};for(const c of Object.values(clients))send(c,m)}
+function cosSend(){try{if(host)cosBroadcast();else if(conn&&conn.open&&netMode!=='srv')send(conn,{type:'cos',c:myCos()})}catch(e){}}
 function send(c,d){try{if(c&&c.open)c.send(d)}catch(e){}}
 function sync(force){if(!host||solo)return;const t=time();if(!force&&t-netAt<66)return;netAt=t;const s=snapshot();for(const c of Object.values(clients))send(c,s)}
 function setNet(msg,kind=''){const el=$('netStatus');el.className='statusline '+kind;el.querySelector('.txt').textContent=msg}
 function hostRoom(){if(OFFLINE||typeof Peer==='undefined'){setNet('Não deu para carregar o módulo online. Verifique a internet.','err');return}
   stopDemo();leaveNet();host=true;solo=false;room=roomId();setNet('Criando a sala no seu aparelho…','busy');
   peer=new Peer(PEER_PREFIX+room,peerOpts());
-  peer.on('open',()=>{self=peer.id;players={};players[self]=newPlayer(self,myNick(),myLook);started=false;over=false;setNet('Sala criada!','ok');go('lobby');renderLobby()});
-  peer.on('connection',c=>{c.on('data',d=>hostMessage(c,d));c.on('close',()=>{delete clients[c.peer];delete votes[c.peer];if(players[c.peer]){toast(players[c.peer].name+' saiu da sala');dropFlag(players[c.peer],time());delete players[c.peer]}sync(true);renderLobby()});c.on('error',()=>{})});
+  peer.on('open',()=>{self=peer.id;players={};players[self]=newPlayer(self,myNick(),myLook);COS={};COS[self]=cleanCos(myCos());started=false;over=false;setNet('Sala criada!','ok');go('lobby');renderLobby()});
+  peer.on('connection',c=>{c.on('data',d=>hostMessage(c,d));c.on('close',()=>{delete clients[c.peer];delete votes[c.peer];delete COS[c.peer];if(players[c.peer]){toast(players[c.peer].name+' saiu da sala');dropFlag(players[c.peer],time());delete players[c.peer]}sync(true);renderLobby()});c.on('error',()=>{})});
   peer.on('error',e=>{setNet('Erro: '+(e.type||'desconhecido')+'. Tente de novo.','err');if(view==='lobby')toast('Conexão perdida','bad')})}
 function joinRoom(code){if(OFFLINE||typeof Peer==='undefined'){setNet('Não deu para carregar o módulo online. Verifique a internet.','err');return}
   code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length!==6){setNet('O código tem 6 letras ou números.','err');return}
@@ -20,16 +28,18 @@ function joinRoom(code){if(OFFLINE||typeof Peer==='undefined'){setNet('Não deu 
   peer.on('error',e=>{setNet(e.type==='peer-unavailable'?'Sala não encontrada. Será que ela foi pegar um lanche?':'Erro de conexão: '+e.type,'err')})}
 function hostMessage(c,d){if(!d||typeof d!=='object')return;
   if(d.type==='join'){const humans=Object.values(players).filter(p=>!p.bot).length;if((started&&!over)||humans>=MAX_PLAYERS){send(c,{type:'reject',reason:started?'A partida já começou. Espere a próxima!':'Sala cheia (10/10).'});return}
-    clients[c.peer]=c;players[c.peer]=newPlayer(c.peer,d.name,d.look);send(c,{type:'welcome',id:c.peer,room});toast(players[c.peer].name+' entrou!','good');Sound.play('boing');sync(true);renderLobby()}
+    clients[c.peer]=c;players[c.peer]=newPlayer(c.peer,d.name,d.look);send(c,{type:'welcome',id:c.peer,room});cosBroadcast();toast(players[c.peer].name+' entrou!','good');Sound.play('boing');sync(true);renderLobby()}
   if(d.type==='i'&&players[c.peer]){players[c.peer].keys=filterKeys(d.k);if(Number.isFinite(d.a))players[c.peer].aim=d.a;if(Number.isFinite(d.d))players[c.peer].ad=d.d}
   if(d.type==='swap'&&players[c.peer])players[c.peer].swapReq=1;
   if(d.type==='perk'&&players[c.peer])choosePerk(players[c.peer],d.id,time());
   if(d.type==='look'&&players[c.peer]&&!started){players[c.peer].look=cleanLook(d.look);sync(true);renderLobby()}
+  if(d.type==='cos'&&players[c.peer]){COS[c.peer]=cleanCos(d.c);cosBroadcast();renderLobby(true)}
   if(d.type==='vote'&&players[c.peer]&&MODES.some(m=>m.id===d.mode)){votes[c.peer]=d.mode;sync(true);if(view==='result')renderVotes()}}
 let lastState=null;
 function clientMessage(d){if(!d||typeof d!=='object')return;
   if(d.type==='reject'){setNet(d.reason,'err');leaveNet(true);return}
-  if(d.type==='welcome'){self=d.id;room=d.room;setNet('Conectado!','ok');go('lobby');return}
+  if(d.type==='welcome'){self=d.id;room=d.room;setNet('Conectado!','ok');go('lobby');cosSend();return}
+  if(d.type==='cos'){COS={};for(const k in d.m||{})COS[k]=cleanCos(d.m[k]);renderLobby(true);return}
   if(d.type==='s'){const off=d.ht-time();clockOff=lastState?lerp(clockOff,off,Math.abs(off-clockOff)>500?1:.1):off;lastState=d;
     const old=players;players={};for(const k in d.P){const n=d.P[k],o=old[k];n.rx=o?o.rx:n.x;n.ry=o?o.ry:n.y;n.keys={};n.gun=n.guns[n.slot];players[k]=n}
     bullets=d.B||[];gems=d.G||[];meds=d.MD||[];crates=d.CR||[];builds=d.BU||[];fields=d.FI||[];effects=d.E||[];matchEnd=d.me;ms=d.ms||ms;votes=d.votes||{};
@@ -42,7 +52,7 @@ function pushInputs(force){const me=players[self];if(host||demo){if(me){me.keys=
   else if(conn&&netMode==='srv'){const k=filterKeys(keys),a=+localAim.toFixed(2),d=Math.round(localAimDist/10)*10,sig=KEYLIST.map(x=>+k[x]).join('')+a+'|'+d,t=time();
     if(force||(sig!==lastSig&&t-lastInput>40)||t-lastInput>500){send(conn,{type:'i',k,a,d});lastInput=t;lastSig=sig}}
   else if(conn&&(force||time()-lastInput>45)){send(conn,{type:'i',k:filterKeys(keys),a:+localAim.toFixed(3),d:Math.round(localAimDist)});lastInput=time()}}
-function leaveNet(keepStatus){srvSession++;stopPing();srvOwner=null;srvInfo=null;wsTok='';try{if(conn){const c=conn;conn=null;c.close()}}catch(e){}try{if(peer){peer.destroy()}}catch(e){}peer=null;conn=null;clients={};lastState=null;
+function leaveNet(keepStatus){srvSession++;stopPing();srvOwner=null;srvInfo=null;wsTok='';try{if(conn){const c=conn;conn=null;c.close()}}catch(e){}try{if(peer){peer.destroy()}}catch(e){}peer=null;conn=null;clients={};lastState=null;COS={};
   if(!keepStatus){host=false;solo=false;started=false;over=false;paused=false}}
 
 

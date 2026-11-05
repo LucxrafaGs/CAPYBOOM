@@ -139,7 +139,7 @@ function drawPlayer(p,tr,t,ht,fancy){const x=p.rx,y=p.ry;
   if(p.dashTime>0&&fancy)addP({x:x+rand(-6,6),y:y+rand(-14,14),h:rand(6,30),vx:-Math.cos(p.aim)*10,type:'dot',col:p.look.trail,size:9,life:.25});
   if(ht<p.burnUntil)FX3D.burning(x,y+8,1/60);
   const hurt=ht-p.hurtAt<140,frozen=ht<p.frozenUntil,g=GUNS[p.gun],me=players[self];
-  acts3.push({id:p.id,x,y,aim:p.aim,bot:p.bot&&!p.fake,sty:p.fake?p.sty:null,eye:p.fake?p.eye:null,look:p.look,gun:p.gun,melee:!!(g&&g.melee),swing:tr.swing||0,recoil:t-tr.shotT<90?1:0,hurt:hurt?1-(ht-p.hurtAt)/140:0,
+  acts3.push({id:p.id,x,y,aim:p.aim,bot:p.bot&&!p.fake,sty:p.fake?p.sty:p.id!==self&&COS[p.id]||null,eye:p.fake?p.eye:p.id!==self&&COS[p.id]&&COS[p.id].eye||null,look:p.look,gun:p.gun,melee:!!(g&&g.melee),swing:tr.swing||0,recoil:t-tr.shotT<90?1:0,hurt:hurt?1-(ht-p.hurtAt)/140:0,
     frozen,dash:p.dashTime>0,low:p.hp<=(p.maxHp||100)*.3,kill:performance.now()-(tr.killT||-1e9)<1600,shield:ht<p.shieldUntil,self:p.id===self,ring:p.team>=0&&isTeams()?TEAM[p.team].c:null,xc:p.id===self?'#FFC531':(p.team>=0&&isTeams())?TEAM[p.team].c:(me&&sameTeam(me,p)?'#6CF06A':'#FF4F9A')});
   if(!CAP3)return;
   ctx.save();ctx.translate(x,y);ctx.translate(0,Map3D.FEET-Map3D.K*30);ctx.scale(1,1/SQ);
