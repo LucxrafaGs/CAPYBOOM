@@ -3,7 +3,7 @@
 // Sem conta, tudo continua só no navegador (como antes). Com conta, cada mudança é salva na nuvem alguns segundos depois,
 // e ao entrar em outro aparelho o progresso vem junto. Na primeira vez, o progresso que já estava no navegador vai para a conta.
 const SB_URL='https://cswuqdlxlguivvhzugyq.supabase.co',SB_KEY='sb_publishable_RVa9J--f2jg_XqPhVU5_sQ_Xs1a_hV3';
-const SYNC_KEYS=['nick','look','owned','equip','eyes','menubg','trophies','bonusXp','stats','daily','totalGems','spent','bonusOr'];
+const SYNC_KEYS=['nick','look','owned','equip','eyes','menubg','trophies','bonusXp','stats','daily','totalGems','spent','bonusOr','season'];
 const ACC={ses:store.get('acc',null),prof:null,tab:'novo',msg:null,busy:false,dirty:false,saveT:0,lastSave:0,syncErr:false,pending:null};
 const rawSet=store.set.bind(store);
 store.set=(k,v)=>{rawSet(k,v);if(ACC.prof&&SYNC_KEYS.includes(k))accDirty()};
@@ -143,7 +143,7 @@ function gateHide(){const g=$('gate');if(!g||g.classList.contains('hidden'))retu
 addEventListener('keydown',e=>{if(!document.body.classList.contains('gated'))return;const tag=document.activeElement&&document.activeElement.tagName;if(tag==='INPUT')return;e.stopImmediatePropagation()},true);
 if(!ACC.ses)gateShow();
 $('btnAcc').onclick=()=>{Sound.play('click');go('conta')};
-$('accTag').onclick=e=>{e.stopPropagation();Sound.play('click');go('conta')};
+if($('accTag'))$('accTag').onclick=e=>{e.stopPropagation();Sound.play('click');go('conta')};
 accTagUpd();
 // ao abrir o jogo com conta: busca o progresso salvo (se falhar, joga com o que está no navegador e tenta salvar depois)
 if(ACC.ses)accPull().then(()=>{if(ACC.recovery&&ACC.prof)go('conta');else if(ACC.welcome&&ACC.prof){toast('Email confirmado! Bem-vindo, '+ACC.prof.username+'!','good');go('conta')}}).catch(e=>console.warn('conta:',e));

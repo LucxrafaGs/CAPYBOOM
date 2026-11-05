@@ -90,7 +90,7 @@
 <div id="mtop" class="m-top m-fixed hidden">
   <div class="m-prof">
     <button class="m-ava" id="avaBtn" title="Visual da capivara"><canvas id="avaCv" width="128" height="128"></canvas><svg class="i m-crown"><use href="#i-crown"/></svg><b class="m-avalv" id="avaLv">1</b></button>
-    <div class="m-panel m-name"><b id="homeNick">Capivara</b><div class="m-bar"><i id="xpFill"></i></div><small id="xpTxt">0 / 100 XP</small><button class="m-acctag" id="accTag">Criar conta</button></div>
+    <div class="m-panel m-name"><b id="homeNick">Capivara</b><div class="m-bar"><i id="xpFill"></i></div><small id="xpTxt">0 / 100 XP</small></div>
   </div>
   <div class="m-res">
     <div class="m-pill" title="Troféus"><svg class="i"><use href="#i-trophy"/></svg><span id="totWins">0</span></div>
@@ -105,16 +105,15 @@
 <!-- INÍCIO: a capivara 3D no deque (desenhada no WebGL atrás) e os painéis em volta -->
 <section id="home" class="screen mscreen">
   <div class="m-right">
-    <button class="m-panel m-mapcard" id="mapCard" title="Montar partida contra bots"><div class="m-mctxt"><small>CONTRA BOTS</small><b id="mcMode">Mata-mata</b><span id="mcMap">Praça Capy</span></div><canvas id="mcThumb" width="220" height="132"></canvas></button>
     <div class="m-panel m-chal" id="chalBox"><h4>Desafios Diários<span class="m-chalsum" id="chalSum">0/3</span></h4><div id="chalList"></div><div class="m-chalfoot"><svg class="i"><use href="#i-timer"/></svg><span id="chalReset">renova em 0h</span></div></div>
   </div>
   <div class="m-bl">
-    <div class="m-season"><div class="m-seahead">PROGRESSO DA TEMPORADA</div><div class="m-seabar"><b id="seaLv">1</b><div class="m-bar"><i id="seaFill"></i><span id="seaName">Capivara Novata</span></div><svg class="i m-lotus"><use href="#i-lotus"/></svg></div></div>
+    <button class="m-season" id="seaCard" title="Ver os prêmios da temporada"><div class="m-seahead" id="seaHead">TEMPORADA 1</div><div class="m-seabar"><b id="seaLv">1</b><div class="m-bar"><i id="seaFill"></i><span id="seaName">0 XP</span></div><svg class="i m-lotus"><use href="#i-gift"/></svg></div></button>
     <button class="m-link" data-friends>ABRIR GRUPO<b class="frbadge hidden"></b></button>
   </div>
   <div class="m-br">
-    <button class="m-sel" id="btnSelector"><svg class="i"><use href="#i-bot"/></svg><span>CONTRA BOTS</span><em>!</em></button>
-    <button class="m-play" id="btnPlay"><b>JOGAR!</b><small>Online • rápida, por código ou sala própria</small></button>
+    <button class="m-sel" id="btnSelector"><svg class="i"><use href="#i-gear"/></svg><span>PERSONALIZADO</span></button>
+    <button class="m-play" id="btnPlay"><b>JOGAR!</b><small>Partida rápida • 10 capivaras</small></button>
   </div>
   <div class="m-hint">arraste para girar a capivara • clique nela!</div>
   <div class="version">v5.1 • CapiBoom 3D</div>
@@ -161,6 +160,19 @@
     <div class="m-bggrid" id="bgGrid"></div>
   </div>
 </section>
+
+<!-- TEMPORADA: os 30 prêmios -->
+<section id="temporada" class="screen mscreen mside hidden">
+  <div class="m-cpanel m-panel m-wide m-seapanel">
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-lotus"/></svg>TEMPORADA</h3></div>
+    <div class="ts-top" id="tsTop"></div>
+    <div class="ts-how" id="tsHow"></div>
+    <div class="ts-grid" id="tsGrid"></div>
+  </div>
+</section>
+
+<!-- FIM DE PARTIDA: suspense, pódio e a barra da temporada -->
+<div id="endSeq" class="hidden"><div class="es-bg"></div><div class="es-stage" id="esStage"></div></div>
 
 <!-- PORTÃO: entrar ou criar conta (aparece depois da abertura; sem conta não dá para jogar) -->
 <div id="gate" class="hidden">
@@ -210,7 +222,7 @@
 <!-- MONTAR PARTIDA (bots) — painel dentro do menu -->
 <section id="setup" class="screen mscreen mside hidden">
   <div class="m-cpanel m-panel m-wide">
-    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-bot"/></svg>CONTRA BOTS</h3></div>
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-gear"/></svg>PERSONALIZADO</h3><button class="m-friends" id="btnFriendsPlay"><svg class="i"><use href="#i-users"/></svg>JOGAR COM AMIGOS</button></div>
     <div class="m-setup"><div class="setupwrap" id="setupPanel"></div></div>
     <div class="m-cact"><span class="m-sub" id="setupSub">Mata-mata • Praça Capy</span><button class="m-play sm" id="btnStartBots"><b>JOGAR!</b></button></div>
   </div>

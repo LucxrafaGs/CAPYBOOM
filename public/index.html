@@ -1347,6 +1347,115 @@ body:not(.mport) .m-accbtn{display:none} /* no PC e celular deitado a conta fica
 .g-art small{font:800 10px var(--font-ui);letter-spacing:2px;color:#FF8FC8}.g-art b{font:400 16px var(--font-display);color:#E9DCFF;text-shadow:0 2px 0 #0008}
 body.gated #toasts{z-index:9600}
 @media (max-height:520px){.g-card{padding:12px 14px;gap:6px}.g-logo{font-size:34px}.g-sub{margin:0}.g-art{display:none}.g-card .m-accnote{display:none}.g-card .m-accform{gap:6px}.g-card .m-accform .field{height:40px}}
+
+/* ---------- topo do menu: cartão do nome na mesma altura da foto ---------- */
+.m-name{height:74px;box-sizing:border-box;justify-content:center}
+/* ---------- cartão da temporada (tela inicial) ---------- */
+button.m-season{display:block;border-left:0;border-right:0;color:var(--cream);text-align:left;cursor:pointer;font:inherit;transition:filter .15s}
+button.m-season:hover{filter:brightness(1.12)}
+.m-season .m-seahead{font-size:14px}
+.m-seabar .m-bar{width:min(240px,32vw)}
+.m-seabar .m-bar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 6px}
+.m-season .m-lotus{color:#FFC531;width:26px;height:26px;animation:sglow 1.3s ease-in-out infinite alternate}
+/* ---------- Personalizado: botão "jogar com amigos" no canto ---------- */
+.m-phead h3{flex:1}
+.m-friends{display:flex;align-items:center;gap:7px;height:42px;padding:0 14px;border-radius:11px;border:2.5px solid var(--mdark);background:linear-gradient(#7FE7FF,#2FB6E8);color:#0B1A3A;font:400 15px var(--font-display);letter-spacing:.3px;cursor:pointer;box-shadow:0 3px 0 var(--mdark);white-space:nowrap}
+.m-friends .i{width:20px;height:20px}.m-friends:hover{filter:brightness(1.06)}.m-friends:active{transform:translateY(2px);box-shadow:0 1px 0 var(--mdark)}
+/* ---------- JOGAR!: procurando / encontrada ---------- */
+.ml-cancel{margin-top:12px;height:38px;padding:0 20px;border-radius:10px;border:2.5px solid #ffffff55;background:#170A38c0;color:var(--cream);font:400 15px var(--font-display);letter-spacing:.5px;cursor:pointer}
+#mload:not(.searching) .ml-cancel{display:none}
+#mload.searching .ml-top b{animation:mlPulse 1.1s ease-in-out infinite}
+#mload.searching .ml-top b::after{content:'';display:inline-block;width:1.2em;text-align:left;animation:dots 1.2s steps(4) infinite}
+#mload.searching .ml-capy svg{animation:mlSpin 1.6s linear infinite}
+@keyframes mlPulse{50%{opacity:.6}}@keyframes mlSpin{to{transform:rotate(360deg)}}
+#mload.found .ml-top small{color:#6CF06A}
+#mload.found .ml-top b{animation:mlFound .5s cubic-bezier(.3,1.7,.5,1)}
+@keyframes mlFound{from{transform:scale(.6);opacity:0}}
+/* ---------- tela da temporada ---------- */
+.m-seapanel{gap:12px}
+.ts-top{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,#5A34B0,#2B1570);border:2px solid #ffffff22}
+.ts-hex{flex:none;width:64px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#FFC531;color:var(--mdark);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.ts-hex small{font:800 9px var(--font-ui);letter-spacing:1px}.ts-hex b{font:400 28px/1 var(--font-display)}
+.ts-hex.pop{animation:hexPop .6s cubic-bezier(.3,1.8,.5,1)}@keyframes hexPop{40%{transform:scale(1.35) rotate(-6deg)}}
+.ts-info{flex:1;min-width:0}.ts-info small{font:800 11px var(--font-ui);letter-spacing:1.2px;color:#FFD0EC}
+.ts-info p{margin:6px 0 0;font:700 12px var(--font-ui);opacity:.85}.ts-info p b{color:#FFC531}
+.ts-bar{height:24px;margin-top:5px}.ts-bar span{position:relative;z-index:1;display:block;text-align:center;font:400 13px/20px var(--font-display);-webkit-text-stroke:3px var(--mdark);paint-order:stroke fill}
+.ts-how{display:flex;flex-wrap:wrap;gap:6px}
+.ts-how span{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;background:#170A38b0;border:1.5px solid #ffffff18;font:700 11px var(--font-ui)}
+.ts-how .i{width:14px;height:14px;color:#FF8FC8}.ts-how b{color:#FFC531;font:400 13px var(--font-display)}
+.ts-grid{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:2px;align-content:start}
+.ts-rw{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 6px 8px;border-radius:12px;background:#170A38c0;border:2px solid #ffffff1a;text-align:center}
+.ts-rw em{position:absolute;left:6px;top:5px;font:400 13px var(--font-display);font-style:normal;color:#B9A8E8}
+.ts-rw b{font:400 12px/1.1 var(--font-display);min-height:2.2em;display:flex;align-items:center}
+.ts-rw>span{display:flex;align-items:center;gap:3px;font:800 9px var(--font-ui);letter-spacing:.5px;opacity:.75;text-transform:uppercase}.ts-rw>span .i{width:11px;height:11px}
+.ts-rw.got{border-color:#6CF06A88;background:linear-gradient(#1f4a2fc0,#170A38c0)}.ts-rw.got>span{color:#9CFF96;opacity:1}
+.ts-rw.next{border-color:#FFC531;box-shadow:0 0 0 3px #FFC53144,0 0 18px #FFC53155}.ts-rw.next>span{color:#FFC531;opacity:1}
+.ts-rw.lock .ts-th{filter:grayscale(.7) brightness(.7)}
+.ts-rw.big{background:linear-gradient(#5A34B0,#24104F)}.ts-rw.big em{color:#FFC531}
+.ts-th{width:58px;height:58px;display:grid;place-items:center}
+.rw-sw{display:block;width:50px;height:50px;border-radius:12px;border:2.5px solid #ffffff44;background-size:cover!important;background-position:center!important;box-shadow:0 3px 0 #0006}
+.rw-sw.art{width:58px;height:42px;border-radius:8px}.rw-sw.glow{border-radius:50%;box-shadow:0 0 16px 4px #ffffff40}
+.rw-ic{width:50px;height:50px;display:grid;place-items:center;border-radius:12px;background:#ffffff14;color:#FFC531}.rw-ic .i{width:30px;height:30px}
+.rw-ic.tr{color:#FFC531}.rw-ic.xp{color:#45D4FF}.rw-ic.tt{color:#FF8FC8}
+@media (max-width:900px){.ts-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+body.mport .ts-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* ---------- fim de partida: suspense → pódio → temporada ---------- */
+#endSeq{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;padding:calc(16px + var(--sat)) 16px calc(16px + var(--sab));overflow:hidden}
+.es-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#4A2390 0%,#1B0D4A 60%,#0C0522 100%)}
+.es-bg::after{content:'';position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,#ffffff06 0 8deg,transparent 8deg 16deg);animation:bootSpin 40s linear infinite}
+.es-stage{position:relative;width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;align-items:center}
+.es-sus{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;cursor:pointer;padding:30px 10px}
+.es-spot{position:absolute;left:50%;top:50%;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,#FFE9A055 0%,transparent 65%);animation:esSpot 2.2s ease-in-out infinite alternate;pointer-events:none}
+@keyframes esSpot{from{transform:translateX(-90px) scale(.9)}to{transform:translateX(90px) scale(1.05)}}
+.es-title{position:relative;font:400 clamp(44px,8vw,78px)/1 var(--font-display);color:#FFC531;-webkit-text-stroke:9px #2A1366;paint-order:stroke fill;text-shadow:0 7px 0 #2A1366;animation:esSlam .55s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes esSlam{from{transform:scale(2.4) rotate(-8deg);opacity:0}}
+.es-q{position:relative;font:400 22px var(--font-display);color:#E9DCFF;animation:esFade .5s .5s both}@keyframes esFade{from{opacity:0;transform:translateY(10px)}}
+.es-roll{position:relative;min-width:min(520px,86vw);padding:16px 26px;border-radius:20px;background:#170A38e8;border:3px solid #ffffff33;box-shadow:0 8px 0 #0C0522,inset 0 0 40px #5A34B055;animation:esFade .5s .7s both}
+.es-roll b{display:block;font:400 clamp(30px,6vw,52px)/1.1 var(--font-display);color:#FFF4E0;-webkit-text-stroke:6px #2A1366;paint-order:stroke fill;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es-roll.win{border-color:#FFC531;background:linear-gradient(#FFE15A,#F2B21C);animation:esWin .7s cubic-bezier(.3,1.8,.5,1)}.es-roll.win b{color:#FFF4E0}
+@keyframes esWin{30%{transform:scale(1.18)}}
+.es-drum{position:relative;display:flex;gap:8px}.es-drum i{width:14px;height:14px;border-radius:50%;background:#FF8FC8;animation:esDrum .32s ease-in-out infinite alternate}
+.es-drum i:nth-child(2){animation-delay:.1s;background:#FFC531}.es-drum i:nth-child(3){animation-delay:.2s;background:#45D4FF}
+@keyframes esDrum{to{transform:translateY(-12px)}}
+.es-sus.revealed .es-drum{opacity:0}
+.es-tap{position:relative;height:46px;padding:0 24px;border-radius:12px;border:3px solid var(--mdark);background:#FFF4E0;color:#3A1A6A;font:400 18px var(--font-display);letter-spacing:.5px;cursor:pointer;box-shadow:0 4px 0 var(--mdark);animation:esFade .5s 1s both}
+.es-tap.gone{visibility:hidden}
+.es-pod,.es-sea{width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;animation:esFade .45s both}
+.es-pod h2{margin:0;font:400 clamp(30px,5vw,44px)/1 var(--font-display);color:#FFF4E0;-webkit-text-stroke:7px #2A1366;paint-order:stroke fill;text-shadow:0 5px 0 #2A1366}
+.es-podium{display:flex;align-items:flex-end;justify-content:center;gap:clamp(6px,2vw,18px);width:100%}
+.es-slot{flex:1;max-width:210px;display:flex;flex-direction:column;align-items:center;animation:esRise .7s cubic-bezier(.3,1.5,.5,1) both}
+.es-slot.s1{animation-delay:.35s}.es-slot.s2{animation-delay:.15s}.es-slot.s3{animation-delay:0s}
+@keyframes esRise{from{transform:translateY(60px);opacity:0}}
+.es-slot canvas{width:min(150px,26vw);height:auto;aspect-ratio:240/264;filter:drop-shadow(0 6px 0 #0007)}
+.es-slot.s1 canvas{width:min(180px,30vw)}
+.es-nm{display:flex;align-items:center;gap:5px;font:400 clamp(14px,2.2vw,19px) var(--font-display);margin:4px 0 6px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es-nm .i{width:20px;height:20px;color:#FFC531}.es-nm small{font:800 11px var(--font-ui);opacity:.7}
+.es-blk{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:14px 14px 4px 4px;border:3px solid var(--mdark);box-shadow:inset 0 -6px 0 #0002}
+.es-blk b{font:400 34px/1 var(--font-display);color:var(--mdark)}.es-blk small{font:800 11px var(--font-ui);color:var(--mdark);opacity:.75}
+.s1 .es-blk{height:110px;background:linear-gradient(#FFE15A,#F2B21C)}.s2 .es-blk{height:80px;background:linear-gradient(#F2F4FF,#BFC5DF)}.s3 .es-blk{height:62px;background:linear-gradient(#F6B27A,#D9843F)}
+.es-you{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.es-you span{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:999px;background:#170A38d0;border:2px solid #ffffff22;font:700 13px var(--font-ui)}
+.es-you b{font:400 18px var(--font-display);color:#FFC531}.es-you .i{width:16px;height:16px;color:#FF8FC8}
+.es-btn{min-width:220px}
+.es-sea{max-width:560px;padding:18px;border-radius:22px;background:linear-gradient(#3A1C80f2,#24104Ff2);border:3px solid #ffffff2a;box-shadow:0 10px 0 #0C0522}
+.es-seahead{width:100%}.es-seahead>small{display:block;text-align:center;font:800 12px var(--font-ui);letter-spacing:1.5px;color:#FFD0EC;margin-bottom:10px}
+.es-lvrow{display:flex;align-items:center;gap:14px}.es-barw{flex:1;min-width:0}
+.es-bar{height:30px}.es-bar i{transition:none}.es-bar span{position:relative;z-index:1;display:block;text-align:center;font:400 15px/26px var(--font-display);-webkit-text-stroke:3px var(--mdark);paint-order:stroke fill}
+.es-gain{margin-top:6px;text-align:right;font:400 18px var(--font-display);color:#6CF06A}
+.es-lines{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:6px;max-height:34vh;overflow:auto}
+.es-lines li{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:10px;background:#170A38b0;border:1.5px solid #ffffff18;font:700 14px var(--font-ui);animation:esLine .35s cubic-bezier(.3,1.5,.5,1) both}
+.es-lines li b{font:400 18px var(--font-display);color:#FFC531}@keyframes esLine{from{transform:translateX(-30px);opacity:0}}
+.es-unlock{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;width:100%}
+.es-uc{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 16px;border-radius:16px;background:linear-gradient(#FFE15A,#F2B21C);border:3px solid var(--mdark);color:var(--mdark);box-shadow:0 5px 0 var(--mdark);animation:esWin .7s cubic-bezier(.3,1.8,.5,1)}
+.es-uc small{font:800 11px var(--font-ui);letter-spacing:1px}.es-uc b{font:400 18px var(--font-display)}
+.es-btns{display:flex;gap:10px;width:100%;justify-content:center}.es-btns>*{flex:1;max-width:260px}
+.es-btns .m-btn2{height:64px}
+body.endseq #hud,body.endseq #touch{display:none!important}
+@media (max-height:520px){.es-slot canvas{width:min(100px,20vw)}.es-slot.s1 canvas{width:min(120px,24vw)}.s1 .es-blk{height:70px}.s2 .es-blk{height:54px}.s3 .es-blk{height:44px}.es-lines{max-height:24vh}.es-sea{padding:12px;gap:8px}}
+.es-btns .m-play.sm b{font-size:24px;white-space:nowrap}
+/* celular em pé: cartão da temporada logo abaixo dos desafios */
+body.mport #home .m-bl{display:flex;top:calc(186px + var(--sat));bottom:auto;transform:scale(var(--ms));transform-origin:top left}
+body.mport #home .m-bl .m-link{display:none}
 </style></head><body class="menu">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
  <defs>
@@ -1440,7 +1549,7 @@ body.gated #toasts{z-index:9600}
 <div id="mtop" class="m-top m-fixed hidden">
   <div class="m-prof">
     <button class="m-ava" id="avaBtn" title="Visual da capivara"><canvas id="avaCv" width="128" height="128"></canvas><svg class="i m-crown"><use href="#i-crown"/></svg><b class="m-avalv" id="avaLv">1</b></button>
-    <div class="m-panel m-name"><b id="homeNick">Capivara</b><div class="m-bar"><i id="xpFill"></i></div><small id="xpTxt">0 / 100 XP</small><button class="m-acctag" id="accTag">Criar conta</button></div>
+    <div class="m-panel m-name"><b id="homeNick">Capivara</b><div class="m-bar"><i id="xpFill"></i></div><small id="xpTxt">0 / 100 XP</small></div>
   </div>
   <div class="m-res">
     <div class="m-pill" title="Troféus"><svg class="i"><use href="#i-trophy"/></svg><span id="totWins">0</span></div>
@@ -1455,16 +1564,15 @@ body.gated #toasts{z-index:9600}
 <!-- INÍCIO: a capivara 3D no deque (desenhada no WebGL atrás) e os painéis em volta -->
 <section id="home" class="screen mscreen">
   <div class="m-right">
-    <button class="m-panel m-mapcard" id="mapCard" title="Montar partida contra bots"><div class="m-mctxt"><small>CONTRA BOTS</small><b id="mcMode">Mata-mata</b><span id="mcMap">Praça Capy</span></div><canvas id="mcThumb" width="220" height="132"></canvas></button>
     <div class="m-panel m-chal" id="chalBox"><h4>Desafios Diários<span class="m-chalsum" id="chalSum">0/3</span></h4><div id="chalList"></div><div class="m-chalfoot"><svg class="i"><use href="#i-timer"/></svg><span id="chalReset">renova em 0h</span></div></div>
   </div>
   <div class="m-bl">
-    <div class="m-season"><div class="m-seahead">PROGRESSO DA TEMPORADA</div><div class="m-seabar"><b id="seaLv">1</b><div class="m-bar"><i id="seaFill"></i><span id="seaName">Capivara Novata</span></div><svg class="i m-lotus"><use href="#i-lotus"/></svg></div></div>
+    <button class="m-season" id="seaCard" title="Ver os prêmios da temporada"><div class="m-seahead" id="seaHead">TEMPORADA 1</div><div class="m-seabar"><b id="seaLv">1</b><div class="m-bar"><i id="seaFill"></i><span id="seaName">0 XP</span></div><svg class="i m-lotus"><use href="#i-gift"/></svg></div></button>
     <button class="m-link" data-friends>ABRIR GRUPO<b class="frbadge hidden"></b></button>
   </div>
   <div class="m-br">
-    <button class="m-sel" id="btnSelector"><svg class="i"><use href="#i-bot"/></svg><span>CONTRA BOTS</span><em>!</em></button>
-    <button class="m-play" id="btnPlay"><b>JOGAR!</b><small>Online • rápida, por código ou sala própria</small></button>
+    <button class="m-sel" id="btnSelector"><svg class="i"><use href="#i-gear"/></svg><span>PERSONALIZADO</span></button>
+    <button class="m-play" id="btnPlay"><b>JOGAR!</b><small>Partida rápida • 10 capivaras</small></button>
   </div>
   <div class="m-hint">arraste para girar a capivara • clique nela!</div>
   <div class="version">v5.1 • CapiBoom 3D</div>
@@ -1511,6 +1619,19 @@ body.gated #toasts{z-index:9600}
     <div class="m-bggrid" id="bgGrid"></div>
   </div>
 </section>
+
+<!-- TEMPORADA: os 30 prêmios -->
+<section id="temporada" class="screen mscreen mside hidden">
+  <div class="m-cpanel m-panel m-wide m-seapanel">
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-lotus"/></svg>TEMPORADA</h3></div>
+    <div class="ts-top" id="tsTop"></div>
+    <div class="ts-how" id="tsHow"></div>
+    <div class="ts-grid" id="tsGrid"></div>
+  </div>
+</section>
+
+<!-- FIM DE PARTIDA: suspense, pódio e a barra da temporada -->
+<div id="endSeq" class="hidden"><div class="es-bg"></div><div class="es-stage" id="esStage"></div></div>
 
 <!-- PORTÃO: entrar ou criar conta (aparece depois da abertura; sem conta não dá para jogar) -->
 <div id="gate" class="hidden">
@@ -1560,7 +1681,7 @@ body.gated #toasts{z-index:9600}
 <!-- MONTAR PARTIDA (bots) — painel dentro do menu -->
 <section id="setup" class="screen mscreen mside hidden">
   <div class="m-cpanel m-panel m-wide">
-    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-bot"/></svg>CONTRA BOTS</h3></div>
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-gear"/></svg>PERSONALIZADO</h3><button class="m-friends" id="btnFriendsPlay"><svg class="i"><use href="#i-users"/></svg>JOGAR COM AMIGOS</button></div>
     <div class="m-setup"><div class="setupwrap" id="setupPanel"></div></div>
     <div class="m-cact"><span class="m-sub" id="setupSub">Mata-mata • Praça Capy</span><button class="m-play sm" id="btnStartBots"><b>JOGAR!</b></button></div>
   </div>
@@ -3616,7 +3737,7 @@ let _v,_A,_N,_Y,_V,_m;
 function syncActors(list,t,dt){if(!_v){_v=new T.Vector3();_A=new T.Vector3();_N=new T.Vector3();_Y=new T.Vector3();_V=new T.Vector3();_m=new T.Matrix4()}const seen=new Set();_V.set(0,1,K).normalize();
   for(const a of list){let A=actors.get(a.id);const lk=a.bot?'bot':(a.look&&a.look.body);
     if(A&&(A.lookKey!==lk||A.bot!==a.bot)){dropActor(a.id);A=null}if(!A){A=newActor(a);actors.set(a.id,A)}seen.add(a.id);A.hid=0;A.g.visible=true;
-    if(A.xray&&A.xc!==a.xc){A.xray.material=xray(a.xc);if(A.hat[2])A.hat[2].material=A.xray.material;A.xc=a.xc}A.setHat(hatOn(a.look,a.bot));applySty(A,!!a.self);
+    if(A.xray&&A.xc!==a.xc){A.xray.material=xray(a.xc);if(A.hat[2])A.hat[2].material=A.xray.material;A.xc=a.xc}A.setHat(hatOn(a.look,a.bot));applySty(A,!!a.self||!!a.sty,a.self?null:a.sty);if(!a.self&&a.eye)CapyRig.setEyes(A,a.eye);
     if(A.self!==!!a.self){A.self=!!a.self;CapyRig.setEyes(A,a.self?EYE:a.bot?botEye(a.id):null)}else if(A.self)CapyRig.setEyes(A,EYE);
     CapyRig.animate(A,{dt,t:t/1000,x:a.x,y:a.y,aim:a.aim,frozen:a.frozen,recoil:a.recoil,swing:a.swing,hurt:a.hurt,dashing:a.dash,melee:a.melee,low:a.low,kill:a.kill});
     A.g.position.set(a.x,0,a.y+FEET);A.g.updateMatrixWorld(true);
@@ -3758,8 +3879,8 @@ function prewarm(ms,geoOnly){if(st!=='ready'||!R||lost||compiling)return true;co
 // visual equipado (só para a SUA capivara): pelagem, roupa e efeito
 let STY={pat:0,patC:'#2A1A12',out:0,outC:'#FF4F9A',fx:''};
 function setStyle(o){STY=Object.assign({pat:0,patC:'#2A1A12',out:0,outC:'#FF4F9A',fx:''},o||{})}
-function applySty(A,on){const u=A.mat&&A.mat.userData.sty;if(!u)return;const s=on?STY:null;u.uPat.value=s?s.pat:0;u.uPatC.value.set(s?s.patC:'#2A1A12');u.uOut.value=s?s.out:0;u.uOutC.value.set(s?s.outC:'#FF4F9A');
-  const m=sharedCapyMats(),ol=on&&STY.fx==='neon'?m.outNeon:m.out;if(A.outline&&A.outline.material!==ol){A.outline.material=ol;if(A.hat[1])A.hat[1].material=ol}}
+function applySty(A,on,so){const u=A.mat&&A.mat.userData.sty;if(!u)return;const s=on?(so||STY):null;u.uPat.value=s?s.pat:0;u.uPatC.value.set(s?s.patC:'#2A1A12');u.uOut.value=s?s.out:0;u.uOutC.value.set(s?s.outC:'#FF4F9A');
+  const m=sharedCapyMats(),ol=on&&(so||STY).fx==='neon'?m.outNeon:m.out;if(A.outline&&A.outline.material!==ol){A.outline.material=ol;if(A.hat[1])A.hat[1].material=ol}}
 const styKey=(o=STY)=>o.pat+'|'+o.out+'|'+o.outC+'|'+o.fx+'|'+eyeKey(o.eye||EYE)+(o.ex||'');
 function menuSpin(dx){if(MN)MN.spin+=dx*.012}
 function menuPoke(){if(MN&&MN.A)CapyRig.poke(MN.A)}
@@ -4361,7 +4482,7 @@ function drawPlayer(p,tr,t,ht,fancy){const x=p.rx,y=p.ry;
   if(p.dashTime>0&&fancy)addP({x:x+rand(-6,6),y:y+rand(-14,14),h:rand(6,30),vx:-Math.cos(p.aim)*10,type:'dot',col:p.look.trail,size:9,life:.25});
   if(ht<p.burnUntil)FX3D.burning(x,y+8,1/60);
   const hurt=ht-p.hurtAt<140,frozen=ht<p.frozenUntil,g=GUNS[p.gun],me=players[self];
-  acts3.push({id:p.id,x,y,aim:p.aim,bot:p.bot,look:p.look,gun:p.gun,melee:!!(g&&g.melee),swing:tr.swing||0,recoil:t-tr.shotT<90?1:0,hurt:hurt?1-(ht-p.hurtAt)/140:0,
+  acts3.push({id:p.id,x,y,aim:p.aim,bot:p.bot&&!p.fake,sty:p.fake?p.sty:null,eye:p.fake?p.eye:null,look:p.look,gun:p.gun,melee:!!(g&&g.melee),swing:tr.swing||0,recoil:t-tr.shotT<90?1:0,hurt:hurt?1-(ht-p.hurtAt)/140:0,
     frozen,dash:p.dashTime>0,low:p.hp<=(p.maxHp||100)*.3,kill:performance.now()-(tr.killT||-1e9)<1600,shield:ht<p.shieldUntil,self:p.id===self,ring:p.team>=0&&isTeams()?TEAM[p.team].c:null,xc:p.id===self?'#FFC531':(p.team>=0&&isTeams())?TEAM[p.team].c:(me&&sameTeam(me,p)?'#6CF06A':'#FF4F9A')});
   if(!CAP3)return;
   ctx.save();ctx.translate(x,y);ctx.translate(0,Map3D.FEET-Map3D.K*30);ctx.scale(1,1/SQ);
@@ -4413,6 +4534,7 @@ document.addEventListener('visibilitychange',()=>{
 let lastFrame=0,hudAt=0,mmAt=0,slowT=0,wasMenuBg=null,menuClr=false;
 function frame(t){requestAnimationFrame(frame);
   if(document.hidden)return;
+  if(document.body.classList.contains('endseq'))return; // tela de fim de partida cobrindo tudo: não desenha a arena por trás
   const mb=menuBg();if(mb!==wasMenuBg){wasMenuBg=mb;resize()}
   const blurCap=document.hasFocus()?999:30; // janela visível mas em outro app: 30 fps bastam e deixam o computador livre
   const minDt=1000/Math.min(blurCap,mb&&!Map3D.menuOk?Math.min(30,S.fps):mb?S.fps:Math.min(S.fps,Map3D.fpsCap))-1.5;if(t-lastFrame<minDt)return;let dt=Math.min(.05,(t-lastFrame)/1000);
@@ -4486,19 +4608,19 @@ const I=(n,c='')=>`<svg class="i ${c}"><use href="#i-${n}"/></svg>`;
 let myLook=cleanLook(store.get('look',defaultLook(1)));
 const myNick=()=>safe($('nick').value||store.get('nick','')||pick(NICKS));
 let view='home',hudGun=-1;
-const SCREENS=['home','custom','loja','fundo','play','setup','online','lobby','arsenal','bye','result','conta'];
+const SCREENS=['home','custom','loja','fundo','play','setup','online','lobby','arsenal','bye','result','conta','temporada'];
 // abas do menu (todas são "dentro" da tela inicial: a capivara desliza para o lado e o painel entra pela direita)
-const NAVV=['home','custom','loja','arsenal','fundo'],MENUV=['home','custom','loja','arsenal','fundo','setup','online','conta'];
+const NAVV=['home','custom','loja','arsenal','fundo'],MENUV=['home','custom','loja','arsenal','fundo','setup','online','conta','temporada'];
 function go(v){const prev=view;view=v;if(prev==='loja'&&v!=='loja')clearTry();for(const s of SCREENS)$(s).classList.toggle('hidden',s!==v);
   const inGame=v==='game';$('hud').classList.toggle('hidden',!inGame);$('touch').classList.toggle('hidden',!inGame);document.body.classList.toggle('menu',!inGame);
   const inMenu=MENUV.includes(v);$('mnav').classList.toggle('hidden',!inMenu);$('mtop').classList.toggle('hidden',!inMenu);$('mnav').querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('on',b.dataset.nav===v));
   document.body.classList.toggle('mclear',inMenu);document.body.classList.toggle('mpanel',inMenu&&v!=='home');
   if(!inGame){$('death').classList.add('hidden');$('pause').classList.add('hidden');$('scoreOv').classList.add('hidden');$('perkOv').classList.add('hidden')}
   if(inMenu)renderTop();
-  if(v==='home')renderHome();if(v==='play')drawPlayArt();if(v==='custom')openCustom();if(v==='fundo')renderBgs();if(v==='loja')renderShop();if(v==='lobby'){lobbyKey='';renderLobby();lobbyAnim()}if(v==='setup'){renderSetup($('setupPanel'),true);setupSub()}if(v==='arsenal')renderArsenal();if(v==='conta'&&typeof accRender==='function')accRender();
+  if(v==='home')renderHome();if(v==='play')drawPlayArt();if(v==='custom')openCustom();if(v==='fundo')renderBgs();if(v==='loja')renderShop();if(v==='lobby'){lobbyKey='';renderLobby();lobbyAnim()}if(v==='setup'){renderSetup($('setupPanel'),true);setupSub()}if(v==='arsenal')renderArsenal();if(v==='conta'&&typeof accRender==='function')accRender();if(v==='temporada')seaRender();
   if(v==='online'){$('nick').value=store.get('nick','');enterOnline();if(OFFLINE)setTimeout(()=>setNet('O online está desligado por enquanto (modo local). Por enquanto, jogue contra os bots!','err'),60)}
   Sound.music(true,inGame?140:100)}
-function goHome(){leaveNet();players={};bullets=[];effects=[];started=false;over=false;paused=false;stopDemo();FX3D.clear();$('result').classList.add('hidden');go('home')}
+function goHome(){quickEnd();leaveNet();players={};bullets=[];effects=[];started=false;over=false;paused=false;stopDemo();FX3D.clear();$('result').classList.add('hidden');go('home')}
 // o que o menu 3D precisa saber (05_render.js > frame)
 let menuDrag=false,arsSel=0;
 const menuView=()=>view==='home'?'home':(view==='setup'||view==='online')?'wide':'side';
@@ -4598,13 +4720,12 @@ function renderTop(){drawSpheres();const x=xpInfo(),tt=equip().title;
   $('homeNick').textContent=store.get('nick','')||'Capivara';$('avaLv').textContent=x.lv;$('xpFill').style.width=(x.cur/x.need*100)+'%';$('xpTxt').textContent=tt>=0?TITLES[tt]:`${x.cur} / ${x.need} XP`;
   {const w=wallet(),el=$('totalGems');el.textContent=shortNum(w);el.parentNode.title=w.toLocaleString('pt-BR')+' laranjas'}$('totWins').textContent=trophies();if(typeof accTagUpd==='function')accTagUpd()}
 function renderHome(){const x=xpInfo(),d=daily();
-  const sl=Math.floor((x.lv-1)/3);$('seaLv').textContent=x.lv;$('seaName').textContent=SEASON[Math.min(SEASON.length-1,sl)];$('seaFill').style.width=(((x.lv-1)%3)+x.cur/x.need)/3*100+'%';
+  try{seaCardRender()}catch(e){} // (09_temporada.js carrega depois)
   const T3=todays();
   $('chalList').innerHTML=T3.map(ch=>{const v=chalVal(ch),done=d.claimed.includes(ch.id),rw=rewardFor(ch);return `<div class="m-ch${done?' done':''}"><span class="m-chic">${I(done?'check':ch.ic)}</span><div class="m-chtx"><b>${escapeHtml(ch.txt)}</b><div class="m-bar"><i style="width:${v/ch.goal*100}%"></i></div></div><span class="m-chv">${v}/${ch.goal}</span><span class="m-chrw" title="${escapeHtml(rewardText(rw))}">${I(rewardIcon(rw))}<small>${rw.t==='item'?'ITEM':rw.n}</small></span></div>`}).join('')+
     `<div class="m-chbox${d.bonus?' done':''}">${I('gift')}<span>${d.bonus?'Baú do dia aberto!':'Complete os 3 e ganhe o Baú do dia'}</span></div>`;
   $('chalSum').textContent=T3.filter(c=>d.claimed.includes(c.id)).length+'/3 ▾';
-  const now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);const hh=Math.floor((mid-now)/36e5),mm=Math.floor((mid-now)%36e5/6e4);$('chalReset').textContent=`renova em ${hh}h ${mm}min`;
-  const md=modeById(cfg.mode),mp=mapById(cfg.map);$('mcMode').textContent=md.n;$('mcMap').textContent=mp.n+' • '+cfg.bots+' bots';drawMapThumb($('mcThumb'),mp)}
+  const now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);const hh=Math.floor((mid-now)/36e5),mm=Math.floor((mid-now)%36e5/6e4);$('chalReset').textContent=`renova em ${hh}h ${mm}min`;}
 // fim de partida: troféus e desafios
 function metaMatchEnd(me,place,won){if(!me)return;const n=Object.values(players).length;
   const tr=won?10:place===2?6:place===3?4:place<=Math.ceil(n/2)?2:1;store.set('trophies',trophies()+tr);
@@ -4615,11 +4736,11 @@ function setupSub(){const md=modeById(cfg.mode),mp=mapById(cfg.map);$('setupSub'
 
 // ---------- HOME ----------
 let customFrom='home';
-const playNow=()=>{Sound.play('boing');matchLoad('bots')};
-$('btnPlay').onclick=()=>{Sound.play('click');go('online')};
+const playNow=()=>{quickEnd();Sound.play('boing');matchLoad('bots')};
+$('btnPlay').onclick=()=>quickPlay();
 $('btnSelector').onclick=()=>{Sound.play('click');go('setup')};
-$('mapCard').onclick=()=>{Sound.play('click');go('setup')};
-$('avaBtn').onclick=()=>{Sound.play('boing');go('custom')};
+$('btnFriendsPlay').onclick=()=>{Sound.play('click');go('online')};
+$('avaBtn').onclick=()=>{Sound.play('click');go('conta')};
 $('btnSettings').onclick=()=>{Sound.play('click');openSettings()};
 $('btnQuit').onclick=async()=>{if(await confirmBox('Sair do Capy Boom?','Tem certeza? As capivaras vão sentir sua falta.','SAIR','FICAR')){try{window.close()}catch(e){}setTimeout(()=>go('bye'),150)}};
 $('btnBack67').onclick=()=>go('home');
@@ -4635,7 +4756,7 @@ for(const id of ['home','custom','loja','arsenal','fundo'])(()=>{const el=$(id);
 addEventListener('keydown',e=>{if(!MENUV.includes(view)||!$('mload').classList.contains('hidden')||bootOn)return;const tag=document.activeElement&&document.activeElement.tagName;if(tag==='INPUT'||tag==='TEXTAREA')return;
   if(!$('settings').classList.contains('hidden')||!$('modal').classList.contains('hidden')||(typeof socIsOpen==='function'&&socIsOpen()))return;const k=(e.key||'').toLowerCase();
   if(k==='q'||k==='e'){const i=Math.max(0,NAVV.indexOf(view)),n=NAVV[(i+(k==='e'?1:NAVV.length-1))%NAVV.length];Sound.play('click');go(n);return}
-  if(k==='enter'){e.preventDefault();if(view==='setup')playNow();else if(view==='home')go('online');else go('home');return}
+  if(k==='enter'){e.preventDefault();if(view==='setup')playNow();else if(view==='home')quickPlay();else go('home');return}
   if(k==='tab'&&view==='home'){e.preventDefault();go('setup');return}
   if(k==='escape'&&view==='home'){openSettings();return}if(k==='escape'){go('home');return}
   if(k==='g'&&document.body.classList.contains('social')){socOpen&&socOpen()}});
@@ -4935,7 +5056,7 @@ $('btnSetDone').onclick=()=>{$('settings').classList.add('hidden');saveSettings(
 
 // ---------- HUD ----------
 let hudK=-1,hudG=-1,hudG2=-2,dashReady=true,deathShown=false;
-function onMatchStart(){if(!solo&&!mlBusy){showLoad('online');setTimeout(hideLoad,5000)}parts=[];FX3D.clear();perkKey='';offerKey='';$('perkOv').classList.add('hidden');for(const k in track)delete track[k];$('feed').innerHTML='';hudGun=-1;hudG2=-2;deathShown=false;$('result').classList.add('hidden');go('game');const me=players[self];if(me)drawPortrait($('portrait'),me.look,{bg:false,self:true});
+function onMatchStart(){seaReset();if(!solo&&!mlBusy){showLoad('online');setTimeout(hideLoad,5000)}parts=[];FX3D.clear();perkKey='';offerKey='';$('perkOv').classList.add('hidden');for(const k in track)delete track[k];$('feed').innerHTML='';hudGun=-1;hudG2=-2;deathShown=false;$('result').classList.add('hidden');go('game');const me=players[self];if(me)drawPortrait($('portrait'),me.look,{bg:false,self:true});
   $('hudName').textContent=me?me.name:'';$('lvl'+'Num');
   bigBanner(MODE.n.toUpperCase(),MODE.d+(isTeams()&&me&&me.team>=0?` Você é do time ${TEAM[me.team].n}!`:''),isTeams()&&me&&me.team>=0?TEAM[me.team].c:'#FFC531');
   if(isTouch&&innerHeight>innerWidth)toast('Gire o celular para jogar melhor')}
@@ -5021,7 +5142,7 @@ function onMatchEnd(){$('death').classList.add('hidden');$('pause').classList.ad
   $('medals').innerHTML=md.slice(0,6).map(([i,t])=>`<div class="medal">${I(i)}${escapeHtml(t)}</div>`).join('');
   $('btnAgain').classList.toggle('hidden',!isOwner());$('btnResLobby').classList.toggle('hidden',!(isOwner()&&!solo));
   $('hud').classList.add('hidden');$('touch').classList.add('hidden');$('result').classList.remove('hidden');view='result';document.body.classList.add('menu');voteKey='';renderVotes();
-  if(won){Sound.play('win');celebrate(160)}else{Sound.play('level');celebrate(50)}}
+  endSeq({list,me,place,won,tw})}
 let voteKey='';
 function renderVotes(force){if(view!=='result')return;const own=isOwner();const vk=JSON.stringify([votes,myVote,cfg.map,host,own]);if(!force&&vk===voteKey)return;voteKey=vk;$('btnAgain').classList.toggle('hidden',!own);$('btnResLobby').classList.toggle('hidden',!(own&&!solo));const count={};for(const v of Object.values(votes))count[v]=(count[v]||0)+1;const sel=myVote||(own?(topVote()||cfg.mode):null);
   $('voteGrid').innerHTML=MODES.map(m=>`<button class="modecard small${m.id===sel?' on':''}" data-vote="${m.id}">${I(m.ic,'mi')}<b>${m.n}</b>${count[m.id]?`<span class="vc">${count[m.id]} ${I('thumb')}</span>`:''}</button>`).join('');
@@ -5137,14 +5258,14 @@ function mlNextImg(){let i;do{i=Math.floor(Math.random()*LOADART.length)}while(i
   on.onload=()=>{const ra=(on.naturalWidth/on.naturalHeight)/(innerWidth/innerHeight);on.classList.toggle('fit',ra<.72||ra>1.4);$('mload').querySelector('.ml-img').style.setProperty('--mlbg',`url(${url})`);on.classList.remove('on');void on.offsetWidth;on.classList.add('on');off.classList.remove('on')};const url=`loading/${k}.jpg?v=${ASSETV}`;if(on.getAttribute('src')===url&&on.complete)on.onload();else on.src=url;$('mlArt').textContent=ART[k]}
 function mlTip(){const p=$('mlTip');p.classList.remove('in');void p.offsetWidth;p.textContent=pick(TIPS);p.classList.add('in')}
 function setLoadPct(p){p=clamp(p,0,1);$('mlPct').textContent=Math.round(p*100)+'%';$('mlFillRect').setAttribute('y',String(100-100*p))}
-function showLoad(kind){const md=modeById(cfg.mode),mp=mapById(cfg.map);$('mlKind').textContent=kind==='online'?'ONLINE':'CONTRA BOTS';$('mlTitle').textContent=md.n.toUpperCase();$('mlMap').textContent=mp.n+(kind==='online'?'':' • '+cfg.bots+' bots');
+function showLoad(kind){const md=modeById(cfg.mode),mp=mapById(cfg.map);$('mlKind').textContent=kind==='online'?'ONLINE':kind==='quick'?'PARTIDA ENCONTRADA':'PERSONALIZADO';$('mlTitle').textContent=md.n.toUpperCase();$('mlMap').textContent=mp.n+(kind==='online'?'':kind==='quick'?` • ${MAX_PLAYERS} capivaras`:' • '+cfg.bots+' bots');
   setLoadPct(0);mlNextImg();mlTip();const el=$('mload');el.classList.remove('hidden','out');document.body.classList.add('bootact');clearInterval(mlTimer);clearInterval(mlTipT);mlTimer=setInterval(mlNextImg,1800);mlTipT=setInterval(mlTip,3200);
   if(kind==='online'){const t0=performance.now();const f=()=>{const k=(performance.now()-t0)/5000;setLoadPct(k);if(k<1&&!el.classList.contains('hidden'))requestAnimationFrame(f)};f()}}
 function hideLoad(){const el=$('mload');if(el.classList.contains('hidden'))return;setLoadPct(1);el.classList.add('out');clearInterval(mlTimer);clearInterval(mlTipT);setTimeout(()=>{el.classList.add('hidden');el.classList.remove('out');if(!bootOn)document.body.classList.remove('bootact')},450)}
 // partida contra bots: pelo menos 5 s de carregamento; o mapa 3D é montado e os shaders compilados por trás
 function matchLoad(kind){if(mlBusy)return;mlBusy=true;showLoad(kind);const t0=performance.now(),M0=mapById(cfg.map);let started0=false;
   const step=()=>{const el=performance.now()-t0;let ready=false;try{const pw=Map3D.prewarm(12);if(pw)iconPrewarm();ready=Map3D.preload(M0)&&pw}catch(e){}setLoadPct(Math.min(el/5000,ready?1:.95));
-    if(!started0&&((el>=5000&&ready)||el>25000)){started0=true;stopDemo();startBots();setTimeout(()=>{hideLoad();mlBusy=false},500);return}
+    if(!started0&&((el>=5000&&ready)||el>25000)){started0=true;stopDemo();startBots();if(kind==='quick')disguiseBots();setTimeout(()=>{hideLoad();mlBusy=false},500);return}
     requestAnimationFrame(step)};requestAnimationFrame(step)}
 // abertura: tela roxa, logo do estúdio com animação cômica e o jogo carregando por trás
 let bootOn=true;
@@ -5160,7 +5281,7 @@ addEventListener('resize',menuScale);menuScale();
 
 // abate seu: uma etiqueta pequena no alto do centro (no lugar do aviso grande)
 let kpStreak=0,kpT=0;
-function killPop(name){const el=$('killPop');const now=performance.now();kpStreak=now-kpT<4000?kpStreak+1:1;kpT=now;
+function killPop(name){const el=$('killPop');const now=performance.now();kpStreak=now-kpT<4000?kpStreak+1:1;kpT=now;seaMulti(kpStreak);
   el.innerHTML=`<span class="kp">${I('skull')}<b>${escapeHtml(name)}</b>${kpStreak>1?`<em>x${kpStreak}</em>`:''}</span>`;const k=el.firstChild;k.classList.add('in');clearTimeout(el._t);el._t=setTimeout(()=>{k.classList.add('out')},1800)}
 
 // ===== CapyAmigos: amigos por código, quem está online, mensagens =====
@@ -5262,7 +5383,7 @@ socInit();
 // Sem conta, tudo continua só no navegador (como antes). Com conta, cada mudança é salva na nuvem alguns segundos depois,
 // e ao entrar em outro aparelho o progresso vem junto. Na primeira vez, o progresso que já estava no navegador vai para a conta.
 const SB_URL='https://cswuqdlxlguivvhzugyq.supabase.co',SB_KEY='sb_publishable_RVa9J--f2jg_XqPhVU5_sQ_Xs1a_hV3';
-const SYNC_KEYS=['nick','look','owned','equip','eyes','menubg','trophies','bonusXp','stats','daily','totalGems','spent','bonusOr'];
+const SYNC_KEYS=['nick','look','owned','equip','eyes','menubg','trophies','bonusXp','stats','daily','totalGems','spent','bonusOr','season'];
 const ACC={ses:store.get('acc',null),prof:null,tab:'novo',msg:null,busy:false,dirty:false,saveT:0,lastSave:0,syncErr:false,pending:null};
 const rawSet=store.set.bind(store);
 store.set=(k,v)=>{rawSet(k,v);if(ACC.prof&&SYNC_KEYS.includes(k))accDirty()};
@@ -5402,10 +5523,139 @@ function gateHide(){const g=$('gate');if(!g||g.classList.contains('hidden'))retu
 addEventListener('keydown',e=>{if(!document.body.classList.contains('gated'))return;const tag=document.activeElement&&document.activeElement.tagName;if(tag==='INPUT')return;e.stopImmediatePropagation()},true);
 if(!ACC.ses)gateShow();
 $('btnAcc').onclick=()=>{Sound.play('click');go('conta')};
-$('accTag').onclick=e=>{e.stopPropagation();Sound.play('click');go('conta')};
+if($('accTag'))$('accTag').onclick=e=>{e.stopPropagation();Sound.play('click');go('conta')};
 accTagUpd();
 // ao abrir o jogo com conta: busca o progresso salvo (se falhar, joga com o que está no navegador e tenta salvar depois)
 if(ACC.ses)accPull().then(()=>{if(ACC.recovery&&ACC.prof)go('conta');else if(ACC.welcome&&ACC.prof){toast('Email confirmado! Bem-vindo, '+ACC.prof.username+'!','good');go('conta')}}).catch(e=>console.warn('conta:',e));
+
+// ===== Temporada (30 dias, 30 prêmios), JOGAR! (partida rápida), adversários "de verdade" e o fim de partida animado =====
+
+// ---------- bots do Médio um pouquinho mais fáceis (mira menos certeira, reagem e atiram um tiquinho menos) ----------
+Object.assign(BOTCFG.normal,{jit:.3,range:340,dash:.006,react:.3,fire:.85,spd:.95,dmg:.88});
+
+// ---------- 100 adversários com cara de jogador: apelido, pelo, chapéu, roupa, pelagem e olhos próprios ----------
+const BOT_NICKS=['Pedrinho_BR','LuaGamer','Kaique07','Thaly.exe','Rafinha_Z','GabiCapy','MatheusFPS','JuuBear','DaviPro','Lele_22',
+  'NandoXD','Bia_Lagoa','CaioTurbo','Duda.mp4','Enzo_Kill','Maju_Ofc','Gui_Sniper','Leticia9','VitinhoGG','Ana_Clara',
+  'Joaozinho','Mel_Fofa','Arthur_Rei','Yasmin.ttv','Brunao_99','Lari_Play','Kauã_Zika','Clarinha','Heitor_BR','Sofia_Uwu',
+  'TheoMaster','Isa_Gamer','Lucca_FF','Nicole.zip','Breno_Top','Valen_tina','Murilo_7','Helo_Capy','PH_Monstro','Alice_Rush',
+  'Samuca','Manu_Star','Igor_Ninja','Rebeca_GG','Otavio.dev','Lívia_BR','Danzinho','Cecília_08','Rodrigo_TV','Aninha_Pro',
+  'Fefe_Cap','Joao_Vitor','Lorena_X','Kevin_Bala','Bela_Moon','Tiago_Lag','Marina_Uau','Caique_Z','Pietra_7','GuhRibeiro',
+  'Nath_Fps','Vini_Raio','Laura_Lol','Cadu_Sz','Bruna.exe','Ruan_Speed','Mari_Capy','Dudu_Boom','Giovana_9','Lipe_Ofc',
+  'Tati_Gamer','Erick_Mito','Julia_Rush','Zeca_Pagod','Lara_Zen','Andre_Tank','Helena_GG','Fabinho','Sarah_Star','Breninho',
+  'Ju_Lagoa','Wesley_FF','Bianca_Uwu','Leo_Caos','Paulinha','Hugo_Mira','Carol_Top','Tom_Capy','Dani_Rose','Junin_Zika',
+  'Malu_Play','Edu_Ninja','Priscila_7','Gustavo.tv','Nina_Boom','Raul_Sniper','Vivi_Capy','Fred_Lag','Lia_Moon','Capi_Lendas'];
+function botProfile(i){const R=mulberry(9173+i*7919),pk=a=>a[Math.floor(R()*a.length)];
+  const furs=[...FURS.map(f=>f[0]),...RFURS.map(f=>f[0]),...SHOP.find(s=>s[0]==='cores')[3].map(c=>c[1])];
+  const L=defaultLook(Math.floor(R()*PRESETS.length));L.body=pk(furs);L.hat=R()<.62?'cartola':'none';
+  const roupas=SHOP.find(s=>s[0]==='roupas')[3],pat=R()<.45?0:1+Math.floor(R()*6),out=R()<.35?0:1+Math.floor(R()*6);
+  return{name:BOT_NICKS[i%BOT_NICKS.length],look:cleanLook(L),sty:{pat,patC:'#2A1A12',out,outC:out?roupas[out-1][1]:'#FF4F9A',fx:R()<.08?'neon':''},eye:{t:Math.floor(R()*6),b:Math.floor(R()*5),c:pk(Map3D.EYECOLS)}}}
+function disguiseBots(){const pool=[...Array(BOT_NICKS.length).keys()].sort(()=>Math.random()-.5);let j=0;
+  for(const p of Object.values(players))if(p.bot){const pr=botProfile(pool[j++]);p.name=pr.name;p.look=pr.look;p.sty=pr.sty;p.eye=pr.eye;p.fake=1}}
+
+// ---------- JOGAR! = partida rápida: procura, encontra e entra com 10 capivaras (você + 9) ----------
+let QUICK=null,qT=0,qClock=0;
+function quickEnd(){if(QUICK){Object.assign(cfg,QUICK.prev);QUICK=null}}
+function quickPlay(){if(mlBusy||qT)return;Sound.play('boing');if(!QUICK)QUICK={prev:JSON.parse(JSON.stringify(cfg))};
+  Object.assign(cfg,{mode:pick(MODES).id,map:pick(MAPS).id,bots:MAX_PLAYERS-1,diff:'normal',time:180});
+  showLoad('quick');const el=$('mload');el.classList.add('searching');el.classList.remove('found');
+  $('mlKind').textContent='PARTIDA RÁPIDA';$('mlTitle').textContent='PROCURANDO PARTIDA';const t0=performance.now();
+  let cb=$('mlCancel');if(!cb){cb=document.createElement('button');cb.id='mlCancel';cb.className='ml-cancel';cb.textContent='CANCELAR';el.querySelector('.ml-top').appendChild(cb)}
+  cb.onclick=()=>{clearTimeout(qT);clearInterval(qClock);qT=0;el.classList.remove('searching','found');hideLoad();quickEnd();Sound.play('click')};
+  const tick=()=>{const s=Math.floor((performance.now()-t0)/1000);$('mlMap').textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')} • procurando capivaras na sua região`};tick();clearInterval(qClock);qClock=setInterval(tick,500);
+  qT=setTimeout(()=>{clearInterval(qClock);qT=0;const md=modeById(cfg.mode),mp=mapById(cfg.map);el.classList.remove('searching');el.classList.add('found');Sound.play('yes');
+    $('mlKind').textContent='PARTIDA ENCONTRADA!';$('mlTitle').textContent=md.n.toUpperCase();$('mlMap').textContent=`${mp.n} • ${MAX_PLAYERS} capivaras`;
+    setTimeout(()=>{el.classList.remove('found');matchLoad('quick')},1300)},2400+Math.random()*2600)}
+
+// ---------- TEMPORADA: 30 dias a partir de 05/11/2026, 30 níveis, um prêmio por nível ----------
+const SEA_START=Date.parse('2026-11-05T00:00:00-03:00'),SEA_LEN=30*864e5;
+const seaId=()=>Math.max(1,Math.floor((Date.now()-SEA_START)/SEA_LEN)+1),seaEnd=()=>SEA_START+seaId()*SEA_LEN;
+const SEA_NAMES=['Capivaras do Caos','Verão na Lagoa','Noite Neon','Festa das Laranjas'];
+const seaName=()=>SEA_NAMES[(seaId()-1)%SEA_NAMES.length];
+const SEA_REW=[{t:'or',n:150},{t:'item',id:'rc:0'},{t:'tr',n:5},{t:'item',id:'roupas:0'},{t:'or',n:250},{t:'item',id:'tt:0'},{t:'item',id:'estilos:2'},{t:'item',id:'rw:0'},{t:'tr',n:10},{t:'item',id:'quadros:3'},
+  {t:'or',n:300},{t:'item',id:'rc:5'},{t:'item',id:'pelos:1'},{t:'xp',n:300},{t:'item',id:'roupas:1'},{t:'tr',n:15},{t:'item',id:'rw:3'},{t:'item',id:'estilos:4'},{t:'or',n:500},{t:'item',id:'pelos:5'},
+  {t:'item',id:'rc:10'},{t:'item',id:'tt:8'},{t:'item',id:'fundos:2'},{t:'tr',n:20},{t:'item',id:'roupas:4'},{t:'or',n:800},{t:'item',id:'estilos:1'},{t:'tr',n:30},{t:'item',id:'quadros:0'},{t:'item',id:'estilos:3'}];
+const SEA_BIG=[10,20,30];
+const seaNeed=l=>100+8*(l-1); // XP para completar o nível l
+function seaState(){let s=store.get('season',null);if(!s||s.id!==seaId())s={id:seaId(),xp:0};return s}
+function seaInfo(xp){let lv=0,acc=0;while(lv<30&&xp>=acc+seaNeed(lv+1)){acc+=seaNeed(lv+1);lv++}return{lv,cur:xp-acc,need:lv<30?seaNeed(lv+1):1,max:lv>=30}}
+function seaLeft(){const ms=Math.max(0,seaEnd()-Date.now()),d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5);return d>0?`${d}d ${h}h`:`${h}h ${Math.floor(ms%36e5/6e4)}min`}
+// adiciona XP e entrega os prêmios dos níveis completados
+function seaAdd(xp){const s=seaState(),a=seaInfo(s.xp);s.xp+=xp;const b=seaInfo(s.xp),ups=[];for(let l=a.lv+1;l<=b.lv;l++)ups.push({lv:l,rw:grant(Object.assign({},SEA_REW[l-1]))});store.set('season',s);return{from:a,to:b,ups,xp0:s.xp-xp,xp1:s.xp}}
+// miniatura de um prêmio (cor, quadro, lagoa, roupa, efeito...)
+function rwThumb(rw){const sw=bg=>`<i class="rw-sw" style="background:${bg}"></i>`;
+  if(rw.t==='or')return`<span class="rw-ic or">${I('orange')}</span>`;if(rw.t==='tr')return`<span class="rw-ic tr">${I('trophy')}</span>`;if(rw.t==='xp')return`<span class="rw-ic xp">${I('star')}</span>`;
+  const [k,i]=rw.id.split(':'),n=+i,cat=SHOP.find(s=>s[0]===k);
+  if(k==='rc')return sw(RFURS[n][0]);if(k==='rw'){const c=RWATERS[n][1];return sw(`radial-gradient(ellipse at 50% 60%,${c[0]},${c[1]} 70%,${c[3]})`)}
+  if(k==='tt')return`<span class="rw-ic tt">${I('crown')}</span>`;
+  if(k==='quadros')return`<i class="rw-sw art" style="background-image:url(loading/${cat[3][n][1]}_p.jpg?v=${ASSETV})"></i>`;
+  if(k==='fundos'){const c=SHOPWATERS[n];return sw(`radial-gradient(ellipse at 50% 60%,${c[0]},${c[1]} 70%,${c[3]})`)}
+  if(k==='cores')return sw(cat[3][n][1]);if(k==='roupas')return`<span class="rw-ic" style="color:${cat[3][n][1]}">${I('shirt')}</span>`;
+  if(k==='pelos')return sw(cat[3][n][1]);if(k==='estilos')return`<i class="rw-sw glow" style="background:${cat[3][n][1]}"></i>`;return`<span class="rw-ic">${I('gift')}</span>`}
+function rwTitle(rw){return rw.t==='item'?itemName(rw.id):rewardText(rw)}
+// cartão da temporada na tela inicial
+function seaCardRender(){const s=seaState(),f=seaInfo(s.xp);$('seaHead').textContent=`TEMPORADA ${s.id} • termina em ${seaLeft()}`;$('seaLv').textContent=f.lv;
+  $('seaFill').style.width=(f.max?100:f.cur/f.need*100)+'%';$('seaName').textContent=f.max?'Temporada completa!':`${f.cur}/${f.need} XP • ${rwTitle(SEA_REW[f.lv])}`}
+// tela da temporada: todos os prêmios (desbloqueados, o próximo e os futuros)
+function seaRender(){const s=seaState(),f=seaInfo(s.xp);
+  $('tsTop').innerHTML=`<div class="ts-hex"><small>NÍVEL</small><b>${f.lv}</b></div><div class="ts-info"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small>
+      <div class="m-bar ts-bar"><i style="width:${f.max?100:f.cur/f.need*100}%"></i><span>${f.max?'Completa!':`${f.cur} / ${f.need} XP`}</span></div>
+      <p>Termina em <b>${seaLeft()}</b> • ${f.lv}/30 prêmios desbloqueados</p></div>`;
+  $('tsHow').innerHTML=[['flag','Terminar partida','+40'],['crown','Vitória','+60'],['skull','Cada eliminação','+12'],['bolt','Double / Triple kill','+15 / +30'],['heart','Morrer pouco','até +40']].map(([ic,t,v])=>`<span>${I(ic)}${t}<b>${v}</b></span>`).join('');
+  $('tsGrid').innerHTML=SEA_REW.map((rw,i)=>{const l=i+1,st=f.lv>=l?'got':l===f.lv+1?'next':'lock';
+    return`<div class="ts-rw ${st}${SEA_BIG.includes(l)?' big':''}"><em>${l}</em><div class="ts-th">${rwThumb(rw)}</div><b>${escapeHtml(rwTitle(rw))}</b><span>${st==='got'?I('check')+'Desbloqueado':st==='next'?`Faltam ${f.need-f.cur} XP`:I('lock')+'Nível '+l}</span></div>`}).join('');
+  const nx=$('tsGrid').querySelector('.next');if(nx)nx.scrollIntoView({block:'nearest'})}
+
+// ---------- XP da partida: terminar, colocação, eliminações, morrer pouco, multi-kills ----------
+const SM={d:0,t:0,m:0};function seaReset(){SM.d=SM.t=SM.m=0}
+function seaMulti(n){if(n===2)SM.d++;else if(n===3)SM.t++;else if(n>=4)SM.m++}
+function matchXP(me,place,won,n){const L=[],add=(t,v)=>{if(v>0)L.push([t,v])};if(!me)return L;
+  add('Partida finalizada',40);
+  if(won)add('Vitória!',60);else if(place===2)add('2º lugar',40);else if(place===3)add('3º lugar',30);else if(place<=Math.ceil(n/2))add('Metade de cima',15);
+  const k=me.kills||0,d=me.deaths||0;add(k+(k===1?' eliminação':' eliminações'),k*12);
+  if(d===0)add('Sem morrer nenhuma vez!',40);else if(d<=2)add('Morreu pouco',20);else if(d<=4)add('Sobreviveu bem',8);
+  add('Double kill'+(SM.d>1?' ×'+SM.d:''),SM.d*15);add('Triple kill'+(SM.t>1?' ×'+SM.t:''),SM.t*30);add('Multi kill'+(SM.m>1?' ×'+SM.m:''),SM.m*45);
+  if((me.best||0)>=3)add('Sequência de '+me.best,me.best*5);return L}
+
+// ---------- fim de partida: suspense → pódio (top 3) → barra da temporada ----------
+let ES=null;
+function esPortrait(cv,p){drawPortrait(cv,p.look,{bg:false,full:true,bot:p.bot&&!p.fake,styObj:p.fake&&p.sty?Object.assign({},p.sty,{eye:p.eye}):null,self:p.id===self})}
+function endSeq(o){const el=$('endSeq');if(!el)return;ES=Object.assign({phase:0,t:[]},o);clearTimeout(ES.tm);el.classList.remove('hidden');document.body.classList.add('endseq');
+  const n=o.list.length;ES.lines=matchXP(o.me,o.place,o.won,n);ES.xp=ES.lines.reduce((a,l)=>a+l[1],0);ES.res=seaAdd(ES.xp);
+  esSuspense()}
+function esSuspense(){const o=ES,st=$('esStage');const tw=o.tw;const win=tw>=0?'TIME '+TEAM[tw].n.toUpperCase():tw===-2?'EMPATE!':(o.list[0]?o.list[0].name:'???');
+  st.innerHTML=`<div class="es-sus"><div class="es-spot"></div><div class="es-title">FIM DE PARTIDA!</div><div class="es-q">E o grande vencedor é…</div>
+    <div class="es-roll"><b id="esRoll">???</b></div><div class="es-drum"><i></i><i></i><i></i></div><button class="es-tap" id="esTap">TOQUE PARA REVELAR</button></div>`;
+  const names=o.list.map(p=>p.name);let i=0,delay=60,done=false;const roll=()=>{if(done)return;$('esRoll').textContent=names[i++%names.length]||'???';Sound.play('tick');delay*=1.09;if(delay<380)ES.rt=setTimeout(roll,delay);else reveal()};
+  const reveal=()=>{if(done)return;done=true;clearTimeout(ES.rt);const r=$('esRoll');r.textContent=win;r.parentNode.classList.add('win');$('esTap').classList.add('gone');
+    st.querySelector('.es-sus').classList.add('revealed');Sound.play('win');celebrate(o.won?180:90);ES.tm=setTimeout(esPodium,1700)};
+  roll();$('esTap').onclick=reveal;st.querySelector('.es-sus').onclick=e=>{if(e.target.id!=='esTap')reveal()}}
+function esPodium(){const o=ES,st=$('esStage'),top=o.list.slice(0,3),me=o.me;
+  const slot=(p,i)=>p?`<div class="es-slot s${i+1}"><canvas width="240" height="264"></canvas><div class="es-nm">${i===0?I('crown'):''}${escapeHtml(p.name)}${p.id===self?' <small>(você)</small>':''}</div><div class="es-blk"><b>${i+1}º</b><small>${escapeHtml(scoreLabel(p))}</small></div></div>`:'<div class="es-slot empty"></div>';
+  st.innerHTML=`<div class="es-pod"><h2>RANKING DA PARTIDA</h2><div class="es-podium">${slot(top[1],1)}${slot(top[0],0)}${slot(top[2],2)}</div>
+    <div class="es-you"><span>Você: <b>${o.place}º</b></span><span>${I('skull')}<b>${me?me.kills:0}</b> elim.</span><span>${I('heart')}<b>${me?me.deaths:0}</b> mortes</span><span>${I('flame')}<b>${me?me.best||0:0}</b> sequência</span></div>
+    <button class="m-play sm es-btn" id="esNext"><b>CONTINUAR</b></button></div>`;
+  st.querySelectorAll('.es-slot canvas').forEach((cv,k)=>{const p=[top[1],top[0],top[2]][k];if(p)esPortrait(cv,p)});Sound.play('pop');
+  $('esNext').onclick=()=>{Sound.play('click');clearTimeout(ES.tm);esSeason()};ES.tm=setTimeout(esSeason,7000)}
+function esSeason(){const o=ES,st=$('esStage'),r=o.res,s=seaState();
+  st.innerHTML=`<div class="es-sea"><div class="es-seahead"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small><div class="es-lvrow"><div class="ts-hex"><small>NÍVEL</small><b id="esLv">${r.from.lv}</b></div>
+      <div class="es-barw"><div class="m-bar es-bar"><i id="esFill"></i><span id="esXp"></span></div><div class="es-gain">+<b id="esGain">0</b> XP</div></div></div></div>
+    <ul class="es-lines" id="esLines"></ul><div class="es-unlock hidden" id="esUnlock"></div>
+    <div class="es-btns">${solo?`<button class="m-btn2" id="esMenu">${I('home')}MENU</button><button class="m-play sm" id="esAgain"><b>JOGAR DE NOVO</b></button>`:`<button class="m-play sm" id="esCont"><b>CONTINUAR</b></button>`}</div></div>`;
+  const fill=$('esFill'),xpT=$('esXp'),lvT=$('esLv');let shown=r.xp0,lv=r.from.lv;const draw=()=>{const f=seaInfo(shown);fill.style.width=(f.max?100:f.cur/f.need*100)+'%';xpT.textContent=f.max?'Temporada completa!':`${f.cur} / ${f.need} XP`;
+    if(f.lv!==lv){lv=f.lv;lvT.textContent=lv;lvT.parentNode.classList.remove('pop');void lvT.offsetWidth;lvT.parentNode.classList.add('pop');const up=r.ups.find(u=>u.lv===lv);if(up)esUnlock(up)}};draw();
+  // cada motivo aparece em sequência e a barra corre junto
+  let li=0,gain=0;const next=()=>{if(ES!==o||li>=o.lines.length)return;const [t,v]=o.lines[li++],ul=$('esLines');if(!ul)return;ul.insertAdjacentHTML('beforeend',`<li><span>${escapeHtml(t)}</span><b>+${v}</b></li>`);Sound.play('gem',li);
+    const from=shown,to=shown+v,t0=performance.now();const run=()=>{if(ES!==o||!$('esFill'))return;const k=Math.min(1,(performance.now()-t0)/520);shown=Math.round(from+(to-from)*k);$('esGain').textContent=gain+Math.round(v*k);draw();if(k<1)requestAnimationFrame(run);else{gain+=v;ES.tm=setTimeout(next,260)}};run()};
+  ES.tm=setTimeout(next,500);
+  if(solo){$('esMenu').onclick=()=>{esClose();Sound.play('click');goHome()};$('esAgain').onclick=()=>{esClose();if(QUICK){goHome();setTimeout(quickPlay,60)}else{goHome();setTimeout(playNow,60)}}}
+  else $('esCont').onclick=()=>{Sound.play('click');esClose()}}
+function esUnlock(up){const el=$('esUnlock');if(!el)return;el.classList.remove('hidden');Sound.play('level');celebrate(60);
+  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`)}
+function esClose(){clearTimeout(ES&&ES.tm);clearTimeout(ES&&ES.rt);$('endSeq').classList.add('hidden');document.body.classList.remove('endseq');ES=null}
+
+$('seaCard').onclick=()=>{Sound.play('click');go('temporada')};
+setInterval(()=>{if(view==='home')seaCardRender();if(view==='temporada')seaRender()},60000);
+seaCardRender();
 
 })();
 </script></body></html>
