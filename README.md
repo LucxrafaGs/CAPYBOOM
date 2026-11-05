@@ -23,6 +23,7 @@ src/
     05_render.js       câmera, efeitos, partículas, previsão local e laço principal
     06_ui.js           menus, salas online, HUD, Arsenal, votação e controles
     07_social.js       CapyAmigos: amigos por código, online/visto por último, mensagens (desligado: precisa do Cloudflare)
+    08_conta.js        contas (Supabase): cadastro, entrar e progresso salvo na nuvem
 server/
   worker.js            Worker: serve o jogo e a API /api/*
   room.js              Durable Object "Room": uma sala = uma partida rodando na nuvem
@@ -45,12 +46,18 @@ versoes-antigas/       versões anteriores, só para consulta
   `?peerhost=IP-DO-PC:9000` em todos os aparelhos.
 - O servidor do Cloudflare (salas na nuvem, lista de salas e CapyAmigos) fica desligado: `CLOUD=false` em `src/js/04_net.js`.
 
-## Acesso e progresso
+## Contas (Supabase)
 
-- O jogo abre sem cadastro ou login. O progresso fica salvo no navegador deste aparelho.
-- A integração de contas com Supabase foi desativada no cliente. As tabelas e contas criadas antes continuam no projeto
-  Supabase, mas esta versão do jogo não consulta nem sincroniza esses dados. A migração em `supabase/migrations/` fica
-  apenas como registro histórico.
+- Tela **MINHA CONTA** (toque no selo embaixo do seu nome, ou no botão de pessoas no celular em pé): criar conta
+  (email, nome de usuário, senha) ou entrar.
+- Projeto Supabase `cswuqdlxlguivvhzugyq`. Tabela `public.profiles`: `username`, `oranges` (laranjas) e `data`
+  (itens comprados, visual, olhos, fundo, troféus, estatísticas e desafios). Cada conta só lê e salva o próprio perfil (RLS).
+- É preciso criar uma conta ou entrar para jogar. Ao criar a conta, o progresso já salvo no navegador vai junto.
+  Com conta, cada mudança é salva na nuvem ~4 s depois; em outro aparelho, é só entrar com o mesmo email.
+- `public.account_grants`: laranjas de presente e nome reservado por email (aplicado quando a conta é criada).
+  Só dá para mexer pelo painel do Supabase. Estrutura completa em `supabase/migrations/`.
+- Dar laranjas para alguém depois: no SQL Editor do Supabase,
+  `update profiles set oranges = 5000 where username = 'nome';` (o jogo pega o valor novo ao abrir).
 
 ## Comandos
 

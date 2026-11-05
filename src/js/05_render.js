@@ -182,6 +182,7 @@ function frame(t){requestAnimationFrame(frame);
   if(S.dynres&&!isTouch&&!mb&&view==='game'&&dt>.026){slowT+=dt;if(slowT>2&&resScale>.55){resScale*=.85;resize();slowT=0}}else slowT=Math.max(0,slowT-dt*.5);
   lastFrame=t;
   const active=demo||started;if(active)menuClr=false;
+  if(!active&&!bootOn&&document.body.classList.contains('gated'))return; // tela de conta cobrindo tudo: não desenha o menu 3D por trás (economiza bateria)
   if(demo)step(dt,time());
   else if(host&&started&&!(paused&&solo)){pushInputs();step(dt,time());sync()}
   else if(!host&&started){pushInputs()}

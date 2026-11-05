@@ -90,11 +90,12 @@
 <div id="mtop" class="m-top m-fixed hidden">
   <div class="m-prof">
     <button class="m-ava" id="avaBtn" title="Visual da capivara"><canvas id="avaCv" width="128" height="128"></canvas><svg class="i m-crown"><use href="#i-crown"/></svg><b class="m-avalv" id="avaLv">1</b></button>
-    <div class="m-panel m-name"><b id="homeNick">Capivara</b><div class="m-bar"><i id="xpFill"></i></div><small id="xpTxt">0 / 100 XP</small></div>
+    <div class="m-panel m-name"><b id="homeNick">Capivara</b><div class="m-bar"><i id="xpFill"></i></div><small id="xpTxt">0 / 100 XP</small><button class="m-acctag" id="accTag">Criar conta</button></div>
   </div>
   <div class="m-res">
     <div class="m-pill" title="Troféus"><svg class="i"><use href="#i-trophy"/></svg><span id="totWins">0</span></div>
     <div class="m-pill" title="Laranjinhas coletadas"><svg class="i"><use href="#i-orange"/></svg><span id="totalGems">0</span></div>
+    <button class="m-sq m-accbtn" id="btnAcc" title="Minha conta" aria-label="Minha conta"><svg class="i"><use href="#i-users"/></svg><i class="m-accdot" id="accDot"></i></button>
     <button class="m-sq" id="btnFs" title="Tela cheia" aria-label="Tela cheia"><svg class="i"><use href="#i-expand"/></svg></button>
     <button class="m-sq" id="btnSettings" title="Configurações"><svg class="i"><use href="#i-gear"/></svg></button>
     <button class="m-sq red" id="btnQuit" title="Sair"><svg class="i"><use href="#i-x"/></svg></button>
@@ -158,6 +159,25 @@
     <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-image"/></svg>FUNDO</h3></div>
     <p class="m-sub"><b id="bgName">Lagoa Roxa</b> — onde o deque da sua capivara fica.</p>
     <div class="m-bggrid" id="bgGrid"></div>
+  </div>
+</section>
+
+<!-- PORTÃO: entrar ou criar conta (aparece depois da abertura; sem conta não dá para jogar) -->
+<div id="gate" class="hidden">
+  <div class="g-bg"><img id="gA" alt=""><img id="gB" alt=""></div>
+  <div class="g-card m-panel">
+    <div class="g-logo">CAPI<span>BOOM</span></div>
+    <p class="g-sub">Entre ou crie sua conta para jogar</p>
+    <div class="m-accbody g-body" id="gateBody"></div>
+  </div>
+  <div class="g-art"><small>OBRA EM EXPOSIÇÃO</small><b id="gArt"></b></div>
+</div>
+
+<!-- CONTA: cadastro / entrar / perfil salvo na nuvem (Supabase) -->
+<section id="conta" class="screen mscreen mside hidden">
+  <div class="m-cpanel m-panel m-acc">
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-users"/></svg>MINHA CONTA</h3></div>
+    <div class="m-accbody" id="accBody"></div>
   </div>
 </section>
 
