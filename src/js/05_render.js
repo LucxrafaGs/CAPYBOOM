@@ -40,8 +40,17 @@ const aimStick={on:false,a:0,mag:0};
 const track={};let demoFocus='d0',demoSwap=0,hurtFlash=0,distortT=0;
 function nearCam(x,y,m=200){return x>cam.x-m&&x<cam.x+VW+m&&y>cam.y-m&&y<cam.y+VH+m}
 function onShot(p,tr){const g=GUNS[p.gun];if(!g)return;const me=p.id===self;if(me&&!demo)tk('shots');
-  if(g.melee){tr.swing=1}else if(!g.instant){tr.recoil=1;const mx=p.x+Math.cos(p.aim)*34,my=p.y+Math.sin(p.aim)*34+8;FX3D.flash(mx,my,FX3D.FLY,g.cat==='heavy'?16:9,g.col||'#fff',.09);if(g.cat==='heavy'&&S.particles!=='low')FX3D.smoke(mx,my,FX3D.FLY,5,2,'#E9E2F7',.5,20)}
-  if(me||(!demo&&nearCam(p.x,p.y,-40)&&Math.random()<.5))Sound.play(g.sfx||'pew');if(me&&(g.cat==='heavy'||g.txt==='NÃO')){vibe(25);shakeA=Math.max(shakeA,g.m==='megabazooka'?9:3)}}
+  const big=g.cat==='heavy'||g.cat==='shotgun',fl={heavy:20,shotgun:17,rifle:13,explosive:12,laser:g.beam?15:10,pistol:9,smg:8}[g.cat]||9;
+  if(g.melee){tr.swing=1}else if(!g.instant){tr.recoil=1;const mx=p.x+Math.cos(p.aim)*34,my=p.y+Math.sin(p.aim)*34+8;FX3D.flash(mx,my,FX3D.FLY,fl,g.col||'#fff',big?.12:.09);if(big)FX3D.flash(mx,my,FX3D.FLY,fl*.55,'#FFFFFF',.07);
+    if((big||g.cat==='rifle')&&S.particles!=='low')FX3D.smoke(mx,my,FX3D.FLY,big?6:4,big?3:1,'#E9E2F7',.55,22);
+    if(g.cat==='shotgun'&&S.particles!=='low')FX3D.burst(mx,my,FX3D.FLY,6,['#FFE066','#FFFFFF'],'dot',320,2.5,.18)
+    // cápsulas de bala pulando para o lado (armas de fogo)
+    if(S.particles!=='low'&&nearCam(p.x,p.y)&&['pistol','smg','rifle','shotgun'].includes(g.cat)){const sa=p.aim+Math.PI/2*(Math.cos(p.aim)>=0?-1:1),n=g.cat==='shotgun'?1:1;
+      for(let i=0;i<n;i++)FX3D.part({k:'cube',x:p.x+Math.cos(p.aim)*14,y:p.y+Math.sin(p.aim)*14+6,h:FX3D.FLY+2,vx:Math.cos(sa)*rand(70,130)+rand(-20,20),vy:Math.sin(sa)*rand(50,100),vh:rand(110,170),g:720,bounce:.45,drag:1,size:g.cat==='shotgun'?2.6:1.7,life:rand(.9,1.4),col:g.cat==='shotgun'?'#D8342E':'#E9B43A',vrx:rand(-20,20),vry:rand(-20,20)})}}
+  // som próprio de cada arma (mais baixo quanto mais longe) + recarga e tranco na tela na sua arma
+  if(!demo||me){const d=me?0:Math.hypot(p.x-(cam.x+VW/2),p.y-(cam.y+VH/2)),v=me?1:clamp(1-d/1100,0,1)*.5;if(v>.03)Sound.gun(g,v)}
+  if(me&&!demo){if(!g.melee&&!g.instant&&g.cd>=550)setTimeout(()=>Sound.reload(g),Math.min(g.cd*.45,650));
+    const k={heavy:7,shotgun:6,rifle:3.5,explosive:3,laser:g.beam?4:1.4,pistol:1.6,smg:1.1}[g.cat]||0;if(g.m==='megabazooka'||g.txt==='NÃO'){shakeA=Math.max(shakeA,10);vibe(35)}else if(k){if(S.shake)shakeA=Math.max(shakeA,k);if(k>=3)vibe(k>=6?30:15)}}}
 const seenFx=new Map();
 function processEffects(t){const now=time();for(const e of effects){if(seenFx.has(e.id))continue;seenFx.set(e.id,now);onEffect(e)}if(seenFx.size>1500)for(const [k,v] of seenFx)if(now-v>12000)seenFx.delete(k)}
 function camShake(x,y,a){if(!S.shake)return;const d=Math.hypot(x-(cam.x+VW/2),y-(cam.y+VH/2));shakeA=Math.max(shakeA,clamp(a-d/90,0,a))}
@@ -52,8 +61,11 @@ function onEffect(e){const near=nearCam(e.x||0,e.y||0),snd=!demo&&near,mine=e.pi
     case 'dmg':if(near)addP({x:e.x+rand(-8,8),y:e.y,vy:-90,type:'word',txt:'-'+e.v,col:e.v>=40?'#FF3B47':'#FFF4E0',size:e.v>=40?24:17,life:.7,drag:2});
       if(mine){Sound.play('hurt');hurtFlash=1;vibe(30);if(S.shake)shakeA=Math.max(shakeA,4)}break;
     case 'boom':if(!near)break;FX3D.boom(e.x,e.y,e.r,e.gold);word(e.x,e.y-e.r*.6,e.gold?'67!':e.r>150?'KA-BUUUM':'KABUM',e.gold?'#FFC531':'#FF7A1A',e.r>150?48:36);
-      if(snd){Sound.play('boom');camShake(e.x,e.y,e.r>150?14:9)}break;
-    case 'meteor':if(!near)break;addP({x:e.x,y:e.y,type:'boom',col:'#FF3B47',size:e.r*1.1,life:.5});for(let i=0;i<10;i++)addP({x:e.x+rand(-40,40),y:e.y+rand(-40,40),vx:rand(-200,200),vy:rand(-200,200),type:'brick',col:'#8E5A3A',size:rand(6,12),life:.8,vr:rand(-9,9),drag:2});camShake(e.x,e.y,16);if(snd)Sound.play('boom');break;
+      FX3D.ring(e.x,e.y,e.r*1.5,'#FFF4E0',.35,4);FX3D.flash(e.x,e.y,30,e.r*.9,'#FFE8A0',.12);
+      if(snd){Sound.bigBoom(e.r,clamp(1.1-Math.hypot(e.x-(cam.x+VW/2),e.y-(cam.y+VH/2))/1200,.25,1));camShake(e.x,e.y,e.r>150?22:13);if(Math.hypot(e.x-(cam.x+VW/2),e.y-(cam.y+VH/2))<350)vibe(40)}break;
+    case 'beam':{const fr=GUNS[e.g]&&GUNS[e.g].freeze;FX3D.beam(e.x,e.y,e.x2,e.y2,e.c,fr?.9:1.15);if(!near&&!nearCam(e.x2,e.y2))break;FX3D.flash(e.x2,e.y2,FX3D.FLY,e.hit?26:16,e.c,.16);FX3D.burst(e.x2,e.y2,FX3D.FLY,e.hit?10:6,[e.c,'#FFFFFF'],fr?'shard':'dot',300,fr?5:3,.3);
+      if(!mine&&snd&&e.hit)Sound.play('zap');if(e.hit)camShake(e.x2,e.y2,4);break}
+    case 'meteor':if(!near)break;if(snd)Sound.bigBoom(e.r*1.3);addP({x:e.x,y:e.y,type:'boom',col:'#FF3B47',size:e.r*1.1,life:.5});for(let i=0;i<10;i++)addP({x:e.x+rand(-40,40),y:e.y+rand(-40,40),vx:rand(-200,200),vy:rand(-200,200),type:'brick',col:'#8E5A3A',size:rand(6,12),life:.8,vr:rand(-9,9),drag:2});camShake(e.x,e.y,18);break;
     case 'stamp':if(!near)break;addP({x:e.x,y:e.y,type:'ring',col:'#E8443A',size:e.r*1.6,life:.5});word(e.x,e.y,'VETADO!','#E8443A',44);camShake(e.x,e.y,10);if(snd)Sound.play('slap');break;
     case 'heal':if(!near)break;for(let i=0;i<7;i++)addP({x:e.x+rand(-18,18),y:e.y+rand(-10,14),vy:-rand(50,110),type:'heart',txt:i%2?'+':'',col:'#6CF06A',size:rand(6,9),life:.9,drag:1});word(e.x,e.y-36,'+'+e.v,'#6CF06A',22);if(snd)Sound.play('heal');break;
     case 'med':if(near){for(let i=0;i<8;i++)addP({x:e.x+rand(-16,16),y:e.y,vy:-rand(60,120),type:'heart',txt:'+',col:'#6CF06A',size:7,life:.9,drag:1});word(e.x,e.y-30,'+50','#6CF06A',24)}if(mine)tk('meds');if(mine)Sound.play('med');break;
@@ -73,7 +85,6 @@ function onEffect(e){const near=nearCam(e.x||0,e.y||0),snd=!demo&&near,mine=e.pi
     case 'kill':addFeed(e);{const kt=track[e.ki];if(kt)kt.killT=performance.now()}if(e.ki===self&&e.vi!==self&&!demo){killPop(e.v);tk('kills');const kg=GUNS[e.g];if(kg)tk('k_'+kg.cat)}break;
     case 'gem':if(near&&S.particles!=='low')burst(e.x,e.y,4,['#FF8A1F','#FFC07A','#fff'],'star',120,4,.4);if(mine){Sound.play('gem',(e.n%8));flyGem(e.x,e.y);const tg=store.get('totalGems',0)+1;store.set('totalGems',tg);$('totalGems').textContent=wallet();bump('gems')}break;
     case 'flagtake':if(!demo){toast(e.name+' pegou a bandeira!',e.pid===self?'good':'');Sound.play('pickup')}break;
-    case 'flagret':if(!demo&&MODE.id==='ctf')toast('Bandeira '+(TEAM[e.team]?TEAM[e.team].n:'')+' voltou pra base');break;
     case 'capture':if(!demo){bigBanner('CAPTURA!',`${e.name} pontuou para o time ${TEAM[e.team].n}`,TEAM[e.team].c);Sound.play('capture');celebrate(60)}break;
     case 'vanish':if(near){addP({x:e.x,y:e.y,type:'spiral',col:'#FFC531',size:40,life:.5,vr:7});for(let i=0;i<8;i++)addP({x:e.x+rand(-14,14),y:e.y+rand(-20,14),vy:-30,type:'smoke',col:'#E9E2F7',size:12,life:.6,drag:2});word(e.x,e.y-40,'CARTA!','#FFC531',26)}if(mine)Sound.play('warp');break;
     case 'reappear':if(near){addP({x:e.x,y:e.y,type:'ring',col:'#FFC531',size:70,life:.5});burst(e.x,e.y,12,['#FFC531','#FF4F9A','#45D4FF'],'star',260,7);const pk=perkById(e.perk);if(pk)word(e.x,e.y-48,pk.n,RARITY[pk.r][1],20)}if(mine)Sound.play('spawn');break;
@@ -85,7 +96,7 @@ function onEffect(e){const near=nearCam(e.x||0,e.y||0),snd=!demo&&near,mine=e.pi
 function worldToScreen(x,y){return[(x-cam.x)*zoom,(y-cam.y)*zoom*SQ]}
 function drawNameTag(c,p,x,y){if(!S.names&&p.id!==self)return;c.save();c.translate(x,y-(Map3D.NAMEOFF-Map3D.FEET));c.scale(1,1/SQ);c.font='800 12px "Baloo 2",sans-serif';c.textAlign='center';c.textBaseline='middle';
   const w=Math.max(44,c.measureText(p.name).width+30),tc=p.team>=0?TEAM[p.team].c:null;c.fillStyle=p.id===self?'#FFC531':tc?shade(tc,-.35):'#12082bcc';rr(c,-w/2,-9,w,18,9);c.fill();c.strokeStyle=INK;c.lineWidth=2;c.stroke();
-  hexgon(c,-w/2+2,0,10);c.fillStyle=tc||'#FFC531';c.fill();c.stroke();c.fillStyle=INK;c.font='13px "Lilita One",sans-serif';c.fillText(MODE.id==='gun'?p.gunLvl+1:p.level,-w/2+2,1);
+  hexgon(c,-w/2+2,0,10);c.fillStyle=tc||'#FFC531';c.fill();c.stroke();c.fillStyle=INK;c.font='13px "Lilita One",sans-serif';c.fillText(p.level,-w/2+2,1);
   c.fillStyle=p.id===self?INK:'#FFF4E0';c.font='800 12px "Baloo 2",sans-serif';c.fillText(p.name,7,1);
   c.fillStyle='#12082b';rr(c,-20,11,40,6,3);c.fill();c.fillStyle=p.hp>40?'#6CF06A':'#FF3B47';rr(c,-20,11,40*clamp(p.hp/100,0,1),6,3);c.fill();c.lineWidth=1.5;rr(c,-20,11,40,6,3);c.stroke();c.restore()}
 function drawStatus(c,p,ht,t){
@@ -102,8 +113,6 @@ function drawWorld(dt,t){const ht=hostNow();
   // O jogo é 3D (03_map3d.js): cenário, capivaras e armas vão para o WebGL; este canvas transparente fica só com tiros, efeitos e textos
   ctx.clearRect(0,0,canvas.width,canvas.height);const g3=Map3D.on(M);CAP3=g3&&Map3D.capysOn(M);acts3.length=0;
   ctx.setTransform(k,0,0,k*SQ,(-cam.x+sx)*k,(-cam.y+sy)*k*SQ);
-  if(MODE.id==='koth'&&ms.zone&&!demo){const z=ms.zone,o=players[z.owner];drawZone(ctx,z,t,z.contested?'#FF3B47':o?(o.id===self?'#FFC531':'#FF4F9A'):'#FFF4E0')}
-  if(MODE.id==='ctf'&&!demo)for(const [i,[bx,by]] of M.bases.entries()){ctx.save();ctx.strokeStyle=TEAM[i].c;ctx.lineWidth=6;ctx.setLineDash([16,12]);ctx.beginPath();ctx.arc(bx,by,80,0,TAU);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=TEAM[i].c+'22';ctx.fill();ctx.restore()}
   for(const f of fields)if(f.k==='time'||f.k==='hole')drawField(ctx,f,t,ht);
   // laranjinhas, kits e caixas: 3D (03_fx3d.js)
   const fancy=S.particles!=='low';

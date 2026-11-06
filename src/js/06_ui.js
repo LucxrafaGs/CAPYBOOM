@@ -94,7 +94,7 @@ function rewardFor(ch){const r=mulberry([...(ch.id+daily().d)].reduce((a,c)=>a*3
   if(r<.90)return{t:'item',id:'tt:'+Math.floor(r*997)%TITLES.length};
   {const cats=['cores','fundos','pelos','roupas','estilos','quadros'],c=cats[Math.floor(r*7919)%cats.length];return{t:'item',id:c+':'+Math.floor(r*1000)%SHOP.find(s=>s[0]===c)[3].length}}}
 function itemName(id){const [k,i]=id.split(':');const n=+i;
-  if(k==='rc')return'Cor '+RFURS[n][1];if(k==='rw')return RWATERS[n][0];if(k==='tt')return'Título "'+TITLES[n]+'"';const c=SHOP.find(s=>s[0]===k);return c?c[3][n][0]:id}
+  if(k==='rc')return'Cor '+RFURS[n][1];if(k==='sf')return'Cor '+SEA_FURS[n][1];if(k==='rw')return RWATERS[n][0];if(k==='tt')return'Título "'+TITLES[n]+'"';const c=SHOP.find(s=>s[0]===k);return c?c[3][n][0]:id}
 function rewardText(rw){return rw.t==='or'?`+${rw.n} laranjas`:rw.t==='xp'?`+${rw.n} XP`:rw.t==='tr'?`+${rw.n} troféus`:itemName(rw.id)}
 function rewardIcon(rw){return rw.t==='or'?'orange':rw.t==='xp'?'star':rw.t==='tr'?'trophy':rw.id.startsWith('tt')?'crown':rw.id.startsWith('rw')||rw.id.startsWith('fundos')||rw.id.startsWith('quadros')?'image':rw.id.startsWith('roupas')?'shirt':'palette'}
 function grant(rw){if(rw.t==='or')store.set('bonusOr',store.get('bonusOr',0)+rw.n);else if(rw.t==='xp')store.set('bonusXp',store.get('bonusXp',0)+rw.n);else if(rw.t==='tr')store.set('trophies',trophies()+rw.n);
@@ -158,11 +158,13 @@ addEventListener('keydown',e=>{if(!MENUV.includes(view)||!$('mload').classList.c
   if(k==='g'&&document.body.classList.contains('social')){socOpen&&socOpen()}});
 
 // ---------- VISUAL: cor da capivara ----------
+// cores de pelo exclusivas da temporada (não aparecem na loja nem nos desafios)
+const SEA_FURS=[['#FFD34E','Ouro Real'],['#FF4FD8','Rosa Neon'],['#5B4BFF','Azul Galáctico'],['#FF6A2A','Lava'],['#BDEBFF','Gelo Eterno']];
 const FURS=[['#B07A4A','Clássica'],['#C98B4E','Caramelo'],['#6B4129','Chocolate'],['#8E5A33','Canela'],['#D9B38C','Areia'],['#EDE6DC','Neve'],['#8A8790','Fumaça'],['#45404A','Carvão'],
   ['#E7A1B5','Algodão-doce'],['#A992D8','Lavanda'],['#8FD3B6','Menta'],['#8CC3EE','Céu'],['#D8E070','Limão'],['#FF9A3C','Tangerina'],['#D9485F','Cereja'],['#E8B84A','Ouro']];
 let draftFur=null;
 // todas as cores possíveis: as de graça + as da loja + as exclusivas dos desafios
-function allFurs(){const L=FURS.map(([h,n])=>({h,n,id:null}));SHOP.find(s=>s[0]==='cores')[3].forEach(([n,h],i)=>L.push({h,n,id:'cores:'+i}));RFURS.forEach(([h,n],i)=>L.push({h,n,id:'rc:'+i}));return L}
+function allFurs(){const L=FURS.map(([h,n])=>({h,n,id:null}));SEA_FURS.forEach(([h,n],i)=>L.push({h,n,id:'sf:'+i}));SHOP.find(s=>s[0]==='cores')[3].forEach(([n,h],i)=>L.push({h,n,id:'cores:'+i}));RFURS.forEach(([h,n],i)=>L.push({h,n,id:'rc:'+i}));return L}
 const furName=h=>(allFurs().find(f=>f.h.toLowerCase()===String(h).toLowerCase())||{n:'Personalizada'}).n;
 // itens equipados (pelagem, roupa, efeito e título) — só a SUA capivara usa
 const FXK=['neon','rainbow','hearts','aura','sparks','bubbles'];
@@ -191,7 +193,7 @@ function renderVis(){$('visTabs').innerHTML=VTABS.map(([k,ic,n])=>`<button class
   if(vtab==='cor'){const L=allFurs(),mine=L.filter(f=>!f.id||has(f.id)),lock=L.filter(f=>f.id&&!has(f.id));
     sub.innerHTML=`<b id="furName">${escapeHtml(furName(draftFur))}</b> — ${mine.length} de ${L.length} cores. Mais cores na Loja e nos Desafios!`;
     g.innerHTML=mine.map(f=>`<button class="m-fur${f.h.toLowerCase()===String(draftFur).toLowerCase()?' on':''}" data-fur="${f.h}" title="${escapeHtml(f.n)}"><canvas width="112" height="112"></canvas><span style="--fc:${f.h}"></span><b>${escapeHtml(f.n)}</b></button>`).join('')+
-      lock.map(f=>lockTile(f.n,f.id.startsWith('cores')?'LOJA':'DESAFIOS',`data-lock="${f.id}"`)).join('');
+      lock.map(f=>lockTile(f.n,f.id.startsWith('cores')?'LOJA':f.id.startsWith('sf')?'TEMPORADA':'DESAFIOS',`data-lock="${f.id}"`)).join('');
     g.querySelectorAll('[data-fur]').forEach(b=>{tileCv(b.querySelector('canvas'),b.dataset.fur,styOf(equip()));b.onclick=()=>setFur(b.dataset.fur)})}
   else if(vtab==='olhos'){const ec=eyesCfg(),so=styOf(e);g.classList.add('eyes');
     sub.innerHTML=`<b>${EYE_T[ec.t]||EYE_T[0]}</b> · ${EYE_CN[Map3D.EYECOLS.indexOf(ec.c)]||'Personalizado'} — escolha o tipo, a sobrancelha e a cor. Teste as expressões!`;
@@ -210,13 +212,13 @@ function renderVis(){$('visTabs').innerHTML=VTABS.map(([k,ic,n])=>`<button class
   else if(vtab==='roupa'||vtab==='pelo'||vtab==='fx'||vtab==='skin'){const cat={roupa:'roupas',pelo:'pelos',fx:'estilos',skin:'skins'}[vtab],key={roupa:'out',pelo:'pat',fx:'fx',skin:'skin'}[vtab],items=SHOP.find(s=>s[0]===cat)[3],cur=e[key];
     sub.innerHTML=`<b>${cur>=0?escapeHtml(items[cur][0]):'Nada'}</b> — ${vtab==='roupa'?'roupas pintadas no corpo':vtab==='pelo'?'padrões no pelo':vtab==='skin'?'personagens completos em 3D (vencem roupas e pelagens)':'efeitos que acompanham sua capivara'}. ${vtab==='skin'?'Compre na Loja.':'Compre na Loja ou ganhe nos Desafios.'}`;
     g.innerHTML=`<button class="m-fur${cur<0?' on':''}" data-eq="-1"><canvas width="112" height="112"></canvas><b>Nada</b></button>`+items.map(([n,v],i)=>has(cat+':'+i)?
-      `<button class="m-fur${cur===i?' on':''}" data-eq="${i}">${vtab==='fx'?`<span class="m-fxpv" style="background:${v}"></span>`:'<canvas width="112" height="112"></canvas>'}<b>${escapeHtml(n)}</b></button>`:lockTile(n,'LOJA',`data-lock="${cat}:${i}"`)).join('');
+      `<button class="m-fur${cur===i?' on':''}" data-eq="${i}">${vtab==='fx'?`<span class="m-fxpv" style="background:${v}"></span>`:'<canvas width="112" height="112"></canvas>'}<b>${escapeHtml(n)}</b></button>`:items[i][2]==='temporada'?lockTile(n,'TEMPORADA',`data-lock="${cat}:${i}" data-sea="1"`):lockTile(n,'LOJA',`data-lock="${cat}:${i}"`)).join('');
     g.querySelectorAll('[data-eq]').forEach(b=>{const i=+b.dataset.eq,cv=b.querySelector('canvas');if(cv){const tmp=Object.assign({},e,{[key]:i});tileCv(cv,myLook.body,styOf(vtab==='fx'?Object.assign(tmp,{fx:-1}):tmp))}b.onclick=()=>{setEquip(key,i);Sound.play('pop');renderVis()}})}
   else{const cur=e.title;const mine=TITLES.map((n,i)=>[n,i]).filter(([n,i])=>has('tt:'+i));sub.innerHTML=`<b>${cur>=0?escapeHtml(TITLES[cur]):'Sem título'}</b> — aparece embaixo do seu nome. ${mine.length}/${TITLES.length} conquistados (ganhe nos Desafios).`;
     g.innerHTML=`<button class="m-title${cur<0?' on':''}" data-tt="-1">Sem título</button>`+mine.map(([n,i])=>`<button class="m-title${cur===i?' on':''}" data-tt="${i}">${escapeHtml(n)}</button>`).join('')+
       TITLES.map((n,i)=>has('tt:'+i)?'':`<button class="m-title lock">${I('lock')}???</button>`).join('');
     g.querySelectorAll('[data-tt]').forEach(b=>b.onclick=()=>{setEquip('title',+b.dataset.tt);Sound.play('pop');renderVis();renderTop()})}
-  g.querySelectorAll('[data-lock]').forEach(b=>b.onclick=()=>{const id=b.dataset.lock,cat=id.split(':')[0];if(SHOP.some(s=>s[0]===cat))shopGo(cat);else{Sound.play('no');toast('Esse item é prêmio dos Desafios Diários!','bad')}})}
+  g.querySelectorAll('[data-lock]').forEach(b=>b.onclick=()=>{const id=b.dataset.lock,cat=id.split(':')[0];if(cat==='sf'||b.dataset.sea){Sound.play('click');go('temporada')}else if(SHOP.some(s=>s[0]===cat))shopGo(cat);else{Sound.play('no');toast('Esse item é prêmio dos Desafios Diários!','bad')}})}
 function lookChanged(){store.set('look',myLook);drawSpheres();if(players[self]&&!started){players[self].look=myLook;if(host)sync(true);else if(conn)send(conn,{type:'look',look:myLook})}}
 function setHead(k){myLook=cleanLook(Object.assign({},myLook,{hat:k==='none'?'none':'cartola'}));lookChanged();Sound.play('pop');Map3D.menuPoke();renderVis()}
 function setFur(h){draftFur=h;myLook=cleanLook(Object.assign({},myLook,{body:h}));Sound.play('pop');Map3D.menuPoke();lookChanged();
@@ -225,8 +227,8 @@ function setFur(h){draftFur=h;myLook=cleanLook(Object.assign({},myLook,{body:h})
 // ---------- LOJA: compra com laranjas; o item vai para o Visual / Fundo e pode ser equipado na hora ----------
 const shortNum=n=>n>=1e6?(Math.floor(n/1e5)/10).toLocaleString('pt-BR')+' mi':n>=1e4?(Math.floor(n/100)/10).toLocaleString('pt-BR')+' mil':String(n); // 99.999.999 -> "99,9 mi" (cabe no topo)
 const wallet=()=>Math.max(0,store.get('totalGems',0)-store.get('spent',0)+store.get('bonusOr',0));
-const RAR={comum:['Comum','#9AA3B3'],raro:['Raro','#45D4FF'],epico:['Épico','#B777FF'],lend:['Lendário','#FFC531']};
-const SHOP=[['skins','crown','Skins',[['Explorador','#D9C69A','epico',900],['Marombeiro','#C98B4E','lend',1500],['Super-Capi','#D6262E','lend',1800],['Cinema Mudo','#8A8F9A','raro',600],['Dino','#4E8B3B','lend',1600]]],
+const RAR={comum:['Comum','#9AA3B3'],raro:['Raro','#45D4FF'],epico:['Épico','#B777FF'],lend:['Lendário','#FFC531'],temporada:['Temporada','#FF4FD8']};
+const SHOP=[['skins','crown','Skins',[['Explorador','#D9C69A','epico',900],['Marombeiro','#C98B4E','lend',1500],['Super-Capi','#D6262E','lend',1800],['Cinema Mudo','#8A8F9A','raro',600],['Dino','#4E8B3B','lend',1600],['Capitão Pirata','#C8282E','temporada',0],['Astronauta','#F1F3F7','temporada',0]]],
   ['roupas','shirt','Roupas',[['Camiseta Listrada','#FF4F9A','comum',60],['Moletom de Capuz','#45D4FF','raro',150],['Jaqueta de Couro','#3A3048','epico',320],['Regata de Praia','#FFC531','comum',50],['Terno Chique','#2A2440','lend',600],['Macacão de Mecânico','#3D6BFF','raro',180]]],
   ['fundos','image','Fundos e temas',[['Praia ao Pôr do Sol','linear-gradient(#FF9A5A,#FF5F8F 55%,#3A1C80)','raro',200],['Floresta Encantada','linear-gradient(#1F5E3A,#3DBE6C 60%,#C9F0A0)','raro',200],['Cidade Neon','linear-gradient(#0B0730,#4A1A8A 50%,#FF4FB0)','epico',350],['Aurora Boreal','linear-gradient(#0A1A3A,#2FA88A 45%,#B777FF)','lend',700],['Doce Chiclete','linear-gradient(#FFD1E8,#FF8FC8)','comum',90],['Deserto','linear-gradient(#FFE0A0,#E8A050 60%,#8A4A20)','comum',90]]],
   ['quadros','image','Quadros',[['A Última Ceia das Capivaras','ceia','lend',800],['O Repouso de Capybarus','deusa','epico',450],['O Vaso Grego das Capivaras','vaso','epico',450],['Capivaras em Festa','pop','raro',300],
@@ -262,7 +264,7 @@ function renderShop(){$('shopBal').textContent=wallet();
   $('shopTabs').querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{shopTab=b.dataset.st;Sound.play('click');renderShop()});
   tabArrows('shopTabs');$('shopTabs')._upd();
   const cat=SHOP.find(c=>c[0]===shopTab),bal=wallet();
-  $('shopGrid').innerHTML=cat[3].map(([n,v,r,price],i)=>{const id=shopTab+':'+i,own=has(id),[rn,rc]=RAR[r],eqd=own&&isEq(id);
+  $('shopGrid').innerHTML=cat[3].map(([n,v,r,price],i)=>{if(r==='temporada')return'';const id=shopTab+':'+i,own=has(id),[rn,rc]=RAR[r],eqd=own&&isEq(id);
     const pv=(shopTab==='skins'||shopTab==='roupas'||shopTab==='pelos'||shopTab==='cores')?`<span class="m-spv" style="background:radial-gradient(circle at 50% 40%,#5A34B0,#24104F)"><canvas width="112" height="112" data-pv="${id}"></canvas></span>`
       :shopTab==='estilos'?`<span class="m-spv" style="background:radial-gradient(circle at 50% 40%,#3A1C80,#170A38)"><i class="m-sglow" style="background:${v}"></i></span>`
       :shopTab==='quadros'?`<span class="m-spv m-art" style="background-image:url(loading/${v}_p.jpg?v=${ASSETV})"></span>`
@@ -457,7 +459,7 @@ $('btnSetDone').onclick=()=>{$('settings').classList.add('hidden');saveSettings(
 
 // ---------- HUD ----------
 let hudK=-1,hudG=-1,hudG2=-2,dashReady=true,deathShown=false;
-function onMatchStart(){seaReset();if(!solo&&!mlBusy){showLoad('online');setTimeout(hideLoad,5000)}parts=[];FX3D.clear();perkKey='';offerKey='';$('perkOv').classList.add('hidden');for(const k in track)delete track[k];$('feed').innerHTML='';hudGun=-1;hudG2=-2;deathShown=false;$('result').classList.add('hidden');go('game');const me=players[self];if(me)drawPortrait($('portrait'),me.look,{bg:false,self:true});
+function onMatchStart(){seaReset();cdLast='';if(!solo&&!mlBusy){showLoad('online');setTimeout(hideLoad,5000)}parts=[];FX3D.clear();perkKey='';offerKey='';$('perkOv').classList.add('hidden');for(const k in track)delete track[k];$('feed').innerHTML='';hudGun=-1;hudG2=-2;deathShown=false;$('result').classList.add('hidden');go('game');const me=players[self];if(me)drawPortrait($('portrait'),me.look,{bg:false,self:true});
   $('hudName').textContent=me?me.name:'';$('lvl'+'Num');
   bigBanner(MODE.n.toUpperCase(),MODE.d+(isTeams()&&me&&me.team>=0?` Você é do time ${TEAM[me.team].n}!`:''),isTeams()&&me&&me.team>=0?TEAM[me.team].c:'#FFC531');
   if(isTouch&&innerHeight>innerWidth)toast('Gire o celular para jogar melhor')}
@@ -467,19 +469,21 @@ function modeHudHTML(me){const L=rank(),lead=L[0];const ts=ms.teamScore||[0,0];
   const teamLine=(u)=>`<span class="tsc" style="--c:${TEAM[0].c}">${ts[0]}</span><span class="vs">${u}</span><span class="tsc" style="--c:${TEAM[1].c}">${ts[1]}</span>`;
   switch(MODE.id){
     case 'tdm':return teamLine('eliminações');
-    case 'ctf':return teamLine('capturas • 3 vence');
     case 'hold':{const f=ms.flags&&ms.flags[0],c=f&&f.carrier&&players[f.carrier];return `${I('flag')} ${c?(c.id===self?'<b>VOCÊ</b> está com a bandeira!':escapeHtml(c.name)+' está com ela'):'Bandeira livre!'} • você ${Math.floor(me.hold)}s / 60`}
-    case 'koth':{const z=ms.zone,o=z&&players[z.owner];return `${I('pond')} ${z&&z.contested?'Lagoa disputada!':o?(o.id===self?'<b>A lagoa é sua!</b>':escapeHtml(o.name)+' na lagoa'):'Lagoa vazia'} • você ${Math.floor(me.zone)}/60`}
-    case 'gun':return `${I('cycle')} Arma ${me.gunLvl+1}/12 • líder: ${escapeHtml(lead?lead.name:'')} (${lead?lead.gunLvl+1:0})`;
-    case 'race':return `${I('orange')} Corrida: líder ${escapeHtml(lead?lead.name:'')} com ${lead?lead.energy:0}`;
     default:return `${I('skull')} Você ${me.kills} • líder ${escapeHtml(lead?lead.name:'')} ${lead?lead.kills:0}`}}
+// contagem regressiva no começo da partida: 3... 2... 1... VAI!
+let cdLast=null;
+let cdHide=0;
+function countdown(){let el=$('cdown');const left=ms&&ms.go?ms.go-hostNow():-9999;let st=left>3000?'':left>0?String(Math.ceil(left/1000)):'';
+  if(!st&&left<=0&&left>-2500&&cdLast&&cdLast!=='VAI!')st='VAI!';else if(!st&&cdLast==='VAI!')return;
+  if(st===cdLast)return;cdLast=st;if(!el){el=document.createElement('div');el.id='cdown';document.body.appendChild(el)}
+  if(!st){el.className='';el.innerHTML='';return}if(st==='VAI!'){clearTimeout(cdHide);cdHide=setTimeout(()=>{cdLast='';el.className='';el.innerHTML=''},850)}el.className='on'+(st==='VAI!'?' go':'');el.innerHTML=`<b>${st}</b>${st==='VAI!'?'':'<small>PREPARE-SE</small>'}`;Sound.play(st==='VAI!'?'go':'count');if(st==='VAI!')vibe(40)}
 function updateHUD(t){const me=players[self];if(!me)return;const ht=hostNow();
   const mh=me.maxHp||100,hpp=clamp(me.hp/mh*100,0,100);$('hpFill').style.width=hpp+'%';$('hpGhost').style.width=hpp+'%';$('hpNum').textContent=Math.ceil(me.hp);$('hpBar').classList.toggle('low',hpp<25);
   updatePerkHUD(me,ht);
-  $('lvNum').textContent=MODE.id==='gun'?me.gunLvl+1:me.level;
-  if(MODE.id==='gun'){$('fill67').style.width=(me.gunLvl/12*100)+'%';$('txt67').textContent=`ARMA ${me.gunLvl+1}/12`;$('bar67').classList.remove('hot')}
-  else{$('fill67').style.width=(me.energy/67*100)+'%';$('txt67').textContent=MODE.id==='race'?`${me.energy}/67 PARA VENCER`:me.energy+'/67';$('bar67').classList.toggle('hot',me.energy>=60)}
-  $('modeHud').innerHTML=modeHudHTML(me);
+  $('lvNum').textContent=me.level;
+  $('fill67').style.width=(me.energy/67*100)+'%';$('txt67').textContent=me.energy+'/67';$('bar67').classList.toggle('hot',me.energy>=60);
+  $('modeHud').innerHTML=modeHudHTML(me);countdown();
   const rem=Math.max(0,matchEnd-ht);$('timer').textContent=fmtT(rem/1000);$('timer').classList.toggle('end',rem<30000);
   if(me.kills!==hudK){hudK=me.kills;pop($('kNum'),me.kills)}if(me.gemsTotal!==hudG){hudG=me.gemsTotal;pop($('gNum'),me.gemsTotal)}
   const gi=me.guns[me.slot],g2=me.guns[1-me.slot];
@@ -515,7 +519,7 @@ function closePause(){$('pause').classList.add('hidden');if(solo&&paused&&pauseA
 $('btnPause').onclick=openPause;$('btnResume').onclick=closePause;$('btnPauseSettings').onclick=openSettings;
 $('btnRestart').onclick=()=>{closePause();startBots()};
 $('btnQuitMatch').onclick=async()=>{if(await confirmBox('Sair da partida?',solo?'Seu progresso nesta partida será perdido.':host?'Você é o anfitrião: a partida acaba para todos.':isOwner()?'A partida continua: outro jogador vira o dono da sala.':'Você vai sair da sala.','SAIR','FICAR'))goHome()};
-function scoreLabel(p){switch(MODE.score){case 'hold':return Math.floor(p.hold)+'s';case 'caps':return p.caps;case 'zone':return Math.floor(p.zone);case 'gun':return (p.gunLvl+1)+'/12';case 'gems':return p.energy;default:return p.kills}}
+function scoreLabel(p){switch(MODE.score){case 'hold':return Math.floor(p.hold)+'s';default:return p.kills}}
 function renderScore(){const list=rank();$('scoreTable').innerHTML=`<tr><th>#</th><th>Capivara</th><th>${MODE.unit}</th><th>Elim.</th><th>Mortes</th><th>Nível</th></tr>`+list.map((p,i)=>`<tr class="${p.id===self?'me':''}"><td>${i+1}</td><td><span class="dotc" style="background:${p.team>=0&&isTeams()?TEAM[p.team].c:'transparent'}"></span>${escapeHtml(p.name)}${p.bot?' '+I('bot'):''}</td><td>${scoreLabel(p)}</td><td>${p.kills}</td><td>${p.deaths}</td><td>${p.level}</td></tr>`).join('')}
 function toggleScore(on){if(view!=='game')return;$('scoreOv').classList.toggle('hidden',!on);if(on)renderScore()}
 $('statKills').onclick=$('statGems').onclick=()=>toggleScore(true);$('btnCloseScore').onclick=()=>toggleScore(false);
@@ -529,7 +533,7 @@ function onMatchEnd(){$('death').classList.add('hidden');$('pause').classList.ad
   const won=tw>=0?(me&&me.team===tw):place===1;const trG=metaMatchEnd(me,place,won)||0;setTimeout(()=>{if(trG)toast(`+${trG} troféus`,'good')},900);$('resTitle').textContent=won?'VITÓRIA CAPIVARA!':'FIM DE PARTIDA';
   const pod=$('podium');pod.innerHTML='';[[1,'p2'],[0,'p1'],[2,'p3']].forEach(([i,cls])=>{const p=list[i];if(!p)return;const d=document.createElement('div');d.className='pod '+cls;const cv=document.createElement('canvas');cv.width=220;cv.height=242;d.appendChild(cv);
     d.insertAdjacentHTML('beforeend',`<div class="nm">${i===0?I('crown')+' ':''}${escapeHtml(p.name)}</div><div class="blk">${i+1}º<small>${scoreLabel(p)}</small></div>`);pod.appendChild(d);drawPortrait(cv,p.look,{bg:false,full:true,bot:p.bot})});
-  const nums=[[place,'Colocação','º'],[me?me.kills:0,'Eliminações'],[me?me.deaths:0,'Mortes'],[me?Math.floor(MODE.score==='hold'?me.hold:MODE.score==='zone'?me.zone:MODE.score==='caps'?me.caps:MODE.score==='gun'?me.gunLvl+1:me.gemsTotal):0,MODE.score==='kills'?'Laranjinhas':MODE.unit],[me?me.level:1,'Nível']];
+  const nums=[[place,'Colocação','º'],[me?me.kills:0,'Eliminações'],[me?me.deaths:0,'Mortes'],[me?Math.floor(MODE.score==='hold'?me.hold:me.gemsTotal):0,MODE.score==='kills'?'Laranjinhas':MODE.unit],[me?me.level:1,'Nível']];
   $('nums').innerHTML=nums.map(([v,l,s])=>`<div class="num sticker"><b data-v="${v}" data-s="${s||''}">0</b><span>${l}</span></div>`).join('');
   document.querySelectorAll('#nums b').forEach(b=>{const tgt=+b.dataset.v,suf=b.dataset.s,t0=time();const tick=()=>{const k=Math.min(1,(time()-t0)/900);b.textContent=Math.round(tgt*k)+suf;if(k<1)requestAnimationFrame(tick)};tick()});
   const md=[],top=f=>list.slice().sort((a,b)=>f(b)-f(a))[0];

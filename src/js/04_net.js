@@ -4,7 +4,7 @@ let netAt=0;
 let COS={};
 function myCos(){const s=styOf(equip());return{sk:s.sk,pat:s.pat,out:s.out,outC:s.outC,fx:s.fx,eye:eyesCfg()}}
 function cleanCos(c){if(!c||typeof c!=='object')return null;const n=(v,a,b)=>Math.max(a,Math.min(b,v|0)),hx=v=>/^#[0-9a-f]{6}$/i.test(v);
-  return{sk:n(c.sk,0,5),pat:n(c.pat,0,6),patC:'#2A1A12',out:n(c.out,0,6),outC:hx(c.outC)?c.outC:'#FF4F9A',fx:['neon','rainbow','hearts','aura','sparks','bubbles'].includes(c.fx)?c.fx:'',
+  return{sk:n(c.sk,0,7),pat:n(c.pat,0,6),patC:'#2A1A12',out:n(c.out,0,6),outC:hx(c.outC)?c.outC:'#FF4F9A',fx:['neon','rainbow','hearts','aura','sparks','bubbles'].includes(c.fx)?c.fx:'',
     eye:c.eye&&typeof c.eye==='object'?{t:n(c.eye.t,0,5),b:n(c.eye.b,0,4),c:hx(c.eye.c)?c.eye.c:'#6B3A1E'}:null}}
 function cosBroadcast(){if(!host||solo)return;COS[self]=cleanCos(myCos());const m={type:'cos',m:COS};for(const c of Object.values(clients))send(c,m)}
 function cosSend(){try{if(host)cosBroadcast();else if(conn&&conn.open&&netMode!=='srv')send(conn,{type:'cos',c:myCos()})}catch(e){}}

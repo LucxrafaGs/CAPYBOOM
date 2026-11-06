@@ -839,7 +839,27 @@ vec3 skinPaint(vec3 c,float lum){vec3 p=vOP;float ax=abs(p.x);float fl=max(dot(u
    }
    if(head>.5&&p.z>.1){float x=p.x;float yt=.848-.75*x*x,yb=.73+.5*x*x;if(ax<.215&&p.y<yt&&p.y>yb){o=red;m=1.;if(p.y>yt-.009||p.y<yb+.009)o=gold;}}
  }
- else if(uSk>4.5){
+ else if(uSk>5.5&&uSk<6.5){
+   vec3 wt=sR(.95,.93,.88),rd=sR(.78,.16,.18),vest=sR(.35,.2,.12),pants=sR(.17,.18,.29),boot=sR(.1,.08,.1),gold=sR(.94,.72,.24);
+   if(arm>.5&&p.y>.3){o=mix(wt,rd,step(.5,fract(p.y*22.)));m=1.;if(p.y<.325)o=wt*.9;}
+   if(tor>.5){m=1.;o=mix(wt,rd,step(.5,fract(p.y*22.)));
+     float open=front*(1.-smoothstep(.1,.11,ax));if(open<.5){o=vest*(.92+.1*vn(p*90.));if(front>.5&&abs(ax-.115)<.009)o=gold*.9;if(front>.5&&abs(ax-.135)<.012&&abs(fract(p.y*14.)-.5)<.18)o=gold;}}
+   if(p.y<.23&&p.y>.165&&arm<.5){o=rd*(.9+.15*vn(p*80.));m=1.;}
+   if(p.y<.225&&p.y>.195&&arm<.5){o=sR(.12,.08,.06);m=1.;}
+   if(p.y<=.165&&arm<.5){o=pants;m=1.;if(ax<.006&&p.z>0.)o*=.8;}
+   if(p.y<.085&&arm<.5){o=boot;m=1.;if(p.y>.07)o=gold*.85;}
+   if(head>.5){float yb=.79+(p.x+.14)*.33;if(abs(p.y-yb)<.009&&p.x>-.2&&!(p.x>.08&&p.y<.86)&&p.z>-.12){o=sR(.08,.06,.08);m=1.;}}
+ }
+ else if(uSk>6.5){
+   vec3 wh=sR(.94,.95,.97),gy=sR(.6,.64,.7),dk=sR(.22,.25,.31),bl=sR(.2,.38,.85),orn=sR(1.,.55,.12);
+   if(head<.5){m=1.;o=wh*(.96+.05*vn(p*70.));
+     if(arm>.5&&abs(p.y-.34)<.016)o=gy;if(arm<.5&&abs(p.y-.115)<.014)o=gy;if(arm<.5&&p.y>.185&&p.y<.225)o=gy*(abs(p.y-.205)<.006?.75:1.);
+     if(arm>.5&&p.y>.4&&p.y<.47&&p.z>.0)o=p.x>0.?bl:orn;
+     if(front>.5&&tor>.5){float d=bx(vec2(p.x,p.y),vec2(0.,.37),vec2(.085,.055));if(d<0.){o=dk;vec2 g2=vec2(p.x,p.y-.37);if(length(g2-vec2(-.045,.015))<.014)o=sR(1.,.3,.3);if(length(g2-vec2(0.,.015))<.014)o=sR(.4,1.,.4);if(length(g2-vec2(.045,.015))<.014)o=sR(.3,.8,1.);if(abs(g2.y+.022)<.01&&abs(g2.x)<.06)o=orn;}else if(d<.008)o=gy;
+       if(abs(p.x-.13)<.035&&abs(p.y-.46)<.022&&p.x>0.)o=mix(bl,wh,step(.5,fract((p.y-.44)*60.)));}
+     if(hand>.5)o=gy*.85;if(arm<.5&&p.y<.075){o=gy;if(p.y<.018)o=dk;}}
+ }
+ else if(uSk>4.5&&uSk<5.5){
    vec3 gr=sR(.31,.55,.23),cr=sR(.93,.8,.55);
    float face=head*step(.0,p.z)*step(length(vec2(p.x/.22,(p.y-.705)/.185)),1.);
    if(face<.5){m=1.;o=gr*(.9+.2*vn(p*40.));o*=1.-.22*smoothstep(.6,.68,vn(p*13.));o*=.92+.1*smoothstep(.3,.7,vn(p*110.));

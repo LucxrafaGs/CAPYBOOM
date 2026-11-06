@@ -13,7 +13,10 @@ const DEF=[null,
   {n:'Marombeiro',hat:false,eye:{t:2,b:2,c:'#3DAE5A'},bones:MUSC_BONES},
   {n:'Super-Capi',hat:true,eye:{t:2,b:2,c:'#3DAE5A'},lid:'#D6262E'},
   {n:'Cinema Mudo',hat:false,eye:{t:2,b:2,c:'#8A8F9A'},gray:1},
-  {n:'Dino',hat:false,eye:{t:2,b:2,c:'#3DAE5A'}}];
+  {n:'Dino',hat:false,eye:{t:2,b:2,c:'#3DAE5A'}},
+  // exclusivas da temporada
+  {n:'Capitão Pirata',hat:false,eye:{t:2,b:4,c:'#3DAE5A'}},
+  {n:'Astronauta',hat:false,eye:{t:0,b:1,c:'#3B7BD8'}}];
 const NAMES=DEF.map(d=>d&&d.n);
 
 // ---------- ajudantes de geometria ----------
@@ -33,16 +36,16 @@ function shell(rx,ry,rz,open){const g=new T.SphereGeometry(1,40,28),p=g.attribut
 
 // monta as peças de uma skin: {bone:[partes]} → uma malha (e um contorno) por osso
 function Builder(rest){const P={};
-  return{P,add(bone,geo,col,o={}){(P[bone]||(P[bone]=[])).push({geo,col:C(col),p:o.p||[0,0,0],r:o.r||[0,0,0],s:o.s||[1,1,1],ol:o.ol!==false,ds:!!o.ds})},
+  return{P,add(bone,geo,col,o={}){(P[bone]||(P[bone]=[])).push({geo,col:C(col),p:o.p||[0,0,0],r:o.r||[0,0,0],s:o.s||[1,1,1],ol:o.ol!==false,ds:!!o.ds,gl:!!o.gl})},
     build(){const out=[];for(const bone in P){const b=rest[bone]||[0,0,0];
-      for(const kind of ['m','ds']){const L=P[bone].filter(q=>kind==='ds'?q.ds:!q.ds);if(!L.length)continue;
+      for(const kind of ['m','ds','gl']){const L=P[bone].filter(q=>kind==='ds'?q.ds:kind==='gl'?q.gl:!q.ds&&!q.gl);if(!L.length)continue;
         const mk=list=>{if(!list.length)return null;const pos=[],nor=[],col=[],ind=[];let off=0;const m=new T.Matrix4(),e=new T.Euler(),qq=new T.Quaternion();
           for(const q of list){let g=q.geo.clone();m.compose(new T.Vector3(q.p[0]-b[0],q.p[1]-b[1],q.p[2]-b[2]),qq.setFromEuler(e.set(q.r[0],q.r[1],q.r[2],'YXZ')),new T.Vector3(...q.s));g.applyMatrix4(m);
             if(!g.attributes.normal)g.computeVertexNormals();const pa=g.attributes.position,na=g.attributes.normal;for(let i=0;i<pa.count;i++){pos.push(pa.getX(i),pa.getY(i),pa.getZ(i));nor.push(na.getX(i),na.getY(i),na.getZ(i));col.push(q.col.r,q.col.g,q.col.b)}
             if(g.index){for(const k of g.index.array)ind.push(k+off)}else for(let i=0;i<pa.count;i++)ind.push(i+off);off+=pa.count;g.dispose()}
           const G=new T.BufferGeometry();G.setAttribute('position',new T.Float32BufferAttribute(pos,3));G.setAttribute('normal',new T.Float32BufferAttribute(nor,3));G.setAttribute('color',new T.Float32BufferAttribute(col,3));
           G.setIndex(off>65535?new T.Uint32BufferAttribute(ind,1):new T.Uint16BufferAttribute(ind,1));G.computeBoundingSphere();return G};
-        out.push({bone,ds:kind==='ds',geo:mk(L),ogeo:kind==='ds'?null:mk(L.filter(q=>q.ol))})}}
+        out.push({bone,ds:kind==='ds',gl:kind==='gl',geo:mk(L),ogeo:kind!=='m'?null:mk(L.filter(q=>q.ol))})}}
       return out}}}
 
 // ---------- materiais das peças ----------
@@ -62,7 +65,10 @@ function mats(){if(MAT)return MAT;
   g.setLineDash([]);g.lineWidth=4;g.beginPath();g.moveTo(66,54);g.lineTo(78,66);g.moveTo(78,54);g.lineTo(66,66);g.stroke();g.strokeStyle='#6B4A2A';g.lineWidth=5;g.strokeRect(3,3,122,122);
   const tex=new T.CanvasTexture(cv);tex.colorSpace=T.SRGBColorSpace;
   const map=H.patch(new T.MeshStandardMaterial({map:tex,roughness:.8,side:T.DoubleSide}),{key:'skinMap',fr:[['#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=diffuseColor.rgb*.42;']]});
-  return MAT={acc,ds,out,map}}
+  // vidro do capacete: transparente, com brilho na borda (fresnel)
+  const glass=H.patch(new T.MeshStandardMaterial({color:'#CFE8FF',roughness:.05,metalness:.1,transparent:true,opacity:.2,depthWrite:false,side:T.DoubleSide}),{key:'skinGlass',dm:.3,
+    fr:[['#include <emissivemap_fragment>','#include <emissivemap_fragment>\n{float fz=pow(1.-abs(normalize(normal).z),2.2);diffuseColor.a=.1+fz*.6;totalEmissiveRadiance+=vec3(.55,.75,1.)*fz*.55;}']]});
+  return MAT={acc,ds,out,map,glass}}
 // capa: material próprio por capivara (uniforms do vento/corrida)
 const CAPE_V=`{float u=aCp.x,v=aCp.y,v2=v*v;float fl=uSpd*.13+uDash*.2;
   transformed.z-=v2*fl;transformed.y+=v2*fl*.55;
@@ -133,6 +139,40 @@ function design(sk,B){const b=Builder(restOf(B)),A=b.add.bind(b);
     // garras
     for(const s of [1,-1]){const hb=s>0?'handL':'handR',fb=s>0?'footL':'footR';for(let k=-1;k<=1;k++){A(hb,new T.ConeGeometry(.013,.04,6),th,{p:[s*(.318+k*.018),.165,.142-Math.abs(k)*.01],r:[Math.PI/2+.5,0,0],ol:false});
         A(fb,new T.ConeGeometry(.016,.045,6),th,{p:[s*.099+k*.034,.022,.125],r:[Math.PI/2-.15,0,0],ol:false})}}}
+  else if(sk===6){// CAPITÃO PIRATA: chapéu de três pontas com caveira, tapa-olho, papagaio no ombro, fivela dourada
+    const bk='#26202E',gd='#E9B43A';
+    A('head',new T.CylinderGeometry(.16,.19,.11,28),bk,{p:[0,.92,.07],s:[1,1,1.05]});
+    A('head',new T.CylinderGeometry(.3,.3,.022,3),bk,{p:[0,.868,.07],r:[0,Math.PI/6+Math.PI,0],s:[1,1,1.05]});
+    const V=[[0,.33],[.29,-.17],[-.29,-.17]];for(let i=0;i<3;i++){const a=V[i],b2=V[(i+1)%3],mx=(a[0]+b2[0])/2,mz=(a[1]+b2[1])/2,L=Math.hypot(b2[0]-a[0],b2[1]-a[1]),ang=Math.atan2(b2[0]-a[0],b2[1]-a[1]);
+      A('head',new T.CapsuleGeometry(.04,L*.82,4,10),bk,{p:[mx*1.02,.905,.07+mz*1.02],r:[Math.PI/2,ang,0]});
+      A('head',new T.CapsuleGeometry(.011,L*.8,3,8),gd,{p:[mx*1.1,.935,.07+mz*1.1],r:[Math.PI/2,ang,0],ol:false})}
+    A('head',sph(12,10),'#F4EFE6',{p:[0,.925,.235],s:[.034,.032,.016]});for(const sx of [1,-1])A('head',sph(8,6),'#1A1208',{p:[sx*.012,.93,.248],s:[.008,.009,.004],ol:false});
+    for(const sx of [1,-1])A('head',new T.CapsuleGeometry(.005,.03,2,6),'#F4EFE6',{p:[0,.895,.238],r:[0,0,sx*.9],ol:false});
+    // tapa-olho no olho direito (a alça é pintada na cabeça)
+    {const n=new T.Vector3(-.8,.36,.4).normalize().add(new T.Vector3(0,.1,.45)).normalize(),q=new T.Quaternion().setFromUnitVectors(new T.Vector3(0,1,0),n),e=new T.Euler().setFromQuaternion(q,'YXZ');
+      A('head',new T.CylinderGeometry(.058,.058,.014,22),'#16121C',{p:[-.138+n.x*.035,.785+n.y*.035,.214+n.z*.035],r:[e.x,e.y,e.z]})}
+    // papagaio no ombro esquerdo
+    const pg='#2FB34A',pr='#E23B2E',pb='#2D6BE0',py='#FFC531';
+    A('chest',sph(),pg,{p:[.2,.585,.0],s:[.05,.075,.055],r:[.2,0,0]});A('chest',sph(),pr,{p:[.2,.67,.025],s:[.042,.042,.042]});
+    A('chest',new T.ConeGeometry(.016,.04,8),py,{p:[.2,.66,.072],r:[Math.PI/2+.5,0,0]});
+    for(const sx of [1,-1]){A('chest',sph(8,6),'#FFFFFF',{p:[.2+sx*.03,.68,.048],s:[.012,.012,.008],ol:false});A('chest',sph(6,4),'#111111',{p:[.2+sx*.033,.68,.054],s:[.006,.006,.004],ol:false});
+      A('chest',sph(),pb,{p:[.2+sx*.045,.58,-.005],s:[.016,.055,.04],r:[.25,0,sx*.15]})}
+    A('chest',new T.ConeGeometry(.03,.14,4),pb,{p:[.2,.49,-.05],r:[Math.PI-.35,0,0],s:[1,1,.4]});A('chest',new T.ConeGeometry(.022,.12,4),pr,{p:[.2,.5,-.03],r:[Math.PI-.2,0,0],s:[1,1,.4],ol:false});
+    for(const sx of [1,-1])A('chest',new T.ConeGeometry(.01,.03,6),'#3A3A3A',{p:[.2+sx*.02,.515,.02],r:[Math.PI,0,0],ol:false});
+    A('hips',rbox(.08,.055,.016,.008),gd,{p:[0,.21,.262]});A('hips',rbox(.045,.028,.018,.005),'#2A1A12',{p:[0,.21,.266],ol:false});
+    for(const sx of [1,-1])A('hips',new T.ConeGeometry(.03,.11,4),'#C8282E',{p:[sx*.06+.15,.15,.21],r:[0,0,sx*.2],s:[1,1,.3],ol:false})}
+  else if(sk===7){// ASTRONAUTA: capacete de vidro, gola, mochila de oxigênio com tanques, antena e mangueiras
+    const wh='#F1F3F7',gy='#AEB6C3',dk='#3A4150';
+    A('head',sph(36,24),'#CFE8FF',{p:[0,.7,.11],s:[.345,.34,.345],gl:true});
+    A('head',sph(10,8),'#FFFFFF',{p:[-.17,.93,.27],s:[.06,.028,.012],r:[.6,-.5,.4],ol:false});
+    A('chest',new T.TorusGeometry(.245,.045,12,40),gy,{p:[0,.5,.06],r:[Math.PI/2+.18,0,0],s:[1.05,1,.9]});
+    A('chest',new T.TorusGeometry(.245,.014,8,40),'#E9B43A',{p:[0,.53,.06],r:[Math.PI/2+.18,0,0],s:[1.05,1,.9],ol:false});
+    A('chest',rbox(.36,.38,.16,.06),wh,{p:[0,.37,-.29]});A('chest',rbox(.22,.12,.03,.02),dk,{p:[0,.42,-.37]});
+    for(let i=0;i<3;i++)A('chest',sph(8,6),['#FF4F4F','#6CF06A','#45D4FF'][i],{p:[-.06+i*.06,.42,-.385],s:[.016,.016,.01],ol:false});
+    for(const sx of [1,-1]){A('chest',new T.CapsuleGeometry(.05,.22,4,12),gy,{p:[sx*.2,.36,-.3]});
+      A('chest',new T.TorusGeometry(.1,.016,8,20,Math.PI*.9),dk,{p:[sx*.19,.5,-.17],r:[0,Math.PI/2,Math.PI*.55],ol:false})}
+    A('chest',new T.CylinderGeometry(.008,.008,.16,6),gy,{p:[.12,.62,-.3],ol:false});A('chest',sph(10,8),'#FF4F4F',{p:[.12,.705,-.3],s:[.022,.022,.022]});
+    A('hips',rbox(.09,.05,.02,.01),gy,{p:[0,.205,.262]})}
   return b.build()}
 function restOf(B){const o={};for(const k in B){let v=B[k].userData.rest.clone(),p=B[k].parent;while(p&&p.isBone&&p.userData.rest){v.add(p.userData.rest);p=p.parent}o[k]=[v.x,v.y,v.z]}return o}
 const CACHE={};
@@ -155,7 +195,7 @@ function set(A,sk){sk=sk|0;if(!DEF[sk])sk=0;if(A.skId===sk||!T)return;clear(A);A
   if(!D)return;
   if(D.bones){A.skBones=D.bones;for(const k in D.bones){const b=A.B[k];if(b)b.scale.fromArray(D.bones[k])}}
   const m=mats();if(!CACHE[sk])CACHE[sk]=design(sk,A.B);A.skObjs=[];
-  for(const c of CACHE[sk]){const bone=A.B[c.bone];if(!bone)continue;const me=new T.Mesh(c.geo,c.ds?m.ds:m.acc);me.castShadow=A.body.castShadow;me.frustumCulled=false;bone.add(me);A.skObjs.push(me);
+  for(const c of CACHE[sk]){const bone=A.B[c.bone];if(!bone)continue;const me=new T.Mesh(c.geo,c.gl?m.glass:c.ds?m.ds:m.acc);me.castShadow=!c.gl&&A.body.castShadow;if(c.gl)me.renderOrder=6;me.frustumCulled=false;bone.add(me);A.skObjs.push(me);
     if(c.ogeo&&A.outline){const o=new T.Mesh(c.ogeo,m.out);o.frustumCulled=false;bone.add(o);A.skObjs.push(o)}}
   const rest=restOf(A.B);
   if(sk===1){const card=new T.Mesh(CACHE.card||(CACHE.card=new T.PlaneGeometry(.085,.1)),m.map),h=rest.hips;card.position.set(-.215-h[0],.13-h[1],.17-h[2]);card.rotation.set(-.05,-.75,.08);A.B.hips.add(card);A.skObjs.push(card)}

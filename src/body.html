@@ -112,7 +112,7 @@
     <button class="m-link" data-friends>ABRIR GRUPO<b class="frbadge hidden"></b></button>
   </div>
   <div class="m-br">
-    <button class="m-sel" id="btnSelector"><svg class="i"><use href="#i-gear"/></svg><span>PERSONALIZADO</span></button>
+    <button class="m-sel" id="btnSelector"><span>PERSONALIZADO</span></button>
     <button class="m-play" id="btnPlay"><b>JOGAR!</b><small>Partida rápida • 10 capivaras</small></button>
   </div>
   <div class="m-hint">arraste para girar a capivara • clique nela!</div>
@@ -162,13 +162,17 @@
 </section>
 
 <!-- TEMPORADA: os 30 prêmios -->
-<section id="temporada" class="screen mscreen mside hidden">
-  <div class="m-cpanel m-panel m-wide m-seapanel">
-    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-lotus"/></svg>TEMPORADA</h3></div>
-    <div class="ts-top" id="tsTop"></div>
-    <div class="ts-how" id="tsHow"></div>
-    <div class="ts-grid" id="tsGrid"></div>
-  </div>
+<section id="temporada" class="screen sea-full hidden">
+  <div class="sf-bg"></div>
+  <header class="sf-head"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button>
+    <div class="sf-title"><small id="sfSea">TEMPORADA</small><b id="sfName"></b></div><div class="sf-time" id="sfTime"></div></header>
+  <div class="sf-prog" id="sfProg"></div>
+  <div class="ts-how sf-how" id="tsHow"></div>
+  <div class="sf-labels"><span class="l" id="sfLabL"></span><button class="sf-now" id="sfNow">PRÓXIMO PRÊMIO</button><span class="r" id="sfLabR"></span></div>
+  <div class="sf-car" id="sfCar"><div class="sf-track" id="sfTrack"></div>
+    <button class="sf-arr l" id="sfL" aria-label="Anterior"><svg class="i"><use href="#i-back"/></svg></button><button class="sf-arr r" id="sfR" aria-label="Próximo"><svg class="i"><use href="#i-back"/></svg></button></div>
+  <div class="sf-line" id="sfLine"></div>
+  <p class="sf-hint">Arraste para os lados para ver todos os prêmios</p>
 </section>
 
 <!-- FIM DE PARTIDA: suspense, pódio e a barra da temporada -->
@@ -222,7 +226,7 @@
 <!-- MONTAR PARTIDA (bots) — painel dentro do menu -->
 <section id="setup" class="screen mscreen mside hidden">
   <div class="m-cpanel m-panel m-wide">
-    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-gear"/></svg>PERSONALIZADO</h3><button class="m-friends" id="btnFriendsPlay"><svg class="i"><use href="#i-users"/></svg>JOGAR COM AMIGOS</button></div>
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3>PERSONALIZADO</h3><button class="m-friends" id="btnFriendsPlay"><svg class="i"><use href="#i-users"/></svg>JOGAR COM AMIGOS</button></div>
     <div class="m-setup"><div class="setupwrap" id="setupPanel"></div></div>
     <div class="m-cact"><span class="m-sub" id="setupSub">Mata-mata • Praça Capy</span><button class="m-play sm" id="btnStartBots"><b>JOGAR!</b></button></div>
   </div>
@@ -231,8 +235,8 @@
 <!-- JOGAR ONLINE — painel dentro do menu -->
 <section id="online" class="screen mscreen mside hidden">
   <div class="m-cpanel m-panel m-wide m-onl">
-    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-globe"/></svg>JOGAR ONLINE</h3></div>
-    <div class="m-namebar"><b>SEU NOME</b><input class="field" id="nick" maxlength="15" placeholder="Seu apelido" autocomplete="off"><button class="m-sq" id="btnDiceName" aria-label="Nome aleatório"><svg class="i"><use href="#i-dice"/></svg></button></div>
+    <div class="m-phead"><button class="m-back" data-back aria-label="Voltar"><svg class="i"><use href="#i-back"/></svg></button><h3><svg class="i"><use href="#i-users"/></svg>JOGAR COM AMIGOS</h3></div>
+    <div class="m-namebar hidden"><b>SEU NOME</b><input class="field" id="nick" maxlength="15" placeholder="Seu apelido" autocomplete="off"><button class="m-sq" id="btnDiceName" aria-label="Nome aleatório"><svg class="i"><use href="#i-dice"/></svg></button></div>
     <div class="m-onlgrid" id="onlGrid">
       <div class="m-ocard m-quick"><h4><svg class="i"><use href="#i-bolt"/></svg>PARTIDA RÁPIDA</h4><p>Entra na primeira sala aberta.</p><button class="m-play sm" id="btnQuick"><b>JOGAR!</b></button></div>
       <div class="m-ocard"><h4><svg class="i"><use href="#i-door"/></svg>SALA PERSONALIZADA</h4><p id="hostHint">pública ou privada, com ou sem senha</p><button class="m-btn2" id="btnHost"><svg class="i"><use href="#i-plus"/></svg>CRIAR SALA</button></div>

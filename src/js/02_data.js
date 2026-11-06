@@ -38,10 +38,6 @@ const MODES=[
   {id:'ffa',n:'Mata-mata',ic:'skull',d:'Todos contra todos. Quem eliminar mais vence.',score:'kills',unit:'eliminações'},
   {id:'onehit',n:'Um Tapa',ic:'slap',d:'Qualquer dano mata na hora. Sem kits médicos.',score:'kills',unit:'eliminações',onehit:1},
   {id:'hold',n:'Pega-Bandeira',ic:'flag',d:'Uma bandeira no mapa. Quem segurar por mais tempo vence (60 s ganha na hora).',score:'hold',unit:'segundos',target:60},
-  {id:'ctf',n:'Rouba-Bandeira',ic:'flags',d:'Dois times. Roube a bandeira inimiga e leve até a sua base. 3 capturas vencem.',teams:1,score:'caps',unit:'capturas',target:3},
-  {id:'koth',n:'Rei da Lagoa',ic:'pond',d:'Fique sozinho dentro da lagoa para pontuar. Ela muda de lugar!',score:'zone',unit:'pontos',target:60},
-  {id:'gun',n:'Arsenal',ic:'cycle',d:'Cada eliminação troca sua arma. Quem passar pelas 12 armas primeiro vence.',score:'gun',unit:'armas',target:12},
-  {id:'race',n:'Corrida 67',ic:'orange',d:'Primeiro a juntar 67 laranjinhas vence. Sem subir de nível.',score:'gems',unit:'laranjinhas',target:67},
 ];
 const modeById=id=>MODES.find(m=>m.id===id)||MODES[0];
 
@@ -109,10 +105,10 @@ const GUNS=[
  {n:'RPG Teleguiado',cat:'heavy',tier:'apelona',cd:1800,sp:420,r:10,dmg:70,boom:120,homing:3.2,life:2.6,p:'rpg',col:'#FF7A1A',m:'rpg',c1:'#4A5A3A',c2:'#FF7A1A',sfx:'heavy',d:'Míssil que persegue o inimigo mais perto.',q:'mandou um míssil com seu nome.'},
  {n:'Canhão de Abóbora',cat:'heavy',tier:'mediana',cd:1000,sp:420,r:13,dmg:38,boom:90,bounce:2,fuse:1.6,p:'pumpkin',col:'#FF8A1F',m:'cannon',c1:'#5B3A8A',c2:'#FF8A1F',sfx:'heavy',d:'Abóbora que quica duas vezes antes de explodir.',q:'explodiu uma abóbora de Halloween em você.'},
  // ENERGIA
- {n:'Laser de Gato',cat:'laser',tier:'boa',cd:900,sp:1250,r:6,dmg:34,p:'beam',col:'#FF3B47',m:'laser',c1:'#FF4F9A',c2:'#FF3B47',x:'catears',sfx:'laser',d:'Feixe quase instantâneo. Miau.',q:'apontou o laser. Você correu atrás.'},
+ {n:'Laser de Gato',cat:'laser',tier:'boa',cd:900,sp:1250,r:6,dmg:34,beam:1250,p:'beam',col:'#FF3B47',m:'laser',c1:'#FF4F9A',c2:'#FF3B47',x:'catears',sfx:'laser',d:'Raio de luz instantâneo e bem longo. Miau.',q:'apontou o laser. Você correu atrás.'},
  {n:'Canhão de Gelatina',cat:'laser',tier:'boa',cd:1150,sp:330,r:20,dmg:46,p:'jelly',col:'#B777FF',m:'laser',c1:'#8E5BFF',c2:'#B777FF',x:'jar',sfx:'heavy',d:'Bola de plasma que treme.',q:'te enterrou em gelatina de uva.'},
  {n:'Raio Disco',cat:'laser',tier:'boa',cd:800,sp:1000,r:6,dmg:22,bounce:2,life:1.4,p:'beam',rainbow:1,col:'#45D4FF',m:'laser',c1:'#2A2440',c2:'#45D4FF',x:'disco',sfx:'laser',d:'Ricocheteia duas vezes nas paredes.',q:'te fez dançar até cair.'},
- {n:'Raio Congelante',cat:'laser',tier:'boa',cd:950,sp:1100,r:6,dmg:14,freeze:1300,p:'beam',col:'#A8EBFF',m:'laser',c1:'#7FD8FF',c2:'#FFFFFF',x:'crystal',sfx:'freeze',d:'Feixe gelado: congela por 1,3 s.',q:'te deixou no freezer.'},
+ {n:'Raio Congelante',cat:'laser',tier:'boa',cd:950,sp:1100,r:6,dmg:14,freeze:1300,beam:1000,p:'beam',col:'#A8EBFF',m:'laser',c1:'#7FD8FF',c2:'#FFFFFF',x:'crystal',sfx:'freeze',d:'Feixe gelado: congela por 1,3 s.',q:'te deixou no freezer.'},
  {n:'Tesla de Capivara',cat:'laser',tier:'apelona',cd:850,sp:900,r:7,dmg:30,chain:2,p:'bolt',col:'#FFF066',m:'tesla',c1:'#5B6B80',c2:'#FFF066',sfx:'zap',d:'O raio pula para mais 2 inimigos próximos.',q:'te eletrocutou em cadeia.'},
  // CORPO A CORPO
  {n:'Katana de Baguete',cat:'melee',tier:'boa',cd:420,range:72,dmg:32,arc:.28,col:'#F2C27A',m:'baguette',sfx:'melee',d:'Corte rápido. Crocante.',q:'te fatiou com pão francês.'},

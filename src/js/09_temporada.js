@@ -26,7 +26,7 @@ function disguiseBots(){const pool=[...Array(BOT_NICKS.length).keys()].sort(()=>
 let QUICK=null,qT=0,qClock=0;
 function quickEnd(){if(QUICK){Object.assign(cfg,QUICK.prev);QUICK=null}}
 function quickPlay(){if(mlBusy||qT)return;Sound.play('boing');if(!QUICK)QUICK={prev:JSON.parse(JSON.stringify(cfg))};
-  Object.assign(cfg,{mode:pick(MODES).id,map:pick(MAPS).id,bots:MAX_PLAYERS-1,diff:'normal',time:180});
+  Object.assign(cfg,{mode:Math.random()<.55?'ffa':pick(MODES.filter(m=>m.id!=='ffa')).id,map:pick(MAPS).id,bots:MAX_PLAYERS-1,diff:'normal',time:180});
   showLoad('quick');const el=$('mload');el.classList.add('searching');el.classList.remove('found');
   $('mlKind').textContent='PARTIDA RÁPIDA';$('mlTitle').textContent='PROCURANDO PARTIDA';const t0=performance.now();
   let cb=$('mlCancel');if(!cb){cb=document.createElement('button');cb.id='mlCancel';cb.className='ml-cancel';cb.textContent='CANCELAR';el.querySelector('.ml-top').appendChild(cb)}
@@ -41,9 +41,11 @@ const SEA_START=Date.parse('2026-11-05T00:00:00-03:00'),SEA_LEN=30*864e5;
 const seaId=()=>Math.max(1,Math.floor((Date.now()-SEA_START)/SEA_LEN)+1),seaEnd=()=>SEA_START+seaId()*SEA_LEN;
 const SEA_NAMES=['Capivaras do Caos','Verão na Lagoa','Noite Neon','Festa das Laranjas'];
 const seaName=()=>SEA_NAMES[(seaId()-1)%SEA_NAMES.length];
-const SEA_REW=[{t:'or',n:150},{t:'item',id:'rc:0'},{t:'tr',n:5},{t:'item',id:'roupas:0'},{t:'or',n:250},{t:'item',id:'tt:0'},{t:'item',id:'estilos:2'},{t:'item',id:'rw:0'},{t:'tr',n:10},{t:'item',id:'quadros:3'},
-  {t:'or',n:300},{t:'item',id:'rc:5'},{t:'item',id:'pelos:1'},{t:'xp',n:300},{t:'item',id:'roupas:1'},{t:'tr',n:15},{t:'item',id:'rw:3'},{t:'item',id:'estilos:4'},{t:'or',n:500},{t:'item',id:'pelos:5'},
-  {t:'item',id:'rc:10'},{t:'item',id:'tt:8'},{t:'item',id:'fundos:2'},{t:'tr',n:20},{t:'item',id:'roupas:4'},{t:'or',n:800},{t:'item',id:'estilos:1'},{t:'tr',n:30},{t:'item',id:'quadros:0'},{t:'item',id:'estilos:3'}];
+// prêmios: cores de pelo "sf" e as skins Capitão Pirata (nível 10) e Astronauta (nível 30) só existem aqui, na temporada
+const SEA_REW=[{t:'or',n:150},{t:'item',id:'rc:0'},{t:'tr',n:5},{t:'item',id:'roupas:0'},{t:'item',id:'sf:0'},{t:'item',id:'tt:0'},{t:'item',id:'estilos:2'},{t:'item',id:'rw:0'},{t:'or',n:250},{t:'item',id:'skins:5'},
+  {t:'item',id:'quadros:3'},{t:'item',id:'rc:5'},{t:'item',id:'pelos:1'},{t:'xp',n:300},{t:'item',id:'sf:1'},{t:'tr',n:15},{t:'item',id:'rw:3'},{t:'item',id:'estilos:4'},{t:'or',n:500},{t:'item',id:'sf:2'},
+  {t:'item',id:'rc:10'},{t:'item',id:'tt:8'},{t:'item',id:'fundos:2'},{t:'tr',n:20},{t:'item',id:'sf:3'},{t:'or',n:800},{t:'item',id:'estilos:1'},{t:'item',id:'sf:4'},{t:'item',id:'quadros:0'},{t:'item',id:'skins:6'}];
+const seaExcl=rw=>rw.t==='item'&&(rw.id.startsWith('sf:')||(rw.id.startsWith('skins:')&&+rw.id.split(':')[1]>=5));
 const SEA_BIG=[10,20,30];
 const seaNeed=l=>100+8*(l-1); // XP para completar o nível l
 function seaState(){let s=store.get('season',null);if(!s||s.id!==seaId())s={id:seaId(),xp:0};return s}
@@ -55,25 +57,58 @@ function seaAdd(xp){const s=seaState(),a=seaInfo(s.xp);s.xp+=xp;const b=seaInfo(
 function rwThumb(rw){const sw=bg=>`<i class="rw-sw" style="background:${bg}"></i>`;
   if(rw.t==='or')return`<span class="rw-ic or">${I('orange')}</span>`;if(rw.t==='tr')return`<span class="rw-ic tr">${I('trophy')}</span>`;if(rw.t==='xp')return`<span class="rw-ic xp">${I('star')}</span>`;
   const [k,i]=rw.id.split(':'),n=+i,cat=SHOP.find(s=>s[0]===k);
-  if(k==='rc')return sw(RFURS[n][0]);if(k==='rw'){const c=RWATERS[n][1];return sw(`radial-gradient(ellipse at 50% 60%,${c[0]},${c[1]} 70%,${c[3]})`)}
+  if(k==='rc')return sw(RFURS[n][0]);if(k==='sf')return`<i class="rw-sw ex" style="background:${SEA_FURS[n][0]}"></i>`;if(k==='skins')return`<canvas class="rw-cv" width="160" height="180" data-skin="${n}"></canvas>`;if(k==='rw'){const c=RWATERS[n][1];return sw(`radial-gradient(ellipse at 50% 60%,${c[0]},${c[1]} 70%,${c[3]})`)}
   if(k==='tt')return`<span class="rw-ic tt">${I('crown')}</span>`;
   if(k==='quadros')return`<i class="rw-sw art" style="background-image:url(loading/${cat[3][n][1]}_p.jpg?v=${ASSETV})"></i>`;
   if(k==='fundos'){const c=SHOPWATERS[n];return sw(`radial-gradient(ellipse at 50% 60%,${c[0]},${c[1]} 70%,${c[3]})`)}
   if(k==='cores')return sw(cat[3][n][1]);if(k==='roupas')return`<span class="rw-ic" style="color:${cat[3][n][1]}">${I('shirt')}</span>`;
   if(k==='pelos')return sw(cat[3][n][1]);if(k==='estilos')return`<i class="rw-sw glow" style="background:${cat[3][n][1]}"></i>`;return`<span class="rw-ic">${I('gift')}</span>`}
+// desenha as miniaturas 3D (skins) que ficaram como <canvas data-skin>
+function rwFill(root){(root||document).querySelectorAll('canvas[data-skin]').forEach(cv=>drawPortrait(cv,{body:myLook.body,hat:myLook.hat},{bg:false,full:true,styObj:styOf(Object.assign({},equip(),{skin:+cv.dataset.skin}))}))}
+function rwKind(rw){if(rw.t==='or')return'Laranjas';if(rw.t==='tr')return'Troféus';if(rw.t==='xp')return'XP bônus';const k=rw.id.split(':')[0];
+  return{skins:'Skin 3D',sf:'Cor de pelo',rc:'Cor de pelo',cores:'Cor de pelo',roupas:'Roupa',pelos:'Pelagem',estilos:'Efeito',quadros:'Quadro',fundos:'Fundo',rw:'Lagoa',tt:'Título'}[k]||'Item'}
 function rwTitle(rw){return rw.t==='item'?itemName(rw.id):rewardText(rw)}
 // cartão da temporada na tela inicial
 function seaCardRender(){const s=seaState(),f=seaInfo(s.xp);$('seaHead').textContent=`TEMPORADA ${s.id} • termina em ${seaLeft()}`;$('seaLv').textContent=f.lv;
   $('seaFill').style.width=(f.max?100:f.cur/f.need*100)+'%';$('seaName').textContent=f.max?'Temporada completa!':`${f.cur}/${f.need} XP • ${rwTitle(SEA_REW[f.lv])}`}
-// tela da temporada: todos os prêmios (desbloqueados, o próximo e os futuros)
-function seaRender(){const s=seaState(),f=seaInfo(s.xp);
-  $('tsTop').innerHTML=`<div class="ts-hex"><small>NÍVEL</small><b>${f.lv}</b></div><div class="ts-info"><small>TEMPORADA ${s.id} • ${escapeHtml(seaName())}</small>
-      <div class="m-bar ts-bar"><i style="width:${f.max?100:f.cur/f.need*100}%"></i><span>${f.max?'Completa!':`${f.cur} / ${f.need} XP`}</span></div>
-      <p>Termina em <b>${seaLeft()}</b> • ${f.lv}/30 prêmios desbloqueados</p></div>`;
+// tela da temporada (tela cheia): progresso em cima e os 30 prêmios num carrossel — o próximo no centro,
+// arrastando para um lado aparecem os já desbloqueados, para o outro os futuros
+const SF={i:0,dx:0,drag:null,cw:200,built:'',moved:false};
+function seaRender(){const s=seaState(),f=seaInfo(s.xp),pct=f.max?100:f.cur/f.need*100;
+  $('sfSea').textContent=`TEMPORADA ${s.id}`;$('sfName').textContent=seaName();$('sfTime').innerHTML=`${I('timer')}<span>Termina em <b>${seaLeft()}</b></span>`;
+  $('sfProg').innerHTML=`<div class="ts-hex"><small>NÍVEL</small><b>${f.lv}</b></div><div class="sf-pinfo"><div class="sf-prow"><b>${f.max?'Temporada completa!':`Próximo prêmio: ${escapeHtml(rwTitle(SEA_REW[f.lv]))}`}</b><span>${f.lv}/30</span></div>
+    <div class="m-bar sf-bar"><i style="width:${pct}%"></i><span>${f.max?'100%':`${f.cur} / ${f.need} XP`}</span></div></div>`;
   $('tsHow').innerHTML=[['flag','Terminar partida','+25'],['crown','Vitória','+35'],['skull','Cada eliminação','+5 (até 15)'],['bolt','Double / Triple kill','+6 / +12'],['heart','Morrer pouco','até +20']].map(([ic,t,v])=>`<span>${I(ic)}${t}<b>${v}</b></span>`).join('');
-  $('tsGrid').innerHTML=SEA_REW.map((rw,i)=>{const l=i+1,st=f.lv>=l?'got':l===f.lv+1?'next':'lock';
-    return`<div class="ts-rw ${st}${SEA_BIG.includes(l)?' big':''}"><em>${l}</em><div class="ts-th">${rwThumb(rw)}</div><b>${escapeHtml(rwTitle(rw))}</b><span>${st==='got'?I('check')+'Desbloqueado':st==='next'?`Faltam ${f.need-f.cur} XP`:I('lock')+'Nível '+l}</span></div>`}).join('');
-  const nx=$('tsGrid').querySelector('.next');if(nx)nx.scrollIntoView({block:'nearest'})}
+  const key=s.id+'|'+f.lv+'|'+f.cur;
+  $('sfTrack').innerHTML=SEA_REW.map((rw,i)=>{const l=i+1,st=f.lv>=l?'got':l===f.lv+1?'next':'lock',ex=seaExcl(rw);
+    return`<div class="sf-card ${st}${SEA_BIG.includes(l)?' big':''}${ex?' ex':''}" data-i="${i}">${ex?`<i class="sf-ex">${I('sparkle')}EXCLUSIVO DA TEMPORADA</i>`:''}
+      <em>NÍVEL ${l}</em><div class="sf-th">${rwThumb(rw)}</div><small>${rwKind(rw)}</small><b>${escapeHtml(rwTitle(rw))}</b>
+      <span class="sf-st">${st==='got'?I('check')+'DESBLOQUEADO':st==='next'?`FALTAM ${f.need-f.cur} XP`:I('lock')+'BLOQUEADO'}</span></div>`}).join('');
+  $('sfLine').innerHTML=SEA_REW.map((rw,i)=>{const l=i+1,st=f.lv>=l?'got':l===f.lv+1?'next':'lock';return`<button class="sf-dot ${st}${SEA_BIG.includes(l)?' big':''}${seaExcl(rw)?' ex':''}" data-j="${i}" aria-label="Nível ${l}"></button>`}).join('');
+  rwFill($('sfTrack'));
+  const nGot=f.lv;$('sfLabL').innerHTML=`${I('back')}DESBLOQUEADOS <b>${nGot}</b>`;$('sfLabR').innerHTML=`FUTUROS <b>${30-nGot}</b>${I('back')}`;
+  if(SF.built!==key){SF.built=key;SF.i=Math.min(29,f.lv)}SF.dx=0;requestAnimationFrame(()=>sfApply(false))}
+function sfMeasure(){const c=$('sfTrack').firstElementChild;if(c)SF.cw=c.offsetWidth+parseFloat(getComputedStyle($('sfTrack')).columnGap||18)}
+function sfApply(anim){const tr=$('sfTrack'),car=$('sfCar');if(!tr||!car||!tr.children.length)return;sfMeasure();const W=car.clientWidth,cw=SF.cw,cardW=tr.firstElementChild.offsetWidth,c=SF.i-SF.dx/cw;
+  tr.style.transition=anim?'transform .5s cubic-bezier(.2,.9,.25,1.08)':'none';tr.style.transform=`translateX(${W/2-cardW/2-SF.i*cw+SF.dx}px)`;
+  [...tr.children].forEach((el,k)=>{const d=k-c,ad=Math.abs(d);el.style.transition=anim?'transform .5s cubic-bezier(.2,.9,.25,1.08),opacity .4s':'none';
+    el.style.transform=`perspective(900px) rotateY(${Math.max(-38,Math.min(38,-d*16))}deg) scale(${Math.max(.72,1-ad*.11)})`;el.style.opacity=String(Math.max(.25,1-ad*.17));el.style.zIndex=String(100-Math.round(ad*10));el.classList.toggle('focus',ad<.5)});
+  $('sfLine').querySelectorAll('.sf-dot').forEach((d,k)=>d.classList.toggle('cur',k===Math.round(c)));
+  $('sfL').classList.toggle('off',SF.i<=0);$('sfR').classList.toggle('off',SF.i>=29)}
+function sfGo(i){const n=Math.max(0,Math.min(29,Math.round(i)));if(n!==SF.i)Sound.play('tick');SF.i=n;SF.dx=0;sfApply(true)}
+(()=>{const car=$('sfCar');let v=0,lx=0,lt=0;
+  car.addEventListener('pointerdown',e=>{if(e.button)return;SF.drag={x:e.clientX,id:e.pointerId};SF.moved=false;lx=e.clientX;lt=performance.now();v=0;car.classList.add('drag')});
+  addEventListener('pointermove',e=>{if(!SF.drag||e.pointerId!==SF.drag.id)return;SF.dx=e.clientX-SF.drag.x;if(Math.abs(SF.dx)>6)SF.moved=true;const t=performance.now();v=(e.clientX-lx)/Math.max(1,t-lt);lx=e.clientX;lt=t;
+    const lim=SF.cw*.6;if(SF.i-SF.dx/SF.cw<-.6)SF.dx=SF.i*SF.cw+lim*Math.tanh((SF.dx-SF.i*SF.cw)/lim);if(SF.i-SF.dx/SF.cw>29.6)SF.dx=-(29-SF.i)*SF.cw-lim*Math.tanh((-(29-SF.i)*SF.cw-SF.dx)/lim);sfApply(false)});
+  const up=e=>{if(!SF.drag||(e&&e.pointerId!==SF.drag.id))return;SF.drag=null;car.classList.remove('drag');const c=SF.i-SF.dx/SF.cw-v*2.2;sfGo(c)};
+  addEventListener('pointerup',up);addEventListener('pointercancel',up);
+  car.addEventListener('click',e=>{if(SF.moved){e.preventDefault();e.stopPropagation();return}const c=e.target.closest('.sf-card');if(c)sfGo(+c.dataset.i)},true);
+  let wt=0;car.addEventListener('wheel',e=>{const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;e.preventDefault();const t=performance.now();if(t-wt<140)return;wt=t;sfGo(SF.i+(d>0?1:-1))},{passive:false});
+  $('sfL').onclick=()=>sfGo(SF.i-1);$('sfR').onclick=()=>sfGo(SF.i+1);
+  $('sfLine').addEventListener('click',e=>{const d=e.target.closest('.sf-dot');if(d)sfGo(+d.dataset.j)});
+  $('sfNow').onclick=()=>{const f=seaInfo(seaState().xp);sfGo(Math.min(29,f.lv))};
+  addEventListener('keydown',e=>{if(view!=='temporada')return;if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A'){sfGo(SF.i-1);e.preventDefault()}else if(e.key==='ArrowRight'||e.key==='d'||e.key==='D'){sfGo(SF.i+1);e.preventDefault()}});
+  addEventListener('resize',()=>{if(view==='temporada')sfApply(false)})})();
 
 // ---------- XP da partida: terminar, colocação, eliminações, morrer pouco, multi-kills ----------
 const SM={d:0,t:0,m:0};function seaReset(){SM.d=SM.t=SM.m=0}
@@ -125,7 +160,7 @@ function esSeason(){const o=ES,st=$('esStage'),r=o.res,s=seaState();
   if(solo){$('esMenu').onclick=()=>{esClose();Sound.play('click');goHome()};$('esAgain').onclick=()=>{esClose();if(QUICK){goHome();setTimeout(quickPlay,60)}else{goHome();setTimeout(playNow,60)}}}
   else $('esCont').onclick=()=>{Sound.play('click');esClose()}}
 function esUnlock(up){const el=$('esUnlock');if(!el)return;el.classList.remove('hidden');Sound.play('level');celebrate(60);
-  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`);const mid=$('esMid');if(mid)setTimeout(()=>{mid.scrollTop=mid.scrollHeight},30)}
+  el.insertAdjacentHTML('beforeend',`<div class="es-uc"><small>NÍVEL ${up.lv} • DESBLOQUEADO!</small><div class="ts-th">${rwThumb(up.rw)}</div><b>${escapeHtml(rwTitle(up.rw))}</b></div>`);rwFill(el);const mid=$('esMid');if(mid)setTimeout(()=>{mid.scrollTop=mid.scrollHeight},30)}
 function esClose(){clearTimeout(ES&&ES.tm);clearTimeout(ES&&ES.rt);$('endSeq').classList.add('hidden');document.body.classList.remove('endseq');ES=null}
 
 $('seaCard').onclick=()=>{Sound.play('click');go('temporada')};

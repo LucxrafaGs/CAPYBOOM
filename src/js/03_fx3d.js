@@ -151,6 +151,8 @@ function boom(x,y,r,gold){const lo=S.particles==='low',big=r>150;
   burst(x,y,14,8,gold?['#FFC531','#FFE066','#FFFFFF']:['#FFC531','#FF7A1A','#FF4F9A'],'star',300,6.5,.8)}
 // raio em zigue-zague entre pontos (Tesla)
 const bolts=[];function bolt(pts,col='#FFF066',life=.3){bolts.push({pts,col:new T.Color(col),life,max:life})}
+// feixe de luz (armas de raio): núcleo branco + brilho colorido grosso, some em ~.4 s
+const beams=[];function beam(x1,y1,x2,y2,col='#FF3B47',w=1,life=.42){if(!ok)return;beams.push({x1,y1,x2,y2,col:new T.Color(col),life,max:life,w})}
 // converte as partículas antigas (2D) para 3D: mesmas chamadas, agora no chão de verdade
 function from2D(o){if(!init())return;const t=o.type,h=o.h;
   switch(t){
@@ -165,7 +167,7 @@ function from2D(o){if(!init())return;const t=o.type,h=o.h;
     case 'boom':return boom(o.x,o.y,o.size/.9,o.col==='#FFC531');
     case 'spiral':return part({k:'ring',x:o.x,y:o.y,h:4,vh:70,drag:0,size:o.size*.8,life:o.life,col:o.col,spiral:1});
     case 'bolt':return bolt(o.pts,o.col,o.life)}}
-function clear(){parts.length=0;bolts.length=0}
+function clear(){parts.length=0;bolts.length=0;beams.length=0}
 
 // ---------- quadro ----------
 function tickParts(dt){for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.life-=dt;if(p.life<=0){parts.splice(i,1);continue}
@@ -188,7 +190,13 @@ function drawParts(){for(const p of parts){const k=p.life/p.max,a=1-k;let s=p.si
   else put(p.k,p.x,p.h,p.y,p.ry,p.rx,p.rz,s,s,s,col)}
   for(let i=bolts.length-1;i>=0;i--){const b=bolts[i];b.life-=1/60;if(b.life<=0){bolts.splice(i,1);continue}const k=b.life/b.max;const c=_c.copy(b.col).multiplyScalar(k);let px=null;
     for(let j=1;j<b.pts.length;j++){const [ax,ay]=b.pts[j-1],[bx,by]=b.pts[j];for(let q=0;q<=5;q++){const f=q/5,x=ax+(bx-ax)*f+(q&&q<5?rnd(-16,16):0),y=ay+(by-ay)*f+(q&&q<5?rnd(-16,16):0),h=FLY+(q&&q<5?rnd(-10,10):0);
-      if(px){const dx=x-px[0],dy=y-px[1],dh=h-px[2],L=Math.hypot(dx,dy,dh);put('seg',px[0],px[2],px[1],-Math.atan2(dy,dx),0,Math.atan2(dh,Math.hypot(dx,dy)),L,1.6+2*k,1.6+2*k,c)}px=[x,y,h]}}}}
+      if(px){const dx=x-px[0],dy=y-px[1],dh=h-px[2],L=Math.hypot(dx,dy,dh);put('seg',px[0],px[2],px[1],-Math.atan2(dy,dx),0,Math.atan2(dh,Math.hypot(dx,dy)),L,1.6+2*k,1.6+2*k,c)}px=[x,y,h]}}}
+  for(let i=beams.length-1;i>=0;i--){const b=beams[i];b.life-=1/60;if(b.life<=0){beams.splice(i,1);continue}const k=b.life/b.max,e=Math.pow(k,.6),dx=b.x2-b.x1,dy=b.y2-b.y1,L=Math.hypot(dx,dy),ry=-Math.atan2(dy,dx),wb=b.w*(1+.25*Math.sin(b.life*90));
+    put('seg',b.x1,FLY,b.y1,ry,0,0,L,13*wb*e,13*wb*e,_c.copy(b.col).multiplyScalar(.55*e));
+    put('seg',b.x1,FLY,b.y1,ry,0,0,L,6*wb*e,6*wb*e,_c.copy(b.col).multiplyScalar(1.1*e));
+    put('seg',b.x1,FLY,b.y1,ry,0,0,L,2.4*wb*(.4+e*.6),2.4*wb*(.4+e*.6),_c2.setRGB(e,e,e));
+    put('glow',b.x2,FLY,b.y2,0,0,0,18*wb*e,18*wb*e,18*wb*e,_c.copy(b.col).multiplyScalar(e));put('glow',b.x1,FLY,b.y1,0,0,0,11*wb*e,11*wb*e,11*wb*e,_c2.setRGB(e,e,e));
+    const n=Math.min(14,Math.floor(L/60));for(let j=0;j<n;j++){const f=((j+.5)/n+b.life*1.7)%1,sz=(2+3*Math.random())*e*wb;put('glow',b.x1+dx*f+rnd(-6,6),FLY+rnd(-6,6),b.y1+dy*f+rnd(-6,6),0,0,0,sz,sz,sz,_c.copy(b.col).multiplyScalar(e))}}}
 // projéteis
 const ORIENT={bullet:1,tracer:1,beam:1,bolt:1,wave:1,rocket:1,rpg:1,bigrocket:1,carrot:1,plunger:1,ice:1,cork:1,staple:1,bee:1,seed:1,corn:1,fork:1,chicken:1,pick:1,banana:1};
 const hsl=new Map();
@@ -239,4 +247,4 @@ function frame(scene,dt,t){if(!init())return;if(grp.parent!==scene)scene.add(grp
 // para compilar os shaders antes da partida: uma cópia de cada tipo de material
 function warm(){if(!init())return null;const g=new T.Group();const keys=[...Object.keys(SIMPLE),...Object.keys(MODELS),'txt:NÃO','txt:SIM','txt:PEW','txt:6','txt:7'];
   for(const k of keys){const P0=protos.get(k)||mk(k);if(!P0)continue;for(const im of P0.im){const c=new T.InstancedMesh(im.geometry,im.material,1);if(im.instanceColor)c.instanceColor=new T.InstancedBufferAttribute(new Float32Array(3).fill(1),3);c.frustumCulled=false;g.add(c)}}return g}
-return{frame,part,burst,boom,ring,flash,smoke,fire,bolt,from2D,clear,burning,warm,FLY,get ok(){return ok}}})();
+return{frame,part,burst,boom,ring,flash,smoke,fire,bolt,beam,from2D,clear,burning,warm,FLY,get ok(){return ok}}})();
